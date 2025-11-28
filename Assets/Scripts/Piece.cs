@@ -31,6 +31,12 @@ public class Piece : Clickable2D
         currentTileIndex = tileIndex;
         transform.position = boardView.GetTilePosition(tileIndex);
     }
+
+    public void MoveToStart(Vector3 spawnPosition)
+    {
+        currentTileIndex = -1;
+        transform.position = spawnPosition;
+    }
  
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

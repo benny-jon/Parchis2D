@@ -3,6 +3,7 @@ using UnityEngine;
 public class BoardView : MonoBehaviour
 {
     public Transform[] tilePoints;
+    public Transform[] pieceSpawnPoints;
 
     public Vector3 GetTilePosition(int tileIndex)
     {
@@ -15,22 +16,49 @@ public class BoardView : MonoBehaviour
         return tilePoints[tileIndex].position;
     }
 
-    public void AutoAssignTiles()
-    {
-        tilePoints = new Transform[transform.childCount];
-
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            tilePoints[i] = transform.GetChild(i);
-        }
-
-        Debug.Log($"BoardView: Auto-assigned {tilePoints.Length} tiles.");
-    }
-
     [ContextMenu("Auto Assign Tiles From Childre")]
     public void AutoAssignTilesContextMenu()
     {
-        AutoAssignTiles();
+        AutoAssignTilesPoints();
+        AutoAssignPieceSpawnPoints();
+    }
+
+        public void AutoAssignTilesPoints()
+    {
+        var trackTilesPointsParent = transform.GetChild(0);
+        var trackTilesPointsCount = trackTilesPointsParent.childCount;
+
+        var homeTrackTilesPointsParent = transform.GetChild(1);
+        var homeTrackTilesPointsCount = homeTrackTilesPointsParent.childCount;
+
+        tilePoints = new Transform[trackTilesPointsCount + homeTrackTilesPointsCount];
+
+        for (int i = 0; i < trackTilesPointsCount; i++)
+        {
+            tilePoints[i] = trackTilesPointsParent.GetChild(i);
+        }
+
+        for (int i = 0; i < homeTrackTilesPointsCount; i++)
+        {
+            tilePoints[trackTilesPointsCount + i] = homeTrackTilesPointsParent.GetChild(i);
+        }
+
+        Debug.Log($"BoardView: Auto-assigned {tilePoints.Length} tiles points.");
+    }
+
+    public void AutoAssignPieceSpawnPoints()
+    {
+        var pieceSpawnPointsParent = transform.GetChild(2);
+        var pieceSpawnPointsCount = pieceSpawnPointsParent.childCount;
+
+        pieceSpawnPoints = new Transform[pieceSpawnPointsCount];
+
+        for (int i = 0; i < pieceSpawnPointsCount; i++)
+        {
+            pieceSpawnPoints[i] = pieceSpawnPointsParent.GetChild(i);
+        }
+
+        Debug.Log($"BoardView: Auto-assigned {pieceSpawnPoints.Length} piece spawn points");
     }
 
     private void OnDrawGizmos() {
@@ -59,6 +87,16 @@ public class BoardView : MonoBehaviour
             // );
 
             // #endif
+        }
+
+        if (pieceSpawnPoints == null) return;
+
+        for (int i = 0; i < pieceSpawnPoints.Length; i++)
+        {
+            var p = pieceSpawnPoints[i];
+            if (p == null) continue;
+
+            Gizmos.DrawWireSphere(p.position, 0.15f);
         }    
     }
 }

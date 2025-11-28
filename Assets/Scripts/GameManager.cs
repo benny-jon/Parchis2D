@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        ResetPieces();
         StartTurn();
     }
 
@@ -23,6 +24,20 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         
+    }
+
+    void ResetPieces()
+    {
+        if (allPieces.Count != boardView.pieceSpawnPoints.Length)
+        {
+            Debug.LogError("Pieces count doesnt match Spawn points count");
+            return;
+        }
+
+        for (int i = 0; i < allPieces.Count; i++)
+        {
+            allPieces[i].MoveToStart(boardView.pieceSpawnPoints[i].position);
+        }
     }
 
     void StartTurn()
@@ -45,7 +60,10 @@ public class GameManager : MonoBehaviour
 
     public void OnPieceClicked(Piece piece)
     {
-        if (!waitingForMove) return;
+        if (!waitingForMove) {
+            Debug.Log("There was not move in progress");
+            return;
+        }
 
         if (piece.ownerPlayerIndex != currentPlayerIndex) { 
             Debug.Log("Not your piece");
@@ -60,6 +78,7 @@ public class GameManager : MonoBehaviour
             Debug.Log($"Move {piece.ToString()} to {targetIndex}");
             piece.MoveToTile(targetIndex, boardView);
             // TODO handle captures, blocks, extra turns, etc;
+            waitingForMove = false;
             EndTurn();
         } else
         {
