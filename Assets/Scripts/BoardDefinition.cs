@@ -1,8 +1,64 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 [CreateAssetMenu(fileName = "BoardDefinition", menuName = "Parchisi/BoardDefinition", order = 0)]
 public class BoardDefinition : ScriptableObject {
+
+    public static readonly int MAIN_TRACK_COUNT = 68;
+    public static readonly int HOME_ROW_COUNT = 8;
+    public static readonly int PLAYERS = 4;
+
+    public static readonly int TOTAL_TILES = MAIN_TRACK_COUNT + HOME_ROW_COUNT * PLAYERS;
     
-    public List<BoardTile> tiles = new List<BoardTile>();    
+    public List<BoardTile> tiles = new List<BoardTile>();  
+
+    public int[] GetTilesIndexByType(TileType type)
+    {
+        List<int> result = new List<int>();
+
+        for (int i = 0; i < tiles.Count; i++)
+        {
+            if (tiles[i].type == type)
+            {
+                result.Add(i);
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    public int[] GetHomeEntryTilesIndex()
+    {
+        return new int[] { 67, 16, 33, 50 };
+    }
+
+    public int[] GetStartTilesIndex()
+    {
+        return new int[] { 4, 21, 38, 55 };
+    }
+
+    /// <summary>
+    /// With 4 playeres and 100 tiles, we know the exact indexes, but 
+    /// keeping it generic in case we implement other variants of Parchise (maybe over-engineered for now)
+    /// </summary>
+    /// <returns></returns>
+    public int[] GetFirstHomeRowTilesIndex()
+    {
+        List<int> result = new List<int>();
+
+        int playerIndex = 0;
+        for (int i = 0; i < tiles.Count; i++)
+        {
+            if (tiles[i].type == TileType.HomeRow && result.Count == playerIndex)
+            {
+                result.Add(i);
+            } else if (tiles[i].type == TileType.Home)
+            {
+                playerIndex++;
+            }
+        }
+
+        return result.ToArray();
+    }
 }

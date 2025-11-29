@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,22 +9,46 @@ public class GameManager : MonoBehaviour
 
     public List<Piece> allPieces;
 
-    private int currentPlayerIndex = 0;
-    private int lastDiceRoll = 0;
+    private BoardRules boardRules;
+    private GameStateMachine stateMachine;
 
-    private bool waitingForMove = false;
+    private void Awake() {
+        
+    }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         ResetPieces();
-        StartTurn();
+        
+        boardRules = new BoardRules(boardDefinition);
+        stateMachine = new GameStateMachine(allPieces, boardView, boardRules);
+
+        stateMachine.OnDiceRolled += roll =>
+        {
+            Debug.Log($"Dice rolled: {roll}");
+        };
+        stateMachine.OnTurnChanged += player =>
+        {
+            Debug.Log($"Turn changed to Player {player}");
+        };
+        stateMachine.OnMoveStarted += () =>
+        {
+            Debug.Log($"On Move Started");
+        };
+        stateMachine.OnMoveEnded += () =>
+        {
+            Debug.Log($"On Move Ended");
+        };
+
+        stateMachine.StartGame();
+
+        Debug.Log("StateMachine Initialized " + GetHashCode());
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     void ResetPieces()
@@ -40,55 +65,25 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void StartTurn()
-    {
-        RollDice();
-        waitingForMove = true;
-        Debug.Log($"Player {currentPlayerIndex} rolled {lastDiceRoll}");
-    }
-
-    void RollDice()
-    {
-        lastDiceRoll = Random.Range(1, 7);
-    }
-
-    public void EndTurn()
-    {
-        currentPlayerIndex = (currentPlayerIndex + 1) % 4;
-        StartTurn();
-    }
-
     public void OnPieceClicked(Piece piece)
     {
-        if (!waitingForMove) {
-            Debug.Log("There was not move in progress");
+        if (stateMachine == null)
+        {
+            Debug.LogError("StateMachine is NULL " + GetHashCode());
             return;
         }
 
-        if (piece.ownerPlayerIndex != currentPlayerIndex) { 
-            Debug.Log("Not your piece");
-            return; // other players pieces
-        }
-
-        int targetIndex = piece.currentTileIndex + lastDiceRoll;
-
-        // TODO handle captures, blocks, extra turns, etc;
-        if (IsMoveValid(piece, targetIndex))
-        {
-            Debug.Log($"Move {piece.ToString()} to {targetIndex}");
-            piece.MoveToTile(targetIndex, boardView);
-            // TODO handle captures, blocks, extra turns, etc;
-            waitingForMove = false;
-            EndTurn();
-        } else
-        {
-            Debug.Log($"Invalid Move {piece.ToString()} to {targetIndex}");
-        }
+        stateMachine.OnPieceClicked(piece);
     }
 
-    bool IsMoveValid(Piece piece, int targetIndex)
+    public void OnDiceRollButton()
     {
-        if (targetIndex < 0 || targetIndex >= boardDefinition.tiles.Count) return false;
-        return true;
+        if (stateMachine == null)
+        {
+            Debug.LogError("StateMachine is NULL");
+            return;
+        }
+
+        stateMachine.RollDice();
     }
 }

@@ -1,0 +1,85 @@
+using UnityEngine;
+
+public class BoardRules
+{
+    private static readonly int INVALID_TARGET = -1;
+    private static readonly int START_ROLL_REQUIREMENT = 5;
+    private BoardDefinition boardDefinition;
+
+    private int[] startTilebyPlayer;
+    private int[] homeEntryByPlayer;
+    private int[] firstHomeRowByPlayer;
+
+    public BoardRules(BoardDefinition boardDefinition)
+    {
+        this.boardDefinition = boardDefinition;
+
+        startTilebyPlayer = boardDefinition.GetStartTilesIndex();
+        homeEntryByPlayer = boardDefinition.GetHomeEntryTilesIndex();
+        firstHomeRowByPlayer = boardDefinition.GetFirstHomeRowTilesIndex();
+
+        Debug.Log($"Initialized: Start Tiles {ArrayUtils.ToString(startTilebyPlayer)}");
+        Debug.Log($"Initialized: Home Entry Tiles {ArrayUtils.ToString(homeEntryByPlayer)}");
+        Debug.Log($"Initialized: First Home Row Tiles {ArrayUtils.ToString(firstHomeRowByPlayer)}");
+    }
+
+    public int GetStartTile(int playerIndex) => startTilebyPlayer[playerIndex];
+
+    // TODO handle 2 dices and 2 possible targets
+    public int TryGetTargetTileIndex(Piece piece, int steps)
+    {
+        int player = piece.ownerPlayerIndex;
+
+        // In Base (-1)
+        if (piece.currentTileIndex < 0)
+        {
+            if (steps <= 0) return INVALID_TARGET;
+            if (steps % START_ROLL_REQUIREMENT == 0)
+            {
+                return startTilebyPlayer[player] + (steps - 5);
+            }
+            
+            return INVALID_TARGET;
+        }
+
+        int currentIndex = piece.currentTileIndex;
+        BoardTile currentTile = boardDefinition.tiles[currentIndex];
+
+        // Already Home
+        if (currentTile.type == TileType.Home)
+        {
+            return INVALID_TARGET;
+        }
+
+        // In Home Rows
+        if (currentTile.type == TileType.HomeRow)
+        {
+            int firstHomeRow = firstHomeRowByPlayer[player];
+            int offset = currentIndex - firstHomeRow;
+            int newOffset = offset + steps;
+
+            if (newOffset > BoardDefinition.HOME_ROW_COUNT - 1)
+            {
+                return INVALID_TARGET; // overshoot
+            }
+
+            return firstHomeRow + newOffset;
+        }
+
+        // On Main Tracks
+        int pos = currentIndex;
+        for (int i = 0; i < steps; i++)
+        {
+            if (pos == homeEntryByPlayer[player])
+            {
+                pos = firstHomeRowByPlayer[player];
+            } 
+            else
+            {
+                pos = (pos + 1) % BoardDefinition.MAIN_TRACK_COUNT;
+            }
+        }
+
+        return pos;
+    }
+}

@@ -43,7 +43,7 @@ public class InputController : MonoBehaviour
             {
                 if (pressedObject == target)
                 {
-                    Debug.Log($"Calling OnClick up on {pressedObject}");
+                    //Debug.Log($"Calling OnClick up on {pressedObject}");
                     // RELEASED ON THE SAME OBJECT → valid click
                     pressedObject.OnClickUp();
                 }

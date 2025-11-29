@@ -4,6 +4,7 @@ public class BoardView : MonoBehaviour
 {
     public Transform[] tilePoints;
     public Transform[] pieceSpawnPoints;
+    public BoardDefinition boardDefinition;
 
     public Vector3 GetTilePosition(int tileIndex)
     {
@@ -23,7 +24,7 @@ public class BoardView : MonoBehaviour
         AutoAssignPieceSpawnPoints();
     }
 
-        public void AutoAssignTilesPoints()
+    public void AutoAssignTilesPoints()
     {
         var trackTilesPointsParent = transform.GetChild(0);
         var trackTilesPointsCount = trackTilesPointsParent.childCount;
@@ -61,8 +62,11 @@ public class BoardView : MonoBehaviour
         Debug.Log($"BoardView: Auto-assigned {pieceSpawnPoints.Length} piece spawn points");
     }
 
-    private void OnDrawGizmos() {
+    private void OnDrawGizmos()
+    {
         if (tilePoints == null) return;
+
+        float sphereRadius = 0.15f;
 
         Gizmos.color = Color.blueViolet;
 
@@ -71,7 +75,24 @@ public class BoardView : MonoBehaviour
             var t = tilePoints[i];
             if (t == null) continue;
 
-            Gizmos.DrawWireSphere(t.position, 0.15f);
+            if (boardDefinition != null)
+            {
+                var boardTile = boardDefinition.tiles[i];
+
+                switch (boardTile.type)
+                {
+                    case TileType.Start:
+                    case TileType.HomeEntry:
+                    case TileType.Safe:
+                    case TileType.Home:
+                        Gizmos.DrawSphere(t.position, sphereRadius);
+                    break;
+                    case TileType.Normal:
+                    default:
+                        Gizmos.DrawWireSphere(t.position, sphereRadius);
+                        break;
+                }
+            }
 
             // #if UNITY_EDITOR
 
@@ -97,6 +118,6 @@ public class BoardView : MonoBehaviour
             if (p == null) continue;
 
             Gizmos.DrawWireSphere(p.position, 0.15f);
-        }    
+        }
     }
 }

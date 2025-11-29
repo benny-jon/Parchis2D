@@ -10,19 +10,8 @@ public class Piece : Clickable2D
     public int currentTileIndex = -1; // -1 = in base
     public GameManager gameManager;
 
-    // public void OnClick()
-    // {
-    //     if (isClickPressed)
-    //     {
-    //         Debug.Log($"{this.ToString()} clicked");
-    //         gameManager.OnPieceClicked(this);
-    //     }
-    //     isClickPressed = !isClickPressed;
-    // }
-
     public override void OnClickUp()
     {
-       Debug.Log($"{this.ToString()} clicked");
        gameManager.OnPieceClicked(this);
     }
 
@@ -36,18 +25,6 @@ public class Piece : Clickable2D
     {
         currentTileIndex = -1;
         transform.position = spawnPosition;
-    }
- 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public override string ToString()
