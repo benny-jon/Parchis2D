@@ -20,7 +20,7 @@ public class BoardDefinition : ScriptableObject {
 
     public int[] GetStartTilesIndex()
     {
-        return new int[] { 4, 21, 38, 55 };
+        return new int[] { 4, 4 + 17, 4 + 17 * 2, 4 + 17 * 3 };
     }
 
     /// <summary>

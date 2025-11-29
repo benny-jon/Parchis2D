@@ -35,12 +35,6 @@ public class GameStateMachine
     {
         phase = GamePhase.WaitingForRoll;
         OnTurnChanged?.Invoke(currentPlayerIndex);
-
-        // // hack for testing
-        // if (currentPlayerIndex > 0)
-        // {
-        //     NextPlayer();
-        // }
     }
 
     public void RollDice()

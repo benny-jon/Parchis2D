@@ -1,0 +1,139 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
+
+public class BoardRulesTests
+{
+    private BoardDefinition boardDefinition;
+    private BoardRules rules;
+
+    [SetUp]
+    public void SetUp()
+    {
+        boardDefinition = ScriptableObject.CreateInstance<BoardDefinition>(); 
+        BoardDefinitionGenerator.GenerateFullBoard(boardDefinition);
+
+        rules = new BoardRules(boardDefinition);
+    }
+
+    [Test]
+    public void BasePiece_CannotLeaveWithoutRollingFive()
+    {
+        for (int owner = 0; owner < 4; owner++)
+        {
+            var piece = CreateTestPiece(owner, -1);
+
+            Assert.IsTrue(rules.TryGetTargetTileIndex(piece, 1) == -1); // cannot move
+            Assert.IsTrue(rules.TryGetTargetTileIndex(piece, 2) == -1); // cannot move
+            Assert.IsTrue(rules.TryGetTargetTileIndex(piece, 3) == -1); // cannot move
+            Assert.IsTrue(rules.TryGetTargetTileIndex(piece, 4) == -1); // cannot move
+            Assert.IsTrue(rules.TryGetTargetTileIndex(piece, 6) == -1); // cannot move
+            Assert.IsTrue(rules.TryGetTargetTileIndex(piece, 5) != -1); // can start!
+        }
+    }
+
+    [Test]
+    public void FirstPlayerPiece_ShouldEntryHomeRows()
+    {
+        for (int steps = 1; steps <= 10; steps++)
+        {
+            var expectedTargetIndex = 65 + steps;
+            var piece = CreateTestPiece(0, 65);
+            var targetIndex = rules.TryGetTargetTileIndex(piece, steps);
+            Assert.AreEqual(expectedTargetIndex, targetIndex);
+        }
+    }
+
+    [Test]
+    public void SecondPlayerPiece_ShouldEntryHomeRows()
+    {
+        int[] expectedIndexes = new int[] { 14, 15, 16, 76, 77 };
+        for (int steps = 0; steps < expectedIndexes.Length; steps++)
+        {
+            var piece = CreateTestPiece(1, 14);
+            var targetIndex = rules.TryGetTargetTileIndex(piece, steps);
+            Assert.AreEqual(expectedIndexes[steps], targetIndex);
+        }
+    }
+
+    [Test]
+    public void ThirdPlayerPiece_ShouldEntryHomeRows()
+    {
+        int[] expectedIndexes = new int[] { 32, 33, 84, 85, 86 };
+        for (int steps = 0; steps < expectedIndexes.Length; steps++)
+        {
+            var piece = CreateTestPiece(2, 32);
+            var targetIndex = rules.TryGetTargetTileIndex(piece, steps);
+            Assert.AreEqual(expectedIndexes[steps], targetIndex);
+        }
+    }
+
+    [Test]
+    public void FourthPlayerPiece_ShouldEntryHomeRows()
+    {
+        int[] expectedIndexes = new int[] { 49, 50, 92, 93, 94 };
+        for (int steps = 0; steps < expectedIndexes.Length; steps++)
+        {
+            var piece = CreateTestPiece(3, 49);
+            var targetIndex = rules.TryGetTargetTileIndex(piece, steps);
+            Assert.AreEqual(expectedIndexes[steps], targetIndex);
+        }
+    }
+
+    [Test]
+    public void Test_Home_Tiles()
+    {
+        Assert.AreEqual(TileType.Home, boardDefinition.tiles[67 + 8].type);
+        Assert.AreEqual(TileType.Home, boardDefinition.tiles[67 + 8 * 2].type);
+        Assert.AreEqual(TileType.Home, boardDefinition.tiles[67 + 8 * 3].type);
+        Assert.AreEqual(TileType.Home, boardDefinition.tiles[67 + 8 * 4].type);
+    }
+
+    [Test]
+    public void FromStartToHome()
+    {
+        // Piece in the start tile
+        var piece = CreateTestPiece(0, 4);
+        // Move all the available tiles
+        var targetIndex = rules.TryGetTargetTileIndex(piece, 68 - 5 + 8);
+        var targetTile = boardDefinition.tiles[targetIndex];
+
+        Assert.AreEqual(TileType.Home, targetTile.type);
+        Assert.AreEqual(0, targetTile.ownerPlayerIndex);
+    }
+
+    // Parametized test arguments
+    static int[] ownerIndex = new int[] { 0, 1, 2, 3 };
+
+    // Parametized test example
+    [UnityTest]
+    public IEnumerator FromStartToHomeForAllPlayers([ValueSource("ownerIndex")] int owner)
+    {
+        var startTile = boardDefinition.GetStartTilesIndex()[owner];
+        // Piece in the start tile
+        var piece = CreateTestPiece(owner, startTile);
+
+        // Move all the available tiles steps
+        var targetIndex = rules.TryGetTargetTileIndex(piece, 68 - 5 + 8);
+        Assert.AreNotEqual(-1, targetIndex);
+        var targetTile = boardDefinition.tiles[targetIndex];
+
+        // Verifications
+        Assert.AreEqual(TileType.Home, targetTile.type);
+        Assert.AreEqual(owner, targetTile.ownerPlayerIndex);
+
+        yield return null;
+    }
+
+    private Piece CreateTestPiece(int ownerPlayerIndex, int currentTileIndex)
+    {
+        var go = new GameObject("TestPiece");
+        var piece = go.AddComponent<Piece>();
+        piece.ownerPlayerIndex = ownerPlayerIndex;
+        piece.currentTileIndex = currentTileIndex;
+        return piece;
+    }
+}

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 public class BoardRules
 {
@@ -74,10 +75,18 @@ public class BoardRules
             {
                 pos = firstHomeRowByPlayer[player];
             } 
-            else
+            else if (pos < BoardDefinition.MAIN_TRACK_COUNT)
             {
                 pos = (pos + 1) % BoardDefinition.MAIN_TRACK_COUNT;
+            } else
+            {
+                pos = pos + 1;
             }
+        }
+
+        if (pos > firstHomeRowByPlayer[player] + BoardDefinition.HOME_ROW_COUNT - 1)
+        {
+            return INVALID_TARGET; // overshoot
         }
 
         return pos;
