@@ -11,22 +11,7 @@ public class BoardDefinition : ScriptableObject {
 
     public static readonly int TOTAL_TILES = MAIN_TRACK_COUNT + HOME_ROW_COUNT * PLAYERS;
     
-    public List<BoardTile> tiles = new List<BoardTile>();  
-
-    public int[] GetTilesIndexByType(TileType type)
-    {
-        List<int> result = new List<int>();
-
-        for (int i = 0; i < tiles.Count; i++)
-        {
-            if (tiles[i].type == type)
-            {
-                result.Add(i);
-            }
-        }
-
-        return result.ToArray();
-    }
+    public List<BoardTile> tiles = new List<BoardTile>();
 
     public int[] GetHomeEntryTilesIndex()
     {

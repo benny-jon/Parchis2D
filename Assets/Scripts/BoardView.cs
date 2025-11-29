@@ -84,9 +84,11 @@ public class BoardView : MonoBehaviour
                     case TileType.Start:
                     case TileType.HomeEntry:
                     case TileType.Safe:
+                        Gizmos.DrawSphere(t.position, sphereRadius);
+                        break;
                     case TileType.Home:
                         Gizmos.DrawSphere(t.position, sphereRadius);
-                    break;
+                        break;
                     case TileType.Normal:
                     default:
                         Gizmos.DrawWireSphere(t.position, sphereRadius);
@@ -112,12 +114,14 @@ public class BoardView : MonoBehaviour
 
         if (pieceSpawnPoints == null) return;
 
+        Gizmos.color = Color.aquamarine;
+
         for (int i = 0; i < pieceSpawnPoints.Length; i++)
         {
             var p = pieceSpawnPoints[i];
             if (p == null) continue;
 
-            Gizmos.DrawWireSphere(p.position, 0.15f);
+            Gizmos.DrawSphere(p.position, 0.10f);
         }
     }
 }
