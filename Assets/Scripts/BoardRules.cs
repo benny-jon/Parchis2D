@@ -35,7 +35,7 @@ public class BoardRules
         if (piece.currentTileIndex < 0)
         {
             if (steps <= 0) return INVALID_TARGET;
-            if (steps % START_ROLL_REQUIREMENT == 0)
+            if (steps == START_ROLL_REQUIREMENT)
             {
                 return startTilebyPlayer[player] + (steps - 5);
             }

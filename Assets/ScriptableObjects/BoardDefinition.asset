@@ -62,8 +62,8 @@ MonoBehaviour:
     type: 0
     ownerPlayerIndex: -1
   - index: 16
-    type: 3
-    ownerPlayerIndex: 1
+    type: 0
+    ownerPlayerIndex: -1
   - index: 17
     type: 0
     ownerPlayerIndex: -1
@@ -113,8 +113,8 @@ MonoBehaviour:
     type: 0
     ownerPlayerIndex: -1
   - index: 33
-    type: 3
-    ownerPlayerIndex: 2
+    type: 0
+    ownerPlayerIndex: -1
   - index: 34
     type: 0
     ownerPlayerIndex: -1
@@ -164,8 +164,8 @@ MonoBehaviour:
     type: 0
     ownerPlayerIndex: -1
   - index: 50
-    type: 3
-    ownerPlayerIndex: 3
+    type: 0
+    ownerPlayerIndex: -1
   - index: 51
     type: 0
     ownerPlayerIndex: -1

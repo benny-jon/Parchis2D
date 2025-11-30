@@ -12,10 +12,6 @@ public class GameManager : MonoBehaviour
     private BoardRules boardRules;
     private GameStateMachine stateMachine;
 
-    private void Awake() {
-        
-    }
-
     void Start()
     {
         ResetPieces();
@@ -23,13 +19,14 @@ public class GameManager : MonoBehaviour
         boardRules = new BoardRules(boardDefinition);
         stateMachine = new GameStateMachine(allPieces, boardView, boardRules);
 
-        stateMachine.OnDiceRolled += roll =>
+        stateMachine.OnDiceRolled += (dice1, dice2) =>
         {
-            Debug.Log($"Dice rolled: {roll}");
+            Debug.Log($"Dice rolled: {dice1}, {dice2}");
         };
         stateMachine.OnTurnChanged += player =>
         {
             Debug.Log($"Turn changed to Player {player}");
+            ClearMoveHints();
         };
         stateMachine.OnMoveStarted += () =>
         {
@@ -39,16 +36,40 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log($"On Move Ended");
         };
+        stateMachine.OnAvailableMovesUpdated += () =>
+        {
+            ClearMoveHints();
+            UpdateMoveHints();
+        };
 
         stateMachine.StartGame();
 
         Debug.Log("StateMachine Initialized " + GetHashCode());
     }
 
-    // Update is called once per frame
-    void Update()
+    private void UpdateMoveHints()
     {
+        var moves = stateMachine.CurrentLegalMoves;
+        if (moves == null) return;
+        //if (moves.Count <= 1) return; // we auto-move the piece
 
+        foreach (var kvp in moves)
+        {
+            var piece = kvp.Key;
+            var options = kvp.Value;
+            if (piece != null)
+            {
+                piece.SetMoveHints(options);
+            }
+        }
+    }
+
+    private void ClearMoveHints()
+    {
+        foreach (Piece piece in allPieces)
+        {
+            if (piece != null) piece.ClearMoveHints();
+        }
     }
 
     void ResetPieces()
@@ -62,6 +83,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < allPieces.Count; i++)
         {
             allPieces[i].MoveToStart(boardView.pieceSpawnPoints[i].position);
+            allPieces[i].ClearMoveHints();
         }
     }
 
