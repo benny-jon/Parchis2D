@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -8,6 +9,7 @@ public class GameManager : MonoBehaviour
     public BoardView boardView;
 
     public List<Piece> allPieces;
+    public TMP_Text[] actionHintPerPlayer;
 
     private BoardRules boardRules;
     private GameStateMachine stateMachine;
@@ -15,13 +17,16 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         ResetPieces();
-        
+        ClearPlayersActionHints();
+
         boardRules = new BoardRules(boardDefinition);
         stateMachine = new GameStateMachine(allPieces, boardView, boardRules);
 
         stateMachine.OnDiceRolled += (dice1, dice2) =>
         {
             Debug.Log($"Dice rolled: {dice1}, {dice2}");
+            ClearPlayersActionHints();
+            SetCurrentPlayerActionHint($"{dice1},{dice2}");
         };
         stateMachine.OnTurnChanged += player =>
         {
@@ -41,10 +46,41 @@ public class GameManager : MonoBehaviour
             ClearMoveHints();
             UpdateMoveHints();
         };
+        stateMachine.OnGamePhaseChanged += (phase) =>
+        {
+            if (phase == GamePhase.WaitingForRoll)
+            {
+                ClearMoveHints();
+                SetCurrentPlayerActionHint("Roll");
+            }
+        };
 
         stateMachine.StartGame();
 
         Debug.Log("StateMachine Initialized " + GetHashCode());
+    }
+
+    private void ClearPlayersActionHints()
+    {
+        if (actionHintPerPlayer != null)
+        {
+            for (int i = 0; i < actionHintPerPlayer.Length; i++)
+            {
+                actionHintPerPlayer[i].text = "";
+            }
+        }
+    }
+
+    private void SetCurrentPlayerActionHint(String hintMessage)
+    {
+        if (actionHintPerPlayer != null && actionHintPerPlayer.Length >= stateMachine.currentPlayerIndex + 1)
+        {
+            actionHintPerPlayer[stateMachine.currentPlayerIndex].text = hintMessage;
+        }
+        else
+        {
+            Debug.LogError("Forgot to assigned values to the actionHintPerPlayer list");
+        }
     }
 
     private void UpdateMoveHints()

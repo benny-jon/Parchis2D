@@ -13,7 +13,7 @@ public class BoardRulesTests
     [SetUp]
     public void SetUp()
     {
-        boardDefinition = ScriptableObject.CreateInstance<BoardDefinition>(); 
+        boardDefinition = ScriptableObject.CreateInstance<BoardDefinition>();
         BoardDefinitionGenerator.GenerateFullBoard(boardDefinition);
 
         rules = new BoardRules(boardDefinition);
@@ -84,12 +84,66 @@ public class BoardRulesTests
     }
 
     [Test]
+    public void FirstPlayerPiece_ShouldContinueInHomeRowsUntilHome()
+    {
+        for (int steps = 1; steps <= 7; steps++)
+        {
+            var firstHomeRowTileIndex = boardDefinition.GetFirstHomeRowTilesIndex()[0];
+            var expectedTargetIndex = firstHomeRowTileIndex + steps;
+            var piece = CreateTestPiece(0, firstHomeRowTileIndex);
+            var targetIndex = rules.TryGetTargetTileIndex(piece, steps);
+            Assert.AreEqual(expectedTargetIndex, targetIndex);
+        }
+    }
+
+    [Test]
+    public void FirstPlayerPiece_ShouldNotOvershootHomeRows()
+    {
+        var piece = CreateTestPiece(0, 68);
+        var targetIndex = rules.TryGetTargetTileIndex(piece, 9);
+        Assert.AreEqual(-1, targetIndex);
+    }
+
+    [Test]
+    public void PlayersPiece_AlreadyHome()
+    {
+        for (int player = 0; player < 4; player++)
+        {
+            var piece = CreateTestPiece(player, boardDefinition.GetFirstHomeRowTilesIndex()[player] + BoardDefinition.HOME_ROW_COUNT - 1);
+            var targetIndex = rules.TryGetTargetTileIndex(piece, 1);
+            Assert.AreEqual(-1, targetIndex);
+        }
+    }
+
+    [Test]
+    public void Test_TryingTooManyMoves()
+    {
+        var piece = CreateTestPiece(0, boardDefinition.GetStartTilesIndex()[0]);
+        var targetIndex = rules.TryGetTargetTileIndex(piece, BoardDefinition.TOTAL_TILES * 2); // too many moves
+        Assert.AreEqual(-1, targetIndex);
+    }
+
+    [Test]
     public void Test_Home_Tiles()
     {
         Assert.AreEqual(TileType.Home, boardDefinition.tiles[67 + 8].type);
         Assert.AreEqual(TileType.Home, boardDefinition.tiles[67 + 8 * 2].type);
         Assert.AreEqual(TileType.Home, boardDefinition.tiles[67 + 8 * 3].type);
         Assert.AreEqual(TileType.Home, boardDefinition.tiles[67 + 8 * 4].type);
+    }
+
+    [Test]
+    public void Test_Start_Tiles()
+    {
+        Assert.AreEqual(4, rules.GetStartTile(0));
+        Assert.AreEqual(4 + 17, rules.GetStartTile(1));
+        Assert.AreEqual(4 + 17 * 2, rules.GetStartTile(2));
+        Assert.AreEqual(4 + 17 * 3, rules.GetStartTile(3));
+
+        Assert.AreEqual(TileType.Start, boardDefinition.tiles[rules.GetStartTile(0)].type);
+        Assert.AreEqual(TileType.Start, boardDefinition.tiles[rules.GetStartTile(1)].type);
+        Assert.AreEqual(TileType.Start, boardDefinition.tiles[rules.GetStartTile(2)].type);
+        Assert.AreEqual(TileType.Start, boardDefinition.tiles[rules.GetStartTile(3)].type);
     }
 
     [Test]

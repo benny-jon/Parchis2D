@@ -1,18 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class GameStateMachine
 {
-    private GamePhase phase;
-    private int currentPlayerIndex;
+    private GamePhase _phase;
+    private GamePhase gamePhase
+    {
+        get { return _phase; }
+        set
+        {
+            OnGamePhaseChanged?.Invoke(value);
+            _phase = value;
+        }
+    }
+    public int currentPlayerIndex { get; private set; }
     private Dictionary<Piece, List<MoveOption>> currentLegalMoves = new Dictionary<Piece, List<MoveOption>>();
     private int lastDice1Roll;
     private int lastDice2Roll;
     private bool dice1Used;
     private bool dice2Used;
+    private int rolledDoublesInARow;
 
     private readonly List<Piece> pieces;
     private readonly BoardRules boardRules;
@@ -23,6 +34,8 @@ public class GameStateMachine
     public Action<int> OnTurnChanged;
     public Action OnMoveStarted;
     public Action OnMoveEnded;
+    public Action<GamePhase> OnGamePhaseChanged;
+    public Action<Piece> OnMovePieceToStart;
 
     public IReadOnlyDictionary<Piece, List<MoveOption>> CurrentLegalMoves => currentLegalMoves;
 
@@ -42,13 +55,13 @@ public class GameStateMachine
 
     private void StartTurn()
     {
-        phase = GamePhase.WaitingForRoll;
+        gamePhase = GamePhase.WaitingForRoll;
         OnTurnChanged?.Invoke(currentPlayerIndex);
     }
 
     public void RollDice()
     {
-        if (phase != GamePhase.WaitingForRoll)
+        if (gamePhase != GamePhase.WaitingForRoll)
         {
             Debug.Log("It's not time to roll the dice");
             return;
@@ -64,6 +77,11 @@ public class GameStateMachine
 
         if (totalMoves == 0)
         {
+            if (lastDice1Roll == lastDice2Roll)
+            {
+                HandleRollingDoubles();
+                return;
+            }
             Debug.Log($"Player {currentPlayerIndex} has no legal moves with roll {lastDice1Roll}, {lastDice2Roll}. Skipping turn.");
             NextPlayer();
             return;
@@ -75,25 +93,23 @@ public class GameStateMachine
             Debug.Log("Auto moving piece");
             var onlyOption = currentLegalMoves.First().Value.First();
             ExecuteMoveOption(onlyOption);
-
-            NextPlayer();
             return;
         }
 
-        phase = GamePhase.WaitingForMove;
+        gamePhase = GamePhase.WaitingForMove;
         Debug.Log($"Player {currentPlayerIndex}, pick a Piece with available moves!");
     }
 
     public void OnPieceClicked(Piece piece)
     {
-        if (phase != GamePhase.WaitingForMove)
+        if (gamePhase != GamePhase.WaitingForMove)
         {
             Debug.Log("We are not waiting for move yet!");
             return;
         }
         if (piece.ownerPlayerIndex != currentPlayerIndex)
         {
-            Debug.Log("That's not your piece");
+            Debug.Log($"That's not your piece: {piece}");
             return;
         }
 
@@ -132,6 +148,11 @@ public class GameStateMachine
 
         if (dice1Used && dice2Used)
         {
+            if (lastDice1Roll == lastDice2Roll)
+            {
+                HandleRollingDoubles();
+                return;
+            }
             NextPlayer();
             return;
         }
@@ -140,6 +161,11 @@ public class GameStateMachine
 
         if (totalMoves == 0)
         {
+            if (lastDice1Roll == lastDice2Roll)
+            {
+                HandleRollingDoubles();
+                return;
+            }
             NextPlayer();
             return;
         }
@@ -152,8 +178,40 @@ public class GameStateMachine
             return;
         }
 
-        phase = GamePhase.WaitingForMove;
+        gamePhase = GamePhase.WaitingForMove;
         Debug.Log($"Player {currentPlayerIndex}, pick a Piece with available moves!");
+    }
+
+    private void HandleRollingDoubles()
+    {
+        if (rolledDoublesInARow >= 2)
+        {
+            Debug.Log($"Oh oh, Player {currentPlayerIndex} have rolled 3 doubles in a row. There will be a penalty");
+
+            Piece mostAdvancePiece = null;
+            int maxIndexFound = 0;
+            foreach (var piece in pieces)
+            {
+                if (piece.ownerPlayerIndex == currentPlayerIndex
+                && maxIndexFound < piece.currentTileIndex
+                && piece.currentTileIndex != -1
+                && piece.currentTileIndex != boardRules.GetHomeTile(currentPlayerIndex))
+                {
+                    maxIndexFound = piece.currentTileIndex;
+                    mostAdvancePiece = piece;
+                }
+            }
+            if (mostAdvancePiece != null)
+            {
+                OnMovePieceToStart?.Invoke(mostAdvancePiece);
+            }
+
+            NextPlayer();
+            return;
+        }
+        rolledDoublesInARow++;
+        gamePhase = GamePhase.WaitingForRoll;
+        Debug.Log($"Player {currentPlayerIndex} can roll again!");
     }
 
     private int CalculateLegalMovesForCurrentPlayer()
@@ -212,13 +270,14 @@ public class GameStateMachine
 
     private void NextPlayer()
     {
+        rolledDoublesInARow = 0;
         currentPlayerIndex = (currentPlayerIndex + 1) % BoardDefinition.PLAYERS;
         StartTurn();
     }
 
     public void ResetGame()
     {
-        phase = GamePhase.WaitingForRoll;
+        gamePhase = GamePhase.WaitingForRoll;
         currentPlayerIndex = 0;
     }
 }

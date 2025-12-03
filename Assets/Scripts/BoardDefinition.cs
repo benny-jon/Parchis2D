@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using System.Linq;
 
 [CreateAssetMenu(fileName = "BoardDefinition", menuName = "Parchisi/BoardDefinition", order = 0)]
 public class BoardDefinition : ScriptableObject {
@@ -21,6 +22,11 @@ public class BoardDefinition : ScriptableObject {
     public int[] GetStartTilesIndex()
     {
         return new int[] { 4, 4 + 17, 4 + 17 * 2, 4 + 17 * 3 };
+    }
+
+    public int[] GetHomeTilesIndex()
+    {
+        return tiles.FindAll(p => p.type == TileType.Home).Select(p => p.index).ToArray();
     }
 
     /// <summary>

@@ -10,6 +10,7 @@ public class BoardRules
     private int[] startTilebyPlayer;
     private int[] homeEntryByPlayer;
     private int[] firstHomeRowByPlayer;
+    private int[] homeTileByPlayer;
 
     public BoardRules(BoardDefinition boardDefinition)
     {
@@ -18,6 +19,7 @@ public class BoardRules
         startTilebyPlayer = boardDefinition.GetStartTilesIndex();
         homeEntryByPlayer = boardDefinition.GetHomeEntryTilesIndex();
         firstHomeRowByPlayer = boardDefinition.GetFirstHomeRowTilesIndex();
+        homeTileByPlayer = boardDefinition.GetHomeTilesIndex();
 
         Debug.Log($"Initialized: Start Tiles {ArrayUtils.ToString(startTilebyPlayer)}");
         Debug.Log($"Initialized: Home Entry Tiles {ArrayUtils.ToString(homeEntryByPlayer)}");
@@ -25,6 +27,8 @@ public class BoardRules
     }
 
     public int GetStartTile(int playerIndex) => startTilebyPlayer[playerIndex];
+
+    public int GetHomeTile(int playerIndex) => homeTileByPlayer[playerIndex];
 
     // TODO handle 2 dices and 2 possible targets
     public int TryGetTargetTileIndex(Piece piece, int steps)
