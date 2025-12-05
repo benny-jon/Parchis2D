@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 
@@ -30,7 +32,47 @@ public class BoardRules
 
     public int GetHomeTile(int playerIndex) => homeTileByPlayer[playerIndex];
 
-    // TODO handle 2 dices and 2 possible targets
+    public bool IsTileSafe(int tileIndex)
+    {
+        TileType type = boardDefinition.tiles[tileIndex].type;
+        return type == TileType.Safe || type == TileType.HomeEntry || type == TileType.Start;
+    }
+
+    public MoveResult TryResolveMove(Piece piece, int steps, List<Piece> allPieces)
+    {
+        int targetIndex = -1;
+
+        // 1) First check pure geometry
+        targetIndex = TryGetTargetTileIndex(piece, steps);
+        if (targetIndex == -1)
+        {
+            return MoveResult.InvalidMove();
+        }
+
+        // 2) Check for Safe tiles
+        if (IsTileSafe(targetIndex))
+        {
+            return new MoveResult(MoveStatus.Normal, targetIndex);
+        }
+
+        // 3) Look for enemies on that tile
+        int currentPlayer = piece.ownerPlayerIndex;
+
+        var enemiesOnTile = allPieces.Where(p => p.currentTileIndex == targetIndex && p.ownerPlayerIndex != currentPlayer).ToList();
+
+        if (enemiesOnTile.Count == 1)
+        {
+            return new MoveResult(MoveStatus.Capture, targetIndex, enemiesOnTile[0]);
+        }
+        else if (enemiesOnTile.Count > 1)
+        {
+            Debug.LogError("There should NOT be a valid move to a tile with more than 1 enemy piece");
+        }
+
+        // nothing to capture
+        return new MoveResult(MoveStatus.Normal, targetIndex);
+    }
+
     public int TryGetTargetTileIndex(Piece piece, int steps)
     {
         int player = piece.ownerPlayerIndex;
@@ -43,7 +85,7 @@ public class BoardRules
             {
                 return startTilebyPlayer[player] + (steps - 5);
             }
-            
+
             return INVALID_TARGET;
         }
 
@@ -78,11 +120,12 @@ public class BoardRules
             if (pos == homeEntryByPlayer[player])
             {
                 pos = firstHomeRowByPlayer[player];
-            } 
+            }
             else if (pos < BoardDefinition.MAIN_TRACK_COUNT)
             {
                 pos = (pos + 1) % BoardDefinition.MAIN_TRACK_COUNT;
-            } else
+            }
+            else
             {
                 pos = pos + 1;
             }

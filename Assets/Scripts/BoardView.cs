@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BoardView : MonoBehaviour
@@ -15,6 +18,85 @@ public class BoardView : MonoBehaviour
         }
 
         return tilePoints[tileIndex].position;
+    }
+
+    public void LayoutPieces(IEnumerable<Piece> pieces)
+    {
+        var groups = pieces
+        .Where(p => p != null && p.currentTileIndex >= 0)
+        .GroupBy(p => p.currentTileIndex);
+
+        foreach (var group in groups)
+        {
+            int tileIndex = group.Key;
+            Vector3 basePos = GetTilePosition(tileIndex);
+
+            var groupList = group.ToList();
+            int count = groupList.Count;
+
+            for (int i = 0; i < count; i++)
+            {
+                Piece piece = groupList[i];
+                Vector3 offset = GetOffsetForGroup(count, i, IsTileVertical(tileIndex));
+                piece.transform.position = basePos + offset;
+            }
+        }
+    }
+
+    private Vector3 GetOffsetForGroup(int count, int index, bool isVerticalTile)
+    {
+        float s = 0.2f; // spacing
+
+        switch (count)
+        {
+            case 1: return Vector3.zero;
+            case 2:
+                if (isVerticalTile)
+                {
+                    return (index == 0) ? new Vector3(0f, -s, 0f) : new Vector3(0f, s, 0f);
+                }
+                else
+                {
+                    return (index == 0) ? new Vector3(-s, 0f, 0f) : new Vector3(s, 0f, 0f);
+                }
+            case 3:
+                if (isVerticalTile)
+                {
+                    if (index == 0) return new Vector3(-s, -s, 0f);
+                    if (index == 1) return new Vector3(-s, s, 0f);
+                    return new Vector3(s * 0.7f, 0f, 0f);
+                }
+                else
+                {
+                    if (index == 0) return new Vector3(-s, -s, 0f);
+                    if (index == 1) return new Vector3(s, -s, 0f);
+                    return new Vector3(0f, s * 0.7f, 0f);
+                }
+            case 4:
+                switch (index)
+                {
+                    case 0: return new Vector3(-s, -s, 0f);
+                    case 1: return new Vector3(s, -s, 0f);
+                    case 2: return new Vector3(-s, s, 0f);
+                    default: return new Vector3(s, s, 0f);
+                }
+            default:
+                Debug.Log($"Stacking TOO many pieces {count}");
+                float angle = (float)(Math.PI * 2f * index / count);
+                return new Vector3(Mathf.Cos(angle) * s, Mathf.Sin(angle) * s, 0f);
+        }
+    }
+
+    private bool IsTileVertical(int tileIndex)
+    {
+        int HomeRowStart_Player1 = boardDefinition.GetFirstHomeRowTilesIndex()[1];
+        int HomeRowStart_Player3 = boardDefinition.GetFirstHomeRowTilesIndex()[3];
+        int HomRowsCount = BoardDefinition.HOME_ROW_COUNT;
+
+        return (tileIndex >= 8 && tileIndex <= 24)
+        || (tileIndex >= 42 && tileIndex <= 58)
+        || (tileIndex >= HomeRowStart_Player1 && tileIndex <= HomeRowStart_Player1 + HomRowsCount)
+        || (tileIndex >= HomeRowStart_Player3 && tileIndex <= HomeRowStart_Player3 + HomRowsCount);
     }
 
     [ContextMenu("Auto Assign Tiles From Childre")]

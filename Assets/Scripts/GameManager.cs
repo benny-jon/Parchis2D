@@ -54,6 +54,10 @@ public class GameManager : MonoBehaviour
                 SetCurrentPlayerActionHint("Roll");
             }
         };
+        stateMachine.OnMovePieceToStart += (piece) =>
+        {
+            ResetPiece(piece);
+        };
 
         stateMachine.StartGame();
 
@@ -120,6 +124,19 @@ public class GameManager : MonoBehaviour
         {
             allPieces[i].MoveToStart(boardView.pieceSpawnPoints[i].position);
             allPieces[i].ClearMoveHints();
+        }
+    }
+
+    void ResetPiece(Piece piece)
+    {
+        for (int i = 0; i < allPieces.Count; i++)
+        {
+            if (allPieces[i] == piece)
+            {
+                piece.MoveToStart(boardView.pieceSpawnPoints[i].position);
+                piece.ClearMoveHints();
+                break;
+            }
         }
     }
 

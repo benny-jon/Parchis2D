@@ -25,7 +25,6 @@ public class Piece : Clickable2D
     public void MoveToTile(int tileIndex, BoardView boardView)
     {
         currentTileIndex = tileIndex;
-        transform.position = boardView.GetTilePosition(tileIndex);
     }
 
     public void MoveToStart(Vector3 spawnPosition)

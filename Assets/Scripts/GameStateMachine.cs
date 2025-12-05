@@ -8,10 +8,10 @@ using UnityEngine;
 public class GameStateMachine
 {
     private GamePhase _phase;
-    private GamePhase gamePhase
+    public GamePhase gamePhase
     {
         get { return _phase; }
-        set
+        private set
         {
             OnGamePhaseChanged?.Invoke(value);
             _phase = value;
@@ -67,11 +67,28 @@ public class GameStateMachine
             return;
         }
 
+        int d1 = UnityEngine.Random.Range(1, 7);
+        int d2 = UnityEngine.Random.Range(1, 7);
+
+        RollDiceWithValues(d1, d2);
+    }
+
+    public void RollDiceWithValues(int d1, int d2)
+    {
         dice1Used = false;
         dice2Used = false;
-        lastDice1Roll = UnityEngine.Random.Range(1, 7);
-        lastDice2Roll = UnityEngine.Random.Range(1, 7);
+        lastDice1Roll = d1;
+        lastDice2Roll = d2;
         OnDiceRolled?.Invoke(lastDice1Roll, lastDice2Roll);
+        if (d1 == d2)
+        {
+            rolledDoublesInARow++;
+            if (PenaltyForRollingDoubles())
+            {
+                NextPlayer();
+                return;
+            }
+        }
 
         int totalMoves = CalculateLegalMovesForCurrentPlayer();
 
@@ -79,7 +96,8 @@ public class GameStateMachine
         {
             if (lastDice1Roll == lastDice2Roll)
             {
-                HandleRollingDoubles();
+                gamePhase = GamePhase.WaitingForRoll;
+                Debug.Log($"Player {currentPlayerIndex} can roll again!");
                 return;
             }
             Debug.Log($"Player {currentPlayerIndex} has no legal moves with roll {lastDice1Roll}, {lastDice2Roll}. Skipping turn.");
@@ -89,10 +107,7 @@ public class GameStateMachine
 
         if (totalMoves == 1)
         {
-            // Auto-move
-            Debug.Log("Auto moving piece");
-            var onlyOption = currentLegalMoves.First().Value.First();
-            ExecuteMoveOption(onlyOption);
+            AutoRunTheOnlyAvailableMove();
             return;
         }
 
@@ -119,29 +134,44 @@ public class GameStateMachine
             return;
         }
 
-        MoveOption chosenOption;
+        MoveOption chosenOption = ChooseMoveOption(options);
 
+        MoveResult moveResult = boardRules.TryResolveMove(piece, chosenOption.steps, pieces);
+        ExecuteResolvedMove(chosenOption, moveResult);
+    }
+
+    public MoveOption ChooseMoveOption(List<MoveOption> options)
+    {
         if (options.Count == 1)
         {
-            chosenOption = options[0];
+            return options[0];
         }
         else
         {
             // TODO show options to the user so they can tap on one.
-            chosenOption = options.First();
+            return options.First();
         }
-
-        ExecuteMoveOption(chosenOption);
     }
 
-    private void ExecuteMoveOption(MoveOption moveOption)
+    private void ExecuteResolvedMove(MoveOption moveOption, MoveResult moveResult)
     {
         if (moveOption.usesDice1) dice1Used = true;
         if (moveOption.usesDice2) dice2Used = true;
 
         OnMoveStarted?.Invoke();
-        Debug.Log($"Moving {moveOption.piece} from Tiles {moveOption.piece.currentTileIndex} to {moveOption.targetTileIndex}");
+
+        if (moveResult.status == MoveStatus.Capture)
+        {
+            Debug.Log($"Capturing {moveResult.capturedPiece}");
+            OnMovePieceToStart?.Invoke(moveResult.capturedPiece);
+            // TODO add bonus steps
+        }
+
         moveOption.piece.MoveToTile(moveOption.targetTileIndex, boardView);
+        Debug.Log($"Moving {moveOption.piece} from Tiles {moveOption.piece.currentTileIndex} to {moveOption.targetTileIndex}");
+
+        boardView.LayoutPieces(pieces);
+
         OnMoveEnded?.Invoke();
 
         // TODO check captures & win conditions
@@ -150,7 +180,8 @@ public class GameStateMachine
         {
             if (lastDice1Roll == lastDice2Roll)
             {
-                HandleRollingDoubles();
+                gamePhase = GamePhase.WaitingForRoll;
+                Debug.Log($"Player {currentPlayerIndex} can roll again!");
                 return;
             }
             NextPlayer();
@@ -163,7 +194,8 @@ public class GameStateMachine
         {
             if (lastDice1Roll == lastDice2Roll)
             {
-                HandleRollingDoubles();
+                gamePhase = GamePhase.WaitingForRoll;
+                Debug.Log($"Player {currentPlayerIndex} can roll again!");
                 return;
             }
             NextPlayer();
@@ -172,9 +204,7 @@ public class GameStateMachine
 
         if (totalMoves == 1)
         {
-            Debug.Log("Auto moving piece");
-            var onlyMove = currentLegalMoves.First().Value.First();
-            ExecuteMoveOption(onlyMove);
+            AutoRunTheOnlyAvailableMove();
             return;
         }
 
@@ -182,9 +212,18 @@ public class GameStateMachine
         Debug.Log($"Player {currentPlayerIndex}, pick a Piece with available moves!");
     }
 
-    private void HandleRollingDoubles()
+    private void AutoRunTheOnlyAvailableMove()
     {
-        if (rolledDoublesInARow >= 2)
+        Debug.Log("Auto moving piece");
+        var onlyMove = currentLegalMoves.First().Value.First();
+        var onlyMoveResult = boardRules.TryResolveMove(onlyMove.piece, onlyMove.steps, pieces);
+        ExecuteResolvedMove(onlyMove, onlyMoveResult);
+    }
+
+    private bool PenaltyForRollingDoubles()
+    {
+        Debug.Log($"Handling rolling doubles. Count={rolledDoublesInARow}");
+        if (rolledDoublesInARow >= 3)
         {
             Debug.Log($"Oh oh, Player {currentPlayerIndex} have rolled 3 doubles in a row. There will be a penalty");
 
@@ -205,13 +244,9 @@ public class GameStateMachine
             {
                 OnMovePieceToStart?.Invoke(mostAdvancePiece);
             }
-
-            NextPlayer();
-            return;
+            return true;
         }
-        rolledDoublesInARow++;
-        gamePhase = GamePhase.WaitingForRoll;
-        Debug.Log($"Player {currentPlayerIndex} can roll again!");
+        return false;
     }
 
     private int CalculateLegalMovesForCurrentPlayer()
