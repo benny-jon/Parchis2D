@@ -49,13 +49,19 @@ public class BoardRules
             return MoveResult.InvalidMove();
         }
 
-        // 2) Check for Safe tiles
+        // 2) Check for blockade
+        if (IsMoveBlockedByBlockade(piece, steps, allPieces))
+        {
+            return new MoveResult(MoveStatus.BlockedByBlockade, -1);
+        }
+
+        // 3) Check for Safe tiles
         if (IsTileSafe(targetIndex))
         {
             return new MoveResult(MoveStatus.Normal, targetIndex);
         }
 
-        // 3) Look for enemies on that tile
+        // 4) Look for enemies on that tile
         int currentPlayer = piece.ownerPlayerIndex;
 
         var enemiesOnTile = allPieces.Where(p => p.currentTileIndex == targetIndex && p.ownerPlayerIndex != currentPlayer).ToList();
@@ -66,15 +72,90 @@ public class BoardRules
         }
         else if (enemiesOnTile.Count > 1)
         {
-            Debug.LogError("There should NOT be a valid move to a tile with more than 1 enemy piece");
+            return new MoveResult(MoveStatus.BlockedByBlockade, -1); // Enemy blockade
         }
 
         // nothing to capture
         return new MoveResult(MoveStatus.Normal, targetIndex);
     }
 
+    public bool IsMoveBlockedByBlockade(Piece piece, int steps, List<Piece> allPieces)
+    {
+        int targetIndex = TryGetTargetTileIndex(piece, steps);
+        if (targetIndex == -1)
+        {
+            return true;
+        }
+
+        int currentIndex = piece.currentTileIndex;
+        
+        // check blockate on the start tile
+        if (currentIndex == -1 &&
+            steps == START_ROLL_REQUIREMENT &&
+            IsBlockadeAtTile(GetStartTile(piece.ownerPlayerIndex), allPieces, out int blackadeOwner))
+        {
+            return true;
+        }
+
+        // check blockate on the other tiles
+        for (int step = 1; step <= steps; step++)
+        {
+            int nextIndex = GetNextIndexAlongPath(currentIndex, piece.ownerPlayerIndex);
+            currentIndex = nextIndex;
+
+            if (IsBlockadeAtTile(nextIndex, allPieces, out blackadeOwner))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private int GetNextIndexAlongPath(int currentIndex, int player)
+    {
+        int pos = currentIndex;
+        if (pos == homeEntryByPlayer[player])
+        {
+            pos = firstHomeRowByPlayer[player];
+        }
+        else if (pos < BoardDefinition.MAIN_TRACK_COUNT)
+        {
+            pos = (pos + 1) % BoardDefinition.MAIN_TRACK_COUNT;
+        }
+        else
+        {
+            pos = pos + 1;
+        }
+        return pos;
+    }
+
+    public bool IsBlockadeAtTile(int tileIndex, List<Piece> allPieces, out int ownerPlayerIndex)
+    {
+        ownerPlayerIndex = -1;
+
+        // Count pieces on this tile grouped by owner
+        var groups = allPieces
+            .Where(p => p != null && p.currentTileIndex == tileIndex)
+            .GroupBy(p => p.ownerPlayerIndex);
+
+        foreach (var g in groups)
+        {
+            int count = g.Count();
+            if (count >= 2)
+            {
+                ownerPlayerIndex = g.Key;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public int TryGetTargetTileIndex(Piece piece, int steps)
     {
+        // TODO Add logs to find bug where Player 1 pieces in Base show not available moves when running a 5 (1, 4) or (3, 5), etc;
+        
         int player = piece.ownerPlayerIndex;
 
         // In Base (-1)

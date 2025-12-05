@@ -36,7 +36,7 @@ public class GameStateMachineTests
     }
 
     [Test]
-    public void RollFive_AllowBasePieceToLeave_ToStartTile()
+    public void RollFiveOnDice1_AllowBasePieceToLeave_ToStartTile()
     {
         stateMachine.StartGame();
 
@@ -49,6 +49,30 @@ public class GameStateMachineTests
         stateMachine.OnPieceClicked(basePiece);
 
         Assert.AreEqual(boardDefinition.GetStartTilesIndex()[0], basePiece.currentTileIndex);
+    }
+
+    [Test]
+    public void RollFiveOnDice2_AllowBasePieceToLeave_ToStartTile()
+    {
+        stateMachine.StartGame();
+        pieces.Clear();
+        pieces.Add(CreateTestPiece(owner: 0, tileIndex: -1));
+        pieces.Add(CreateTestPiece(1, -1));
+        pieces.Add(CreateTestPiece(1, -1));
+        pieces.Add(CreateTestPiece(1, 52));
+        pieces.Add(CreateTestPiece(1, -1));
+
+        // Move turn to Player 1 by rollling not starting dice
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        stateMachine.RollDiceWithValues(1, 2); 
+        
+        Assert.AreEqual(1, stateMachine.currentPlayerIndex);
+        stateMachine.RollDiceWithValues(3, 5);
+
+        Assert.AreEqual(GamePhase.WaitingForMove, stateMachine.gamePhase);
+        var basePiece = pieces[1];
+        stateMachine.OnPieceClicked(basePiece);
+        Assert.AreEqual(boardDefinition.GetStartTilesIndex()[1], basePiece.currentTileIndex);
     }
 
     [Test]

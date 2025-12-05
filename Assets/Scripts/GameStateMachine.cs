@@ -263,30 +263,30 @@ public class GameStateMachine
 
             if (lastDice1Roll > 0 && !dice1Used)
             {
-                int targetIndex = boardRules.TryGetTargetTileIndex(piece, lastDice1Roll);
-                if (targetIndex != -1)
+                MoveResult moveResult = boardRules.TryResolveMove(piece, lastDice1Roll, pieces);
+                if (moveResult.targetTileIndex != -1)
                 {
-                    options.Add(new MoveOption(piece, targetIndex, lastDice1Roll, true, false));
+                    options.Add(new MoveOption(piece, moveResult.targetTileIndex, lastDice1Roll, true, false));
                     Debug.Log($"Available Move: {options.Last()}");
                 }
             }
 
             if (lastDice2Roll > 0 && !dice2Used)
             {
-                int targetIndex = boardRules.TryGetTargetTileIndex(piece, lastDice2Roll);
-                if (targetIndex != -1)
+                MoveResult moveResult = boardRules.TryResolveMove(piece, lastDice2Roll, pieces);
+                if (moveResult.targetTileIndex != -1)
                 {
-                    options.Add(new MoveOption(piece, targetIndex, lastDice2Roll, false, true));
+                    options.Add(new MoveOption(piece, moveResult.targetTileIndex, lastDice2Roll, false, true));
                     Debug.Log($"Available Move: {options.Last()}");
                 }
             }
 
             if (lastDice1Roll > 0 && lastDice2Roll > 0 && !dice1Used && !dice2Used)
             {
-                int targetIndex = boardRules.TryGetTargetTileIndex(piece, lastDice1Roll + lastDice2Roll);
-                if (targetIndex != -1)
+                MoveResult moveResult = boardRules.TryResolveMove(piece, lastDice1Roll + lastDice2Roll, pieces);
+                if (moveResult.targetTileIndex != -1)
                 {
-                    options.Add(new MoveOption(piece, targetIndex, lastDice1Roll + lastDice2Roll, true, true));
+                    options.Add(new MoveOption(piece, moveResult.targetTileIndex, lastDice1Roll + lastDice2Roll, true, true));
                     Debug.Log($"Available Move: {options.Last()}");
                 }
             }

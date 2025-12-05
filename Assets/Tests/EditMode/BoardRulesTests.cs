@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -33,6 +34,29 @@ public class BoardRulesTests
             Assert.IsTrue(rules.TryGetTargetTileIndex(piece, 6) == -1); // cannot move
             Assert.IsTrue(rules.TryGetTargetTileIndex(piece, 5) != -1); // can start!
         }
+    }
+
+    [Test]
+    public void BasePiece_CanStart()
+    {
+        var piece1 = CreateTestPiece(1, -1);
+        var piece2 = CreateTestPiece(1, -1);
+        var piece3 = CreateTestPiece(1, 52);
+        var piece4 = CreateTestPiece(1, -1);
+
+        var allPieces = new List<Piece>() { piece1, piece2, piece3, piece4, };
+
+        MoveResult resultFor1 = rules.TryResolveMove(piece1, 5, allPieces);
+        Assert.AreEqual(MoveStatus.Normal, resultFor1.status);
+        Assert.AreEqual(boardDefinition.GetStartTilesIndex()[1], resultFor1.targetTileIndex);
+
+        MoveResult resultFor2 = rules.TryResolveMove(piece2, 5, allPieces);
+        Assert.AreEqual(MoveStatus.Normal, resultFor2.status);
+        Assert.AreEqual(boardDefinition.GetStartTilesIndex()[1], resultFor2.targetTileIndex);
+
+        MoveResult resultFor4 = rules.TryResolveMove(piece4, 5, allPieces);
+        Assert.AreEqual(MoveStatus.Normal, resultFor4.status);
+        Assert.AreEqual(boardDefinition.GetStartTilesIndex()[1], resultFor4.targetTileIndex);
     }
 
     [Test]
@@ -157,6 +181,34 @@ public class BoardRulesTests
 
         Assert.AreEqual(TileType.Home, targetTile.type);
         Assert.AreEqual(0, targetTile.ownerPlayerIndex);
+    }
+
+    [Test]
+    public void VerifyPiece_CannotPassBlockade()
+    {
+        var pieceA1 = CreateTestPiece(0, 4);
+        var pieceA2 = CreateTestPiece(0, 4);
+
+        var trackPiece = CreateTestPiece(1, 2);
+
+        var result = rules.TryResolveMove(trackPiece, 4, new Piece[] { pieceA1, pieceA2, trackPiece}.ToList());
+
+        Assert.AreEqual(result.status, MoveStatus.BlockedByBlockade);
+        Assert.AreEqual(result.targetTileIndex, -1);
+    }
+
+    [Test]
+    public void VerifyPiece_CannotStartWithBlockade()
+    {
+        var pieceA1 = CreateTestPiece(0, boardDefinition.GetStartTilesIndex()[0]);
+        var pieceA2 = CreateTestPiece(0, boardDefinition.GetStartTilesIndex()[0]);
+
+        var trackPiece = CreateTestPiece(0, -1);
+
+        var result = rules.TryResolveMove(trackPiece, 5, new Piece[] { pieceA1, pieceA2, trackPiece}.ToList());
+
+        Assert.AreEqual(result.status, MoveStatus.BlockedByBlockade);
+        Assert.AreEqual(result.targetTileIndex, -1);
     }
 
     // Parametized test arguments
