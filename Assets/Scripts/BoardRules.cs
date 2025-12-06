@@ -42,26 +42,26 @@ public class BoardRules
     {
         int targetIndex = -1;
 
-        // 1) First check pure geometry
+        // First check pure geometry
         targetIndex = TryGetTargetTileIndex(piece, steps);
         if (targetIndex == -1)
         {
             return MoveResult.InvalidMove();
         }
 
-        // 2) Check for blockade
+        // Check for blockade in the main tracks
         if (IsMoveBlockedByBlockade(piece, steps, allPieces))
         {
             return new MoveResult(MoveStatus.BlockedByBlockade, -1);
         }
 
-        // 3) Check for Safe tiles
+        // Check for Safe tiles
         if (IsTileSafe(targetIndex))
         {
             return new MoveResult(MoveStatus.Normal, targetIndex);
         }
 
-        // 4) Look for enemies on that tile
+        // Look for enemies on that tile
         int currentPlayer = piece.ownerPlayerIndex;
 
         var enemiesOnTile = allPieces.Where(p => p.currentTileIndex == targetIndex && p.ownerPlayerIndex != currentPlayer).ToList();
@@ -88,13 +88,17 @@ public class BoardRules
         }
 
         int currentIndex = piece.currentTileIndex;
-        
+
         // check blockate on the start tile
-        if (currentIndex == -1 &&
-            steps == START_ROLL_REQUIREMENT &&
-            IsBlockadeAtTile(GetStartTile(piece.ownerPlayerIndex), allPieces, out int blackadeOwner))
+        if (currentIndex == -1)
         {
-            return true;
+            if (IsBlockadeAtTile(GetStartTile(piece.ownerPlayerIndex), allPieces, out _))
+            {
+                return true;
+            }
+
+            // Starting tile is not blocked
+            return false;
         }
 
         // check blockate on the other tiles
@@ -103,7 +107,7 @@ public class BoardRules
             int nextIndex = GetNextIndexAlongPath(currentIndex, piece.ownerPlayerIndex);
             currentIndex = nextIndex;
 
-            if (IsBlockadeAtTile(nextIndex, allPieces, out blackadeOwner))
+            if (IsBlockadeAtTile(nextIndex, allPieces, out _))
             {
                 return true;
             }
@@ -154,8 +158,6 @@ public class BoardRules
 
     public int TryGetTargetTileIndex(Piece piece, int steps)
     {
-        // TODO Add logs to find bug where Player 1 pieces in Base show not available moves when running a 5 (1, 4) or (3, 5), etc;
-        
         int player = piece.ownerPlayerIndex;
 
         // In Base (-1)
@@ -164,9 +166,11 @@ public class BoardRules
             if (steps <= 0) return INVALID_TARGET;
             if (steps == START_ROLL_REQUIREMENT)
             {
+                Debug.LogWarning($"[BR] Piece in base can Start: {piece} with steps {steps}");
                 return startTilebyPlayer[player] + (steps - 5);
             }
 
+            Debug.LogWarning($"[BR] Invalid {steps} steps for piece in base {piece}");
             return INVALID_TARGET;
         }
 
@@ -176,6 +180,7 @@ public class BoardRules
         // Already Home
         if (currentTile.type == TileType.Home)
         {
+            Debug.LogWarning($"[BR] Piece already home {piece}");
             return INVALID_TARGET;
         }
 
@@ -188,9 +193,11 @@ public class BoardRules
 
             if (newOffset > BoardDefinition.HOME_ROW_COUNT - 1)
             {
+                Debug.LogWarning($"[BR] {steps} steps will overshoot Home for {piece}");
                 return INVALID_TARGET; // overshoot
             }
 
+            Debug.LogWarning($"[BR] Can move {steps} steps in Home Rows: {piece}");
             return firstHomeRow + newOffset;
         }
 
@@ -214,9 +221,11 @@ public class BoardRules
 
         if (pos > firstHomeRowByPlayer[player] + BoardDefinition.HOME_ROW_COUNT - 1)
         {
+            Debug.LogWarning($"[BR] In Main track, Steps: {steps} overshoot piece: {piece}");
             return INVALID_TARGET; // overshoot
         }
 
+        Debug.LogWarning($"[BR] Available steps {steps} for {piece}");
         return pos;
     }
 }

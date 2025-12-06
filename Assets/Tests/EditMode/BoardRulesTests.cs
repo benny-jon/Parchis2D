@@ -211,6 +211,20 @@ public class BoardRulesTests
         Assert.AreEqual(result.targetTileIndex, -1);
     }
 
+    [Test]
+    public void VerifyPiece_CanIfNotBlockade()
+    {
+        var pieceA1 = CreateTestPiece(0, boardDefinition.GetStartTilesIndex()[0] - 3);
+        var pieceA2 = CreateTestPiece(0, boardDefinition.GetStartTilesIndex()[0] - 3);
+
+        var trackPiece = CreateTestPiece(3, -1);
+
+        var result = rules.TryResolveMove(trackPiece, 5, new Piece[] { pieceA1, pieceA2, trackPiece}.ToList());
+
+        Assert.AreEqual(result.status, MoveStatus.Normal);
+        Assert.AreEqual(result.targetTileIndex, boardDefinition.GetStartTilesIndex()[3]);
+    }
+
     // Parametized test arguments
     static int[] ownerIndex = new int[] { 0, 1, 2, 3 };
 
