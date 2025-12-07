@@ -55,6 +55,11 @@ public class BoardRules
             return new MoveResult(MoveStatus.BlockedByBlockade, -1);
         }
 
+        if (boardDefinition.GetHomeTilesIndex()[piece.ownerPlayerIndex] == targetIndex)
+        {
+            return new MoveResult(MoveStatus.ReachedHome, targetIndex);
+        }
+
         // Check for Safe tiles
         if (IsTileSafe(targetIndex))
         {
@@ -137,6 +142,12 @@ public class BoardRules
     public bool IsBlockadeAtTile(int tileIndex, List<Piece> allPieces, out int ownerPlayerIndex)
     {
         ownerPlayerIndex = -1;
+
+        // It's OK to have multiple pieces at Home
+        if (boardDefinition.GetHomeTilesIndex().Contains(tileIndex))
+        {
+            return false;
+        }
 
         // Count pieces on this tile grouped by owner
         var groups = allPieces
@@ -227,5 +238,37 @@ public class BoardRules
 
         Debug.LogWarning($"[BR] Available steps {steps} for {piece}");
         return pos;
+    }
+
+    /// <summary>
+    /// Returns a "progress" score along this player's path:
+    /// -1 = base,
+    /// 0..67 = distance from start along outer loop,
+    /// 68+ = in home row (further is better).
+    /// </summary>
+    public int GetProgressScore(int tileIndex, int playerIndex)
+    {
+        if (tileIndex < 0)
+            return -1; // base, not on board
+
+        int homeStart = firstHomeRowByPlayer[playerIndex];
+        int homeEndExclusive = homeStart + BoardDefinition.HOME_ROW_COUNT - 1; // one past final home
+        int outerLoopLength = BoardDefinition.MAIN_TRACK_COUNT;
+
+        // Home row segment for this player
+        if (tileIndex >= homeStart && tileIndex < homeEndExclusive)
+        {
+            // steps in home row: 0..7 (0 = first home-row tile)
+            int homeSteps = tileIndex - homeStart;
+            // Outer loop fully traversed (=68) + home steps
+            return outerLoopLength + homeSteps;
+        }
+
+        // Otherwise, treat as outer loop tile
+        int startIndex = startTilebyPlayer[playerIndex];
+
+        // Distance from this player's start around the loop (0..67)
+        int diff = (tileIndex - startIndex + outerLoopLength) % outerLoopLength;
+        return diff;
     }
 }

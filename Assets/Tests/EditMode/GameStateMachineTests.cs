@@ -99,7 +99,7 @@ public class GameStateMachineTests
     }
 
     [Test]
-    public void ThreeConsecutiveDoubles_SendsFurthestPieceBackToBase()
+    public void Verify_FirstPlayerPenalty_ForMostAdvancePiece_WhenRollingThreeDoubles()
     {
         stateMachine.StartGame();
         Assert.AreEqual(-1, pieces[0].currentTileIndex);
@@ -119,6 +119,36 @@ public class GameStateMachineTests
     
         Assert.AreEqual(-1, trackPiece.currentTileIndex);
         Assert.AreEqual(1, stateMachine.currentPlayerIndex);
+    }
+
+    [Test]
+    public void Verify_NonFirstPlayerPenalty_ForMostAdvancePiece_WhenRollingThreeDoubles()
+    {
+        stateMachine.StartGame();
+        pieces.Clear();
+
+        var secondMostAdvance = CreateTestPiece(owner: 2, tileIndex: 60);
+        var mostAdvance = CreateTestPiece(owner: 2, tileIndex: 3);
+
+        pieces.Add(secondMostAdvance);
+        pieces.Add(mostAdvance);
+
+        stateMachine.RollDiceWithValues(1, 2); // moving turn to player 1
+        stateMachine.RollDiceWithValues(1, 2); // moving turn to player 2
+        Assert.AreEqual(2, stateMachine.currentPlayerIndex);
+
+        stateMachine.RollDiceWithValues(1, 1);
+        stateMachine.OnPieceClicked(secondMostAdvance);
+        stateMachine.OnPieceClicked(secondMostAdvance);
+
+        stateMachine.RollDiceWithValues(1, 1);
+        stateMachine.OnPieceClicked(secondMostAdvance);
+        stateMachine.OnPieceClicked(secondMostAdvance);
+
+        stateMachine.RollDiceWithValues(1, 1);
+        //Verify penalty
+        Assert.AreEqual(-1, mostAdvance.currentTileIndex);
+        Assert.AreEqual(64, secondMostAdvance.currentTileIndex);
     }
 
     [Test]

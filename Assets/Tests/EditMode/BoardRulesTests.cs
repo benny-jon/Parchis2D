@@ -121,6 +121,26 @@ public class BoardRulesTests
     }
 
     [Test]
+    public void LastPiece_CanArriveHome()
+    {
+        int homeTileIndex = boardDefinition.GetHomeTilesIndex()[0];
+        int firstHomeRowTileIndex = boardDefinition.GetFirstHomeRowTilesIndex()[0];
+
+        List<Piece> pieces = new List<Piece>()
+        {
+            CreateTestPiece(0, homeTileIndex),
+            CreateTestPiece(0, homeTileIndex),
+            CreateTestPiece(0, homeTileIndex),
+            CreateTestPiece(0, firstHomeRowTileIndex),
+        };
+
+        var result = rules.TryResolveMove(pieces[3], BoardDefinition.HOME_ROW_COUNT - 1, pieces);
+
+        Assert.AreEqual(MoveStatus.ReachedHome, result.status);
+        Assert.AreEqual(homeTileIndex, result.targetTileIndex);
+    }
+
+    [Test]
     public void FirstPlayerPiece_ShouldNotOvershootHomeRows()
     {
         var piece = CreateTestPiece(0, 68);

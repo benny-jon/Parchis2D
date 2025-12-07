@@ -7,6 +7,9 @@ using UnityEngine;
 
 public class GameStateMachine
 {
+    private const int BonusForCapture = 20;
+    private const int BonusForReachingHome = 10;
+
     private GamePhase _phase;
     public GamePhase gamePhase
     {
@@ -24,6 +27,7 @@ public class GameStateMachine
     private bool dice1Used;
     private bool dice2Used;
     private int rolledDoublesInARow;
+    private List<int> bonusStepsToMove = new List<int>();
 
     private readonly List<Piece> pieces;
     private readonly BoardRules boardRules;
@@ -158,13 +162,24 @@ public class GameStateMachine
         if (moveOption.usesDice1) dice1Used = true;
         if (moveOption.usesDice2) dice2Used = true;
 
+        if (moveOption.bonusIndex >= 0)
+        {
+            bonusStepsToMove.RemoveAt(moveOption.bonusIndex);
+        }
+
         OnMoveStarted?.Invoke();
 
         if (moveResult.status == MoveStatus.Capture)
         {
             Debug.Log($"Capturing {moveResult.capturedPiece}");
             OnMovePieceToStart?.Invoke(moveResult.capturedPiece);
-            // TODO add bonus steps
+            bonusStepsToMove.Add(BonusForCapture);
+        }
+
+        if (moveResult.status == MoveStatus.ReachedHome)
+        {
+            Debug.Log($"{moveOption.piece} reached Home!");
+            bonusStepsToMove.Add(BonusForReachingHome);
         }
 
         moveOption.piece.MoveToTile(moveOption.targetTileIndex, boardView);
@@ -174,9 +189,7 @@ public class GameStateMachine
 
         OnMoveEnded?.Invoke();
 
-        // TODO check captures & win conditions
-
-        if (dice1Used && dice2Used)
+        if (dice1Used && dice2Used && bonusStepsToMove.Count == 0)
         {
             if (lastDice1Roll == lastDice2Roll)
             {
@@ -228,20 +241,26 @@ public class GameStateMachine
             Debug.Log($"Oh oh, Player {currentPlayerIndex} have rolled 3 doubles in a row. There will be a penalty");
 
             Piece mostAdvancePiece = null;
-            int maxIndexFound = 0;
+            int maxProgressScore = 0;
             foreach (var piece in pieces)
             {
-                if (piece.ownerPlayerIndex == currentPlayerIndex
-                && maxIndexFound < piece.currentTileIndex
-                && piece.currentTileIndex != -1
-                && piece.currentTileIndex != boardRules.GetHomeTile(currentPlayerIndex))
+                if (piece.ownerPlayerIndex != currentPlayerIndex
+                || piece.currentTileIndex == -1
+                || piece.currentTileIndex == boardRules.GetHomeTile(currentPlayerIndex)) {
+                    continue;
+                }
+
+                var currentProgressScore = boardRules.GetProgressScore(piece.currentTileIndex, piece.ownerPlayerIndex);
+
+                if (maxProgressScore < currentProgressScore)
                 {
-                    maxIndexFound = piece.currentTileIndex;
+                    maxProgressScore = currentProgressScore;
                     mostAdvancePiece = piece;
                 }
             }
             if (mostAdvancePiece != null)
             {
+                Debug.Log($"Sent back home: {mostAdvancePiece}");
                 OnMovePieceToStart?.Invoke(mostAdvancePiece);
             }
             return true;
@@ -291,6 +310,19 @@ public class GameStateMachine
                 }
             }
 
+            if (bonusStepsToMove.Count > 0)
+            {
+                for (int i = 0; i < bonusStepsToMove.Count; i++)
+                {
+                    MoveResult moveResult = boardRules.TryResolveMove(piece, bonusStepsToMove[i], pieces);
+                    if (moveResult.targetTileIndex != -1)
+                    {
+                        options.Add(new MoveOption(piece, moveResult.targetTileIndex, bonusStepsToMove[i], i));
+                        Debug.Log($"Available Move: {options.Last()}");
+                    }
+                }
+            }
+
             if (options.Count > 0)
             {
                 currentLegalMoves[piece] = options;
@@ -306,6 +338,7 @@ public class GameStateMachine
     private void NextPlayer()
     {
         rolledDoublesInARow = 0;
+        bonusStepsToMove.Clear();
         currentPlayerIndex = (currentPlayerIndex + 1) % BoardDefinition.PLAYERS;
         StartTurn();
     }
