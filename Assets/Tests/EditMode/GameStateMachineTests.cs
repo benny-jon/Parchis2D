@@ -193,6 +193,52 @@ public class GameStateMachineTests
         Assert.AreEqual(enemyPieceTileIndex, pieces[2].currentTileIndex);
     }
 
+    [Test]
+    public void GetBonus_ForReachingHome()
+    {
+        pieces.Clear();
+        var finishingPiece = CreateTestPiece(0, boardRules.GetHomeTile(0) - 1);
+        var pieceA = CreateTestPiece(0, 4);
+        var pieceB = CreateTestPiece(0, 5);
+        pieces.Add(finishingPiece);
+        pieces.Add(pieceA);
+        pieces.Add(pieceB);
+
+        stateMachine.StartGame();
+
+        stateMachine.RollDiceWithValues(1, 0);
+        stateMachine.OnPieceClicked(finishingPiece);
+
+        var bonusMoveOption = stateMachine.CurrentLegalMoves[pieceA][0];
+        Assert.AreEqual(GamePhase.WaitingForMove, stateMachine.gamePhase);
+        Assert.AreEqual(0, bonusMoveOption.bonusIndex);
+        Assert.AreEqual(false, bonusMoveOption.usesDice1);
+        Assert.AreEqual(false, bonusMoveOption.usesDice2);
+    }
+
+    [Test]
+    public void LoseBonusForReachingHome_IfNoMovesAvailable_EvenAfterRollingDoubles()
+    {
+        pieces.Clear();
+        var finishingPiece = CreateTestPiece(0, boardRules.GetHomeTile(0) - 2);
+        var pieceA = CreateTestPiece(0, -1);
+        pieces.Add(finishingPiece);
+        pieces.Add(pieceA);
+
+        stateMachine.StartGame();
+
+        stateMachine.RollDiceWithValues(1, 1);
+        stateMachine.OnPieceClicked(finishingPiece);
+
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+        stateMachine.RollDiceWithValues(2, 3);
+
+        Assert.AreEqual(1, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+        Assert.AreEqual(boardRules.GetStartTile(0), pieceA.currentTileIndex);
+        Assert.AreEqual(0, stateMachine.CurrentLegalMoves.Count);
+    }
+
     private BoardView CreateTestBoardView(int tileCount)
     {
         var go = new GameObject("BoardView");

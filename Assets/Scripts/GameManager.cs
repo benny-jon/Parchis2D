@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 
     public List<Piece> allPieces;
     public TMP_Text[] actionHintPerPlayer;
+    public TMP_Text[] diceHintPerPlayer;
 
     private BoardRules boardRules;
     private GameStateMachine stateMachine;
@@ -26,7 +27,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log($"Dice rolled: {dice1}, {dice2}");
             ClearPlayersActionHints();
-            SetCurrentPlayerActionHint($"{dice1},{dice2}");
+            SetCurrentPlayerDiceHint($"{dice1},{dice2}");
         };
         stateMachine.OnTurnChanged += player =>
         {
@@ -50,8 +51,14 @@ public class GameManager : MonoBehaviour
         {
             if (phase == GamePhase.WaitingForRoll)
             {
+                ClearPlayersActionHints();
                 ClearMoveHints();
                 SetCurrentPlayerActionHint("Roll");
+            }
+            if (phase == GamePhase.WaitingForMove)
+            {
+                ClearOtherPlayersDiceHints();
+                SetCurrentPlayerActionHint("Move");
             }
         };
         stateMachine.OnMovePieceToStart += (piece) =>
@@ -59,6 +66,7 @@ public class GameManager : MonoBehaviour
             ResetPiece(piece);
         };
 
+        ClearOtherPlayersDiceHints();
         stateMachine.StartGame();
 
         Debug.Log("StateMachine Initialized " + GetHashCode());
@@ -75,6 +83,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void ClearOtherPlayersDiceHints()
+    {
+        if (diceHintPerPlayer != null)
+        {
+            for (int i = 0; i < diceHintPerPlayer.Length; i++)
+            {
+                if (i != stateMachine.currentPlayerIndex)
+                {
+                    diceHintPerPlayer[i].text = "";
+                }
+            }
+        }
+    }
+
     private void SetCurrentPlayerActionHint(String hintMessage)
     {
         if (actionHintPerPlayer != null && actionHintPerPlayer.Length >= stateMachine.currentPlayerIndex + 1)
@@ -84,6 +106,18 @@ public class GameManager : MonoBehaviour
         else
         {
             Debug.LogError("Forgot to assigned values to the actionHintPerPlayer list");
+        }
+    }
+
+    private void SetCurrentPlayerDiceHint(String hintMessage)
+    {
+        if (diceHintPerPlayer != null && diceHintPerPlayer.Length >= stateMachine.currentPlayerIndex + 1)
+        {
+            diceHintPerPlayer[stateMachine.currentPlayerIndex].text = hintMessage;
+        }
+        else
+        {
+            Debug.LogError("Forgot to assigned values to the diceHintPerPlayer list");
         }
     }
 

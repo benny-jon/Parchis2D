@@ -182,8 +182,8 @@ public class GameStateMachine
             bonusStepsToMove.Add(BonusForReachingHome);
         }
 
-        moveOption.piece.MoveToTile(moveOption.targetTileIndex, boardView);
         Debug.Log($"Moving {moveOption.piece} from Tiles {moveOption.piece.currentTileIndex} to {moveOption.targetTileIndex}");
+        moveOption.piece.MoveToTile(moveOption.targetTileIndex, boardView);
 
         boardView.LayoutPieces(pieces);
 
@@ -205,6 +205,8 @@ public class GameStateMachine
 
         if (totalMoves == 0)
         {
+            bonusStepsToMove.Clear(); // Loses bonus if you cant move with the previous roll
+
             if (lastDice1Roll == lastDice2Roll)
             {
                 gamePhase = GamePhase.WaitingForRoll;
@@ -339,7 +341,9 @@ public class GameStateMachine
     {
         rolledDoublesInARow = 0;
         bonusStepsToMove.Clear();
+        currentLegalMoves.Clear();
         currentPlayerIndex = (currentPlayerIndex + 1) % BoardDefinition.PLAYERS;
+        Debug.Log($"[SM] Next Player {currentPlayerIndex}");
         StartTurn();
     }
 
