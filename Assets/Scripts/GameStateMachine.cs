@@ -28,6 +28,7 @@ public class GameStateMachine
     private bool dice2Used;
     private int rolledDoublesInARow;
     private List<int> bonusStepsToMove = new List<int>();
+    private bool playerHadABlockade;
 
     private readonly List<Piece> pieces;
     private readonly BoardRules boardRules;
@@ -79,6 +80,7 @@ public class GameStateMachine
 
     public void RollDiceWithValues(int d1, int d2)
     {
+        playerHadABlockade = false;
         dice1Used = false;
         dice2Used = false;
         lastDice1Roll = d1;
@@ -98,7 +100,7 @@ public class GameStateMachine
 
         if (totalMoves == 0)
         {
-            if (lastDice1Roll == lastDice2Roll)
+            if (lastDice1Roll == lastDice2Roll && !playerHadABlockade)
             {
                 gamePhase = GamePhase.WaitingForRoll;
                 Debug.Log($"Player {currentPlayerIndex} can roll again!");
@@ -248,7 +250,8 @@ public class GameStateMachine
             {
                 if (piece.ownerPlayerIndex != currentPlayerIndex
                 || piece.currentTileIndex == -1
-                || piece.currentTileIndex == boardRules.GetHomeTile(currentPlayerIndex)) {
+                || piece.currentTileIndex == boardRules.GetHomeTile(currentPlayerIndex))
+                {
                     continue;
                 }
 
@@ -328,13 +331,66 @@ public class GameStateMachine
             if (options.Count > 0)
             {
                 currentLegalMoves[piece] = options;
-                totalMoves += options.Count;
+            }
+        }
+
+        if (lastDice1Roll == lastDice2Roll)
+        {
+            EnforceBreakOwnBlockadeRule();
+        }
+
+        foreach (var piece in pieces)
+        {
+            if (currentLegalMoves.Keys.Contains(piece))
+            {
+                totalMoves += currentLegalMoves[piece].Count;
             }
         }
 
         OnAvailableMovesUpdated?.Invoke();
 
         return totalMoves;
+    }
+
+    private void EnforceBreakOwnBlockadeRule()
+    {
+        var blockadePieces = new HashSet<Piece>();
+
+        var blockadeGroups = pieces
+        .Where(
+            p => p.ownerPlayerIndex == currentPlayerIndex &&
+            p.currentTileIndex >= 0 &&
+            p.currentTileIndex != boardRules.GetHomeTile(currentPlayerIndex)
+        )
+        .GroupBy(p => p.currentTileIndex);
+
+        foreach (var group in blockadeGroups)
+        {
+            if (group.Count() >= 2)
+            {
+               foreach (var piece in group)
+               {
+                    Debug.Log($"Blockage piece: {piece}");
+                    blockadePieces.Add(piece);
+               }
+            }
+        }
+
+        if (blockadePieces.Count == 0)
+        {
+            return; // no blockade
+        }
+
+        playerHadABlockade = true;
+
+        foreach (var piece in pieces)
+        {
+            if (!blockadePieces.Contains(piece) && currentLegalMoves.Keys.Contains(piece))
+            {
+                Debug.Log($"Piece cannot move because player has a blockade: {piece}");
+                currentLegalMoves.Remove(piece);
+            }
+        }
     }
 
     private void NextPlayer()

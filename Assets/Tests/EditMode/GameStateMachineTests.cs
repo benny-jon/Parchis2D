@@ -11,7 +11,7 @@ public class GameStateMachineTests
     private BoardRules boardRules;
     private BoardView boardView;
     private List<Piece> pieces;
-    
+
     private GameStateMachine stateMachine;
 
     [SetUp]
@@ -31,7 +31,7 @@ public class GameStateMachineTests
 
         stateMachine.OnMovePieceToStart += (piece) =>
         {
-           piece.currentTileIndex = -1;  
+            piece.currentTileIndex = -1;
         };
     }
 
@@ -64,8 +64,8 @@ public class GameStateMachineTests
 
         // Move turn to Player 1 by rollling not starting dice
         Assert.AreEqual(0, stateMachine.currentPlayerIndex);
-        stateMachine.RollDiceWithValues(1, 2); 
-        
+        stateMachine.RollDiceWithValues(1, 2);
+
         Assert.AreEqual(1, stateMachine.currentPlayerIndex);
         stateMachine.RollDiceWithValues(3, 5);
 
@@ -93,7 +93,7 @@ public class GameStateMachineTests
         Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
 
         stateMachine.RollDiceWithValues(2, 3);
-    
+
         Assert.AreNotEqual(-1, trackPiece.currentTileIndex);
         Assert.AreEqual(0, stateMachine.currentPlayerIndex);
     }
@@ -116,7 +116,7 @@ public class GameStateMachineTests
         Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
 
         stateMachine.RollDiceWithValues(2, 2);
-    
+
         Assert.AreEqual(-1, trackPiece.currentTileIndex);
         Assert.AreEqual(1, stateMachine.currentPlayerIndex);
     }
@@ -237,6 +237,121 @@ public class GameStateMachineTests
         Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
         Assert.AreEqual(boardRules.GetStartTile(0), pieceA.currentTileIndex);
         Assert.AreEqual(0, stateMachine.CurrentLegalMoves.Count);
+    }
+
+    [Test]
+    public void Blockade_MustBeBroken_WhenRollingDoubles()
+    {
+        pieces.Clear();
+        var pieceInBlockadeA = CreateTestPiece(0, 25);
+        var pieceInBlockadeB = CreateTestPiece(0, 25);
+        var freePiece = CreateTestPiece(0, 5);
+        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece });
+
+        stateMachine.StartGame();
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+
+        stateMachine.RollDiceWithValues(3, 3);
+
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForMove, stateMachine.gamePhase);
+        Assert.False(stateMachine.CurrentLegalMoves.Keys.Contains(freePiece));
+        Assert.AreEqual(3, stateMachine.CurrentLegalMoves[pieceInBlockadeA].Count);
+        Assert.AreEqual(3, stateMachine.CurrentLegalMoves[pieceInBlockadeB].Count);
+    }
+
+    [Test]
+    public void Blockade_NonNeedToBeBroken_WhenNotRollingDoubles()
+    {
+        pieces.Clear();
+        var pieceInBlockadeA = CreateTestPiece(0, 25);
+        var pieceInBlockadeB = CreateTestPiece(0, 25);
+        var freePiece = CreateTestPiece(0, 5);
+        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece });
+
+        stateMachine.StartGame();
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+
+        stateMachine.RollDiceWithValues(3, 4);
+
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForMove, stateMachine.gamePhase);
+        Assert.AreEqual(3, stateMachine.CurrentLegalMoves[freePiece].Count);
+        Assert.AreEqual(3, stateMachine.CurrentLegalMoves[pieceInBlockadeA].Count);
+        Assert.AreEqual(3, stateMachine.CurrentLegalMoves[pieceInBlockadeB].Count);
+    }
+
+    [Test]
+    public void ForfeitTurn_IfBlockadeIsBlocked_WhenRollingDoubles()
+    {
+        pieces.Clear();
+        var enemyInBlockadeA = CreateTestPiece(1, 26);
+        var enemyInBlockadeB = CreateTestPiece(1, 26);
+        // blockage blocked by enemy blockade
+        var pieceInBlockadeA = CreateTestPiece(0, 25);
+        var pieceInBlockadeB = CreateTestPiece(0, 25);
+        var freePiece = CreateTestPiece(0, 5);
+        pieces.AddRange(new List<Piece> { enemyInBlockadeA, enemyInBlockadeB, pieceInBlockadeA, pieceInBlockadeB, freePiece });
+ 
+        stateMachine.StartGame();
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+
+        stateMachine.RollDiceWithValues(3, 3);
+
+        Assert.AreEqual(1, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+    }
+
+    [Test]
+    public void DontForfeitTurn_IfBlockadeIsBlocked_AndNotRollingDoubles()
+    {
+        pieces.Clear();
+        var enemyInBlockadeA = CreateTestPiece(1, 26);
+        var enemyInBlockadeB = CreateTestPiece(1, 26);
+        // blockage blocked by enemy blockade
+        var pieceInBlockadeA = CreateTestPiece(0, 25);
+        var pieceInBlockadeB = CreateTestPiece(0, 25);
+        var freePiece = CreateTestPiece(0, 5);
+        pieces.AddRange(new List<Piece> { enemyInBlockadeA, enemyInBlockadeB, pieceInBlockadeA, pieceInBlockadeB, freePiece });
+ 
+        stateMachine.StartGame();
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+
+        stateMachine.RollDiceWithValues(3, 4);
+
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForMove, stateMachine.gamePhase);
+    }
+
+    [Test]
+    public void AllowToReformSameBlockade_WhenRollingDoubles()
+    {
+        pieces.Clear();
+        var pieceInBlockadeA = CreateTestPiece(0, 25);
+        var pieceInBlockadeB = CreateTestPiece(0, 25);
+        var freePiece = CreateTestPiece(0, 5);
+        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece });
+
+        stateMachine.StartGame();
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+        Assert.AreEqual(pieceInBlockadeA.currentTileIndex, pieceInBlockadeB.currentTileIndex); // blockade exist
+
+        stateMachine.RollDiceWithValues(3, 3);
+        Assert.False(stateMachine.CurrentLegalMoves.Keys.Contains(freePiece));
+        Assert.AreEqual(3, stateMachine.CurrentLegalMoves[pieceInBlockadeA].Count);
+        Assert.AreEqual(3, stateMachine.CurrentLegalMoves[pieceInBlockadeB].Count);
+
+        stateMachine.OnPieceClicked(pieceInBlockadeA);
+        Assert.AreEqual(1, stateMachine.CurrentLegalMoves[pieceInBlockadeB].Count);
+        Assert.AreNotEqual(pieceInBlockadeA.currentTileIndex, pieceInBlockadeB.currentTileIndex); // broken blockade
+
+        stateMachine.OnPieceClicked(pieceInBlockadeB);
+        Assert.AreEqual(pieceInBlockadeA.currentTileIndex, pieceInBlockadeB.currentTileIndex); // blockade reform 3 steps forward
     }
 
     private BoardView CreateTestBoardView(int tileCount)
