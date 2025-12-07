@@ -28,11 +28,11 @@ public class BoardDefinitionGenerator
         SetTile(board, 12 + 17 * 2 - 1, TileType.Safe, -1);
         SetTile(board, 12 + 17 * 3 - 1, TileType.Safe, -1);
 
-        // Home Entry Tiles
+        // Home Entry Tiles (67, 16, 33, 50)
         SetTile(board, 67, TileType.HomeEntry, 0);
-        SetTile(board, 67 + 9, TileType.HomeEntry, 1);
-        SetTile(board, 67 + 9 * 2, TileType.HomeEntry, 2);
-        SetTile(board, 67 + 9 * 3, TileType.HomeEntry, 3);
+        SetTile(board, 16, TileType.HomeEntry, 1);
+        SetTile(board, 33, TileType.HomeEntry, 2);
+        SetTile(board, 50, TileType.HomeEntry, 3);
 
         // Home Tiles
         SetHomeColumTilesFrom(board, 68, 0);

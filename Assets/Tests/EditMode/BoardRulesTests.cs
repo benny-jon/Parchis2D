@@ -168,6 +168,15 @@ public class BoardRulesTests
     }
 
     [Test]
+    public void Test_HomeEntry_Tiles()
+    {
+        Assert.AreEqual(TileType.HomeEntry, boardDefinition.tiles[67].type);
+        Assert.AreEqual(TileType.HomeEntry, boardDefinition.tiles[16].type);
+        Assert.AreEqual(TileType.HomeEntry, boardDefinition.tiles[33].type);
+        Assert.AreEqual(TileType.HomeEntry, boardDefinition.tiles[50].type);
+    }
+
+    [Test]
     public void Test_Home_Tiles()
     {
         Assert.AreEqual(TileType.Home, boardDefinition.tiles[67 + 8].type);
@@ -243,6 +252,65 @@ public class BoardRulesTests
 
         Assert.AreEqual(result.status, MoveStatus.Normal);
         Assert.AreEqual(result.targetTileIndex, boardDefinition.GetStartTilesIndex()[3]);
+    }
+
+    [Test]
+    public void Piece_CanGoOver_SafeTileWithEnemy()
+    {
+        var enemyPiece = CreateTestPiece(0, boardDefinition.GetHomeEntryTilesIndex()[1]);
+        var mainPiece = CreateTestPiece(2, boardDefinition.GetHomeEntryTilesIndex()[1] - 3);
+
+        var result = rules.TryResolveMove(mainPiece, 5, new List<Piece> { enemyPiece, mainPiece });
+
+        Assert.AreEqual(MoveStatus.Normal, result.status);
+        Assert.AreEqual(boardDefinition.GetHomeEntryTilesIndex()[1] + 2, result.targetTileIndex);
+    }
+
+    [Test]
+    public void Piece_CannotLandOn_SafeTileWithEnemy()
+    {
+        var homeEntryTile = boardDefinition.GetHomeEntryTilesIndex()[1];
+        Assert.AreEqual(TileType.HomeEntry, boardDefinition.tiles[homeEntryTile].type);
+        Assert.True(rules.IsTileSafe(homeEntryTile));
+    
+        var enemyPiece = CreateTestPiece(0, boardDefinition.GetHomeEntryTilesIndex()[1]);
+        var mainPiece = CreateTestPiece(2, boardDefinition.GetHomeEntryTilesIndex()[1] - 3);
+
+        var result = rules.TryResolveMove(mainPiece, 3, new List<Piece> { enemyPiece, mainPiece });
+
+        Assert.AreEqual(MoveStatus.Invalid, result.status);
+        Assert.AreEqual(-1, result.targetTileIndex);
+    }
+
+    [Test]
+    public void Piece_CanStartAnd_CaptureEnemy_OnStartTile()
+    {
+        var playerOneStartTile = boardDefinition.GetStartTilesIndex()[1];
+        Assert.AreEqual(TileType.Start, boardDefinition.tiles[playerOneStartTile].type);
+
+        var enemyPiece = CreateTestPiece(0, playerOneStartTile);
+        var mainPiece = CreateTestPiece(1, -1);
+
+        var result = rules.TryResolveMove(mainPiece, 5, new List<Piece> { enemyPiece, mainPiece });
+
+        Assert.AreEqual(MoveStatus.Capture, result.status);
+        Assert.AreEqual(playerOneStartTile, result.targetTileIndex);
+    }
+
+    [Test]
+    public void Piece_CannotStart_WithEnemyBlockade_OnStartTile()
+    {
+        var playerOneStartTile = boardDefinition.GetStartTilesIndex()[1];
+        Assert.AreEqual(TileType.Start, boardDefinition.tiles[playerOneStartTile].type);
+
+        var enemyPieceA = CreateTestPiece(0, playerOneStartTile);
+        var enemyPieceB = CreateTestPiece(0, playerOneStartTile);
+        var mainPiece = CreateTestPiece(1, -1);
+
+        var result = rules.TryResolveMove(mainPiece, 5, new List<Piece> { enemyPieceA, enemyPieceB, mainPiece });
+
+        Assert.AreEqual(MoveStatus.BlockedByBlockade, result.status);
+        Assert.AreEqual(-1, result.targetTileIndex);
     }
 
     // Parametized test arguments

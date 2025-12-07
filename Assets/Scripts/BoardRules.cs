@@ -63,6 +63,19 @@ public class BoardRules
         // Check for Safe tiles
         if (IsTileSafe(targetIndex))
         {
+            var enemyPiece = allPieces.Find(p => p.currentTileIndex == targetIndex && p.ownerPlayerIndex != piece.ownerPlayerIndex);
+
+            if (enemyPiece != null)
+            {
+                if (targetIndex == startTilebyPlayer[piece.ownerPlayerIndex])
+                {
+                    return new MoveResult(MoveStatus.Capture, targetIndex); // kick out enemy piece from my Start tile.
+                }
+
+                Debug.Log($"Enemy piece already in Safe tile {targetIndex}");
+                return MoveResult.InvalidMove(); // Cannot land on Safe tile that has an enemy piece on it.
+            }
+
             return new MoveResult(MoveStatus.Normal, targetIndex);
         }
 
