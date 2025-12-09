@@ -11,12 +11,17 @@ public class GameManager : MonoBehaviour
     public List<Piece> allPieces;
     public TMP_Text[] actionHintPerPlayer;
     public TMP_Text[] diceHintPerPlayer;
+    public TMP_Text gameOverText;
 
     private BoardRules boardRules;
     private GameStateMachine stateMachine;
 
     void Start()
     {
+        if (gameOverText != null)
+        {
+            gameOverText.enabled = false;
+        }
         ResetPieces();
         ClearPlayersActionHints();
 
@@ -53,17 +58,31 @@ public class GameManager : MonoBehaviour
             {
                 ClearPlayersActionHints();
                 ClearMoveHints();
-                SetCurrentPlayerActionHint("Roll");
+                SetPlayerActionHint(stateMachine.currentPlayerIndex, "Roll");
             }
             if (phase == GamePhase.WaitingForMove)
             {
                 ClearOtherPlayersDiceHints();
-                SetCurrentPlayerActionHint("Move");
+                SetPlayerActionHint(stateMachine.currentPlayerIndex, "Move");
             }
         };
         stateMachine.OnMovePieceToStart += (piece) =>
         {
             ResetPiece(piece);
+        };
+        stateMachine.OnPlayerFinishedTheGame += (player) =>
+        {
+            Debug.Log($"Player {player} has finished the game");  
+            SetPlayerActionHint(player, "Winner!");
+            if (gameOverText != null)
+            {
+                gameOverText.text = $"Player {player}\nhas Won!";
+                gameOverText.enabled = true;
+            }
+        };
+        stateMachine.OnGameOver += () =>
+        {
+            Debug.LogWarning("GAME OVER!");  
         };
 
         ClearOtherPlayersDiceHints();
@@ -97,11 +116,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void SetCurrentPlayerActionHint(String hintMessage)
+    private void SetPlayerActionHint(int player, String hintMessage)
     {
-        if (actionHintPerPlayer != null && actionHintPerPlayer.Length >= stateMachine.currentPlayerIndex + 1)
+        if (actionHintPerPlayer != null && actionHintPerPlayer.Length >= player + 1)
         {
-            actionHintPerPlayer[stateMachine.currentPlayerIndex].text = hintMessage;
+            actionHintPerPlayer[player].text = hintMessage;
         }
         else
         {

@@ -41,6 +41,8 @@ public class GameStateMachine
     public Action OnMoveEnded;
     public Action<GamePhase> OnGamePhaseChanged;
     public Action<Piece> OnMovePieceToStart;
+    public Action<int> OnPlayerFinishedTheGame;
+    public Action OnGameOver;
 
     public IReadOnlyDictionary<Piece, List<MoveOption>> CurrentLegalMoves => currentLegalMoves;
 
@@ -56,6 +58,12 @@ public class GameStateMachine
     public void StartGame()
     {
         StartTurn();
+    }
+
+    public void EndGame()
+    {
+        gamePhase = GamePhase.GameOver;
+        OnGameOver?.Invoke();
     }
 
     private void StartTurn()
@@ -171,6 +179,13 @@ public class GameStateMachine
 
         OnMoveStarted?.Invoke();
 
+        Debug.Log($"Moving {moveOption.piece} from Tiles {moveOption.piece.currentTileIndex} to {moveOption.targetTileIndex}");
+        moveOption.piece.MoveToTile(moveOption.targetTileIndex, boardView);
+
+        boardView.LayoutPieces(pieces);
+
+        OnMoveEnded?.Invoke();
+
         if (moveResult.status == MoveStatus.Capture)
         {
             Debug.Log($"Capturing {moveResult.capturedPiece}");
@@ -182,14 +197,15 @@ public class GameStateMachine
         {
             Debug.Log($"{moveOption.piece} reached Home!");
             bonusStepsToMove.Add(BonusForReachingHome);
+            
+            if (HasPlayerFinishedTheGame())
+            {
+                OnPlayerFinishedTheGame?.Invoke(currentPlayerIndex);
+                //NextPlayer();
+                EndGame();
+                return;
+            }
         }
-
-        Debug.Log($"Moving {moveOption.piece} from Tiles {moveOption.piece.currentTileIndex} to {moveOption.targetTileIndex}");
-        moveOption.piece.MoveToTile(moveOption.targetTileIndex, boardView);
-
-        boardView.LayoutPieces(pieces);
-
-        OnMoveEnded?.Invoke();
 
         if (dice1Used && dice2Used && bonusStepsToMove.Count == 0)
         {
@@ -393,12 +409,38 @@ public class GameStateMachine
         }
     }
 
+    private bool HasPlayerFinishedTheGame()
+    {
+        return pieces.Find(p => p.ownerPlayerIndex == currentPlayerIndex && boardRules.GetHomeTile(currentPlayerIndex) != p.currentTileIndex) == null;
+    }
+
+    private bool IsGameOver()
+    {
+        var playersStillPlayingGroups = pieces.Where(p => p.currentTileIndex != boardRules.GetHomeTile(p.ownerPlayerIndex)).GroupBy(p => p.ownerPlayerIndex);
+        var playersWithActivePieces = playersStillPlayingGroups.Count();
+        return playersWithActivePieces <= 1;
+    }
+
     private void NextPlayer()
     {
         rolledDoublesInARow = 0;
         bonusStepsToMove.Clear();
         currentLegalMoves.Clear();
         currentPlayerIndex = (currentPlayerIndex + 1) % BoardDefinition.PLAYERS;
+
+        if (IsGameOver())
+        {
+            EndGame();
+            return;
+        }
+
+        if (HasPlayerFinishedTheGame())
+        {
+            // Skip already finished Player
+            NextPlayer();
+            return;
+        }
+
         Debug.Log($"[SM] Next Player {currentPlayerIndex}");
         StartTurn();
     }
