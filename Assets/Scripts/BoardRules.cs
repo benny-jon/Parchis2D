@@ -64,6 +64,12 @@ public class BoardRules
         if (IsTileSafe(targetIndex))
         {
             var enemyPiece = allPieces.Find(p => p.currentTileIndex == targetIndex && p.ownerPlayerIndex != piece.ownerPlayerIndex);
+            var piecesCount = allPieces.Where(p => p.currentTileIndex == targetIndex).Count();
+
+            if (piecesCount >= 2)
+            {
+                return MoveResult.InvalidMove(); // Dont allow more than 2 piece stacking
+            }
 
             if (enemyPiece != null)
             {
@@ -73,7 +79,8 @@ public class BoardRules
                 }
 
                 Debug.Log($"Enemy piece already in Safe tile {targetIndex}");
-                return MoveResult.InvalidMove(); // Cannot land on Safe tile that has an enemy piece on it.
+                // Update: allow sharing Safe tiles
+                //return MoveResult.InvalidMove(); // Cannot land on Safe tile that has an enemy piece on it.
             }
 
             return new MoveResult(MoveStatus.Normal, targetIndex);

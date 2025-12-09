@@ -222,8 +222,10 @@ public class GameStateMachineTests
         pieces.Clear();
         var finishingPiece = CreateTestPiece(0, boardRules.GetHomeTile(0) - 2);
         var pieceA = CreateTestPiece(0, -1);
+        var otherPlayerPiece = CreateTestPiece(1, -1);
         pieces.Add(finishingPiece);
         pieces.Add(pieceA);
+        pieces.Add(otherPlayerPiece);
 
         stateMachine.StartGame();
 
@@ -352,6 +354,27 @@ public class GameStateMachineTests
 
         stateMachine.OnPieceClicked(pieceInBlockadeB);
         Assert.AreEqual(pieceInBlockadeA.currentTileIndex, pieceInBlockadeB.currentTileIndex); // blockade reform 3 steps forward
+    }
+
+    [Test]
+    public void Verify_GameOver_WhenOnePlayerFinishes()
+    {
+        pieces.Clear();
+        var finishingPiece = CreateTestPiece(0, boardRules.GetHomeTile(0) - 3);
+        var otherPiece1 = CreateTestPiece(1, -1);
+        var otherPiece2 = CreateTestPiece(2, -1);
+        var otherPiece3 = CreateTestPiece(3, -1);
+        pieces.AddRange(new List<Piece> { finishingPiece, otherPiece1, otherPiece2, otherPiece3 });
+
+        stateMachine.StartGame();
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+
+        // Roll and auto-finish piece
+        stateMachine.RollDiceWithValues(1, 2);
+        stateMachine.OnPieceClicked(finishingPiece);
+
+        Assert.AreEqual(GamePhase.GameOver, stateMachine.gamePhase);
     }
 
     private BoardView CreateTestBoardView(int tileCount)

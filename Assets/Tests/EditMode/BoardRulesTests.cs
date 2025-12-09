@@ -267,7 +267,7 @@ public class BoardRulesTests
     }
 
     [Test]
-    public void Piece_CannotLandOn_SafeTileWithEnemy()
+    public void Piece_SharesSafeTileWithEnemy()
     {
         var homeEntryTile = boardDefinition.GetHomeEntryTilesIndex()[1];
         Assert.AreEqual(TileType.HomeEntry, boardDefinition.tiles[homeEntryTile].type);
@@ -277,6 +277,57 @@ public class BoardRulesTests
         var mainPiece = CreateTestPiece(2, boardDefinition.GetHomeEntryTilesIndex()[1] - 3);
 
         var result = rules.TryResolveMove(mainPiece, 3, new List<Piece> { enemyPiece, mainPiece });
+
+        Assert.AreEqual(MoveStatus.Normal, result.status);
+        Assert.AreEqual(boardDefinition.GetHomeEntryTilesIndex()[1], result.targetTileIndex);
+    }
+
+    [Test]
+    public void Piece_CannotLandOnSafeTile_WithTwoEnemiesThere()
+    {
+        var homeEntryTile = boardDefinition.GetHomeEntryTilesIndex()[1];
+        Assert.AreEqual(TileType.HomeEntry, boardDefinition.tiles[homeEntryTile].type);
+        Assert.True(rules.IsTileSafe(homeEntryTile));
+    
+        var enemyPiece = CreateTestPiece(0, boardDefinition.GetHomeEntryTilesIndex()[1]);
+        var enemyPieceB = CreateTestPiece(3, boardDefinition.GetHomeEntryTilesIndex()[1]);
+        var mainPiece = CreateTestPiece(2, boardDefinition.GetHomeEntryTilesIndex()[1] - 3);
+
+        var result = rules.TryResolveMove(mainPiece, 3, new List<Piece> { enemyPiece, enemyPieceB, mainPiece });
+
+        Assert.AreEqual(MoveStatus.Invalid, result.status);
+        Assert.AreEqual(-1, result.targetTileIndex);
+    }
+
+    [Test]
+    public void Piece_CannotLandOnSafeTile_WithTwoOtherPiecesThere()
+    {
+        var homeEntryTile = boardDefinition.GetHomeEntryTilesIndex()[1];
+        Assert.AreEqual(TileType.HomeEntry, boardDefinition.tiles[homeEntryTile].type);
+        Assert.True(rules.IsTileSafe(homeEntryTile));
+    
+        var enemyPiece = CreateTestPiece(0, boardDefinition.GetHomeEntryTilesIndex()[1]);
+        var mainOtherPiece = CreateTestPiece(2, boardDefinition.GetHomeEntryTilesIndex()[1]);
+        var mainPiece = CreateTestPiece(2, boardDefinition.GetHomeEntryTilesIndex()[1] - 3);
+
+        var result = rules.TryResolveMove(mainPiece, 3, new List<Piece> { enemyPiece, mainOtherPiece, mainPiece });
+
+        Assert.AreEqual(MoveStatus.Invalid, result.status);
+        Assert.AreEqual(-1, result.targetTileIndex);
+    }
+
+    [Test]
+    public void Piece_CannotLandOnStartTile_WithTwoDifferentEnemiesThere()
+    {
+        var playerStartTile = boardDefinition.GetStartTilesIndex()[2];
+        Assert.AreEqual(TileType.Start, boardDefinition.tiles[playerStartTile].type);
+        Assert.True(rules.IsTileSafe(playerStartTile));
+    
+        var enemyPiece = CreateTestPiece(0, playerStartTile);
+        var enemyPieceB = CreateTestPiece(3, playerStartTile);
+        var mainPiece = CreateTestPiece(2, -1);
+
+        var result = rules.TryResolveMove(mainPiece, 5, new List<Piece> { enemyPiece, enemyPieceB, mainPiece });
 
         Assert.AreEqual(MoveStatus.Invalid, result.status);
         Assert.AreEqual(-1, result.targetTileIndex);
