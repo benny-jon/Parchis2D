@@ -38,6 +38,7 @@ public class GameStateMachine
     public Action OnAvailableMovesUpdated;
     public Action<int> OnTurnChanged;
     public Action OnMoveStarted;
+    public Action<Piece, List<int>, Action> OnMoveAnimationRequested;
     public Action OnMoveEnded;
     public Action<GamePhase> OnGamePhaseChanged;
     public Action<Piece> OnMovePieceToStart;
@@ -179,12 +180,19 @@ public class GameStateMachine
 
         OnMoveStarted?.Invoke();
 
+        List<int> path = boardRules.GetPathIndices(moveOption.piece, moveOption.steps);
+
+        OnMoveAnimationRequested?.Invoke(
+            moveOption.piece,
+            path,
+            () => FinalizeMoveAfterAnimation(moveOption, moveResult)
+        );
+    }
+
+    private void FinalizeMoveAfterAnimation(MoveOption moveOption, MoveResult moveResult)
+    {
         Debug.Log($"Moving {moveOption.piece} from Tiles {moveOption.piece.currentTileIndex} to {moveOption.targetTileIndex}");
         moveOption.piece.MoveToTile(moveOption.targetTileIndex, boardView);
-
-        boardView.LayoutPieces(pieces);
-
-        OnMoveEnded?.Invoke();
 
         if (moveResult.status == MoveStatus.Capture)
         {
@@ -193,11 +201,20 @@ public class GameStateMachine
             bonusStepsToMove.Add(BonusForCapture);
         }
 
+        boardView.LayoutPieces(pieces);
+
+        OnMoveEnded?.Invoke();
+
+        HandleEndOfMove(moveOption, moveResult);
+    }
+
+    private void HandleEndOfMove(MoveOption moveOption, MoveResult moveResult)
+    {
         if (moveResult.status == MoveStatus.ReachedHome)
         {
             Debug.Log($"{moveOption.piece} reached Home!");
             bonusStepsToMove.Add(BonusForReachingHome);
-            
+
             if (HasPlayerFinishedTheGame())
             {
                 OnPlayerFinishedTheGame?.Invoke(currentPlayerIndex);
@@ -384,11 +401,11 @@ public class GameStateMachine
         {
             if (group.Count() >= 2)
             {
-               foreach (var piece in group)
-               {
+                foreach (var piece in group)
+                {
                     Debug.Log($"Blockage piece: {piece}");
                     blockadePieces.Add(piece);
-               }
+                }
             }
         }
 

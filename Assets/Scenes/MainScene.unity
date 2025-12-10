@@ -186,7 +186,7 @@ Transform:
   m_GameObject: {fileID: 30962299}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.16, y: -0.74, z: 0}
+  m_LocalPosition: {x: 1.16, y: -0.84, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1389,7 +1389,7 @@ Transform:
   m_GameObject: {fileID: 491993626}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.1150002, y: -0.762, z: 0}
+  m_LocalPosition: {x: -1.1150002, y: -0.84, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2849,6 +2849,52 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 15
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &945880645
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 945880647}
+  - component: {fileID: 945880646}
+  m_Layer: 0
+  m_Name: AnimationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &945880646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945880645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27a0a651585774df68c275fdec878e12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Scripts::AnimationManager
+  boardView: {fileID: 2066784745}
+  stepDuration: 0.15
+--- !u!4 &945880647
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945880645}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.58249, y: 0.51455, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &966834831
 GameObject:
   m_ObjectHideFlags: 0
@@ -3795,7 +3841,7 @@ Transform:
   m_GameObject: {fileID: 1146727815}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.143, y: 0.81, z: 0}
+  m_LocalPosition: {x: 1.143, y: 0.84, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3857,7 +3903,7 @@ Transform:
   m_GameObject: {fileID: 1154230178}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.8000001, y: 1.11, z: 0}
+  m_LocalPosition: {x: 0.85, y: 1.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3919,7 +3965,7 @@ Transform:
   m_GameObject: {fileID: 1173999126}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.766, y: -1.14, z: 0}
+  m_LocalPosition: {x: -0.8569999, y: -1.14, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4547,7 +4593,7 @@ Transform:
   m_GameObject: {fileID: 1381443270}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.116, y: 0.80600005, z: 0}
+  m_LocalPosition: {x: -1.116, y: 0.854, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7127,7 +7173,7 @@ Transform:
   m_GameObject: {fileID: 2034857159}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.752, y: 1.11, z: 0}
+  m_LocalPosition: {x: -0.84, y: 1.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7591,7 +7637,7 @@ Transform:
   m_GameObject: {fileID: 2095166342}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.78, y: -1.14, z: 0}
+  m_LocalPosition: {x: 0.8410001, y: -1.14, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7766,6 +7812,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   boardDefinition: {fileID: 11400000, guid: 888552e238ef54efa9af347baacd8354, type: 2}
   boardView: {fileID: 2066784745}
+  animationManager: {fileID: 945880646}
   allPieces:
   - {fileID: 717106762}
   - {fileID: 1700317435}
@@ -7972,6 +8019,7 @@ SceneRoots:
   - {fileID: 619394802}
   - {fileID: 2066784743}
   - {fileID: 6336190654349970620}
+  - {fileID: 945880647}
   - {fileID: 483442566}
   - {fileID: 499500996}
   - {fileID: 1107356546}

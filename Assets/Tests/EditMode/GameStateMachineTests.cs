@@ -33,6 +33,11 @@ public class GameStateMachineTests
         {
             piece.currentTileIndex = -1;
         };
+
+        stateMachine.OnMoveAnimationRequested += (_, _, onComplete) =>
+        {
+            onComplete?.Invoke();
+        };
     }
 
     [Test]
@@ -179,6 +184,26 @@ public class GameStateMachineTests
     }
 
     [Test]
+    public void Verify_CaptureEnemyPiece_OnOwnStartTile()
+    {
+        int enemyPieceTileIndex = boardDefinition.tiles.First(t => t.type == TileType.Start).index;
+        int enemyPlayer = 1;
+        Assert.True(boardRules.GetStartTile(0) == enemyPieceTileIndex);
+
+        pieces.Insert(2, CreateTestPiece(enemyPlayer, enemyPieceTileIndex));
+        pieces[1].currentTileIndex = enemyPieceTileIndex - 1;
+
+        stateMachine.OnMovePieceToStart += (piece) =>
+        {
+            Assert.AreEqual(enemyPlayer, piece.ownerPlayerIndex);
+        };
+
+        stateMachine.StartGame();
+        stateMachine.RollDiceWithValues(3, 2);
+        stateMachine.OnPieceClicked(pieces[0]);
+    }
+
+    [Test]
     public void Verify_CannotCaptureEnemyPiece_OnSafeTile()
     {
         int enemyPieceTileIndex = boardDefinition.tiles.First(t => t.type == TileType.Safe).index;
@@ -296,7 +321,7 @@ public class GameStateMachineTests
         var pieceInBlockadeB = CreateTestPiece(0, 25);
         var freePiece = CreateTestPiece(0, 5);
         pieces.AddRange(new List<Piece> { enemyInBlockadeA, enemyInBlockadeB, pieceInBlockadeA, pieceInBlockadeB, freePiece });
- 
+
         stateMachine.StartGame();
         Assert.AreEqual(0, stateMachine.currentPlayerIndex);
         Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
@@ -318,7 +343,7 @@ public class GameStateMachineTests
         var pieceInBlockadeB = CreateTestPiece(0, 25);
         var freePiece = CreateTestPiece(0, 5);
         pieces.AddRange(new List<Piece> { enemyInBlockadeA, enemyInBlockadeB, pieceInBlockadeA, pieceInBlockadeB, freePiece });
- 
+
         stateMachine.StartGame();
         Assert.AreEqual(0, stateMachine.currentPlayerIndex);
         Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);

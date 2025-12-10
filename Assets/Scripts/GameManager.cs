@@ -5,8 +5,9 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public BoardDefinition boardDefinition;
-    public BoardView boardView;
+    [SerializeField] public BoardDefinition boardDefinition;
+    [SerializeField] public BoardView boardView;
+    [SerializeField] public AnimationManager animationManager;
 
     public List<Piece> allPieces;
     public TMP_Text[] actionHintPerPlayer;
@@ -83,6 +84,11 @@ public class GameManager : MonoBehaviour
         stateMachine.OnGameOver += () =>
         {
             Debug.LogWarning("GAME OVER!");  
+        };
+        stateMachine.OnMoveAnimationRequested += (piece, path, onComplete) =>
+        {
+            Debug.Log($"Animating piece: {piece}");
+            animationManager.PlayMove(piece, path, onComplete);
         };
 
         ClearOtherPlayersDiceHints();

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -75,7 +76,8 @@ public class BoardRules
             {
                 if (targetIndex == startTilebyPlayer[piece.ownerPlayerIndex])
                 {
-                    return new MoveResult(MoveStatus.Capture, targetIndex); // kick out enemy piece from my Start tile.
+                    Debug.Log($"Kicking enemy piece from Start tile ({targetIndex}): {piece}");
+                    return new MoveResult(MoveStatus.Capture, targetIndex, enemyPiece); // kick out enemy piece from my Start tile.
                 }
 
                 Debug.Log($"Enemy piece already in Safe tile {targetIndex}");
@@ -290,5 +292,27 @@ public class BoardRules
         // Distance from this player's start around the loop (0..67)
         int diff = (tileIndex - startIndex + outerLoopLength) % outerLoopLength;
         return diff;
+    }
+
+    public List<int> GetPathIndices(Piece piece, int steps)
+    {
+        var resultPath = new List<int>();
+
+        if (piece.currentTileIndex < 0)
+        {
+            resultPath.Add(startTilebyPlayer[piece.ownerPlayerIndex]);
+            return resultPath;
+        }
+
+        int currentIndex = piece.currentTileIndex;
+
+        for (int i = 0; i < steps; i++)
+        {
+            int nextIndex = GetNextIndexAlongPath(currentIndex, piece.ownerPlayerIndex);
+            currentIndex = nextIndex;
+            resultPath.Add(currentIndex);
+        }
+
+        return resultPath;
     }
 }
