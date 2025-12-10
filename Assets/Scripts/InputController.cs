@@ -18,7 +18,24 @@ public class InputController : MonoBehaviour
         // For a Button action, this will be 1 on press, 0 on release
         float value = ctx.ReadValue<float>();
 
-        Vector2 screenPos = Mouse.current.position.ReadValue();
+        Vector2 screenPos;
+        var pointerDevice = ctx.control.device as Pointer;
+        if (pointerDevice != null)
+        {
+            screenPos = Pointer.current.position.ReadValue();
+        }
+        else if (Mouse.current != null)
+        {
+            screenPos = Mouse.current.position.ReadValue();
+        }
+        else if (Touchscreen.current != null)
+        {
+            screenPos = Touchscreen.current.primaryTouch.position.ReadValue();
+        }
+        else
+        {
+            return;
+        }
         Vector2 worldPos = cam.ScreenToWorldPoint(screenPos);
 
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);

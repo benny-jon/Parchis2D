@@ -80,7 +80,7 @@ public class BoardRules
                     return new MoveResult(MoveStatus.Capture, targetIndex, enemyPiece); // kick out enemy piece from my Start tile.
                 }
 
-                Debug.Log($"Enemy piece already in Safe tile {targetIndex}");
+                //Debug.Log($"Enemy piece already in Safe tile {targetIndex}");
                 // Update: allow sharing Safe tiles
                 //return MoveResult.InvalidMove(); // Cannot land on Safe tile that has an enemy piece on it.
             }
@@ -199,11 +199,11 @@ public class BoardRules
             if (steps <= 0) return INVALID_TARGET;
             if (steps == START_ROLL_REQUIREMENT)
             {
-                Debug.LogWarning($"[BR] Piece in base can Start: {piece} with steps {steps}");
+                //Debug.LogWarning($"[BR] Piece in base can Start: {piece} with steps {steps}");
                 return startTilebyPlayer[player] + (steps - 5);
             }
 
-            Debug.LogWarning($"[BR] Invalid {steps} steps for piece in base {piece}");
+            //Debug.LogWarning($"[BR] Invalid {steps} steps for piece in base {piece}");
             return INVALID_TARGET;
         }
 
@@ -213,7 +213,7 @@ public class BoardRules
         // Already Home
         if (currentTile.type == TileType.Home)
         {
-            Debug.LogWarning($"[BR] Piece already home {piece}");
+            //Debug.LogWarning($"[BR] Piece already home {piece}");
             return INVALID_TARGET;
         }
 
@@ -226,11 +226,11 @@ public class BoardRules
 
             if (newOffset > BoardDefinition.HOME_ROW_COUNT - 1)
             {
-                Debug.LogWarning($"[BR] {steps} steps will overshoot Home for {piece}");
+                //Debug.LogWarning($"[BR] {steps} steps will overshoot Home for {piece}");
                 return INVALID_TARGET; // overshoot
             }
 
-            Debug.LogWarning($"[BR] Can move {steps} steps in Home Rows: {piece}");
+            //Debug.LogWarning($"[BR] Can move {steps} steps in Home Rows: {piece}");
             return firstHomeRow + newOffset;
         }
 
@@ -254,11 +254,11 @@ public class BoardRules
 
         if (pos > firstHomeRowByPlayer[player] + BoardDefinition.HOME_ROW_COUNT - 1)
         {
-            Debug.LogWarning($"[BR] In Main track, Steps: {steps} overshoot piece: {piece}");
+            //Debug.LogWarning($"[BR] In Main track, Steps: {steps} overshoot piece: {piece}");
             return INVALID_TARGET; // overshoot
         }
 
-        Debug.LogWarning($"[BR] Available steps {steps} for {piece}");
+        //Debug.LogWarning($"[BR] Available steps {steps} for {piece}");
         return pos;
     }
 
