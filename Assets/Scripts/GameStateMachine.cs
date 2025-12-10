@@ -43,7 +43,6 @@ public class GameStateMachine
     public Action<GamePhase> OnGamePhaseChanged;
     public Action<Piece> OnMovePieceToStart;
     public Action<int> OnPlayerFinishedTheGame;
-    public Action OnGameOver;
 
     public IReadOnlyDictionary<Piece, List<MoveOption>> CurrentLegalMoves => currentLegalMoves;
 
@@ -64,7 +63,6 @@ public class GameStateMachine
     public void EndGame()
     {
         gamePhase = GamePhase.GameOver;
-        OnGameOver?.Invoke();
     }
 
     private void StartTurn()
@@ -215,7 +213,7 @@ public class GameStateMachine
             Debug.Log($"{moveOption.piece} reached Home!");
             bonusStepsToMove.Add(BonusForReachingHome);
 
-            if (HasPlayerFinishedTheGame())
+            if (HasCurrentPlayerFinishedTheGame())
             {
                 OnPlayerFinishedTheGame?.Invoke(currentPlayerIndex);
                 //NextPlayer();
@@ -426,12 +424,12 @@ public class GameStateMachine
         }
     }
 
-    private bool HasPlayerFinishedTheGame()
+    private bool HasCurrentPlayerFinishedTheGame()
     {
         return pieces.Find(p => p.ownerPlayerIndex == currentPlayerIndex && boardRules.GetHomeTile(currentPlayerIndex) != p.currentTileIndex) == null;
     }
 
-    private bool IsGameOver()
+    private bool ThereIsOnlyOnePlayerLeft()
     {
         var playersStillPlayingGroups = pieces.Where(p => p.currentTileIndex != boardRules.GetHomeTile(p.ownerPlayerIndex)).GroupBy(p => p.ownerPlayerIndex);
         var playersWithActivePieces = playersStillPlayingGroups.Count();
@@ -445,13 +443,13 @@ public class GameStateMachine
         currentLegalMoves.Clear();
         currentPlayerIndex = (currentPlayerIndex + 1) % BoardDefinition.PLAYERS;
 
-        if (IsGameOver())
+        if (ThereIsOnlyOnePlayerLeft())
         {
             EndGame();
             return;
         }
 
-        if (HasPlayerFinishedTheGame())
+        if (HasCurrentPlayerFinishedTheGame())
         {
             // Skip already finished Player
             NextPlayer();

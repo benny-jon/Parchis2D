@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     private BoardRules boardRules;
     private GameStateMachine stateMachine;
 
-    void Start()
+    private void Awake()
     {
         if (gameOverText != null)
         {
@@ -29,73 +29,134 @@ public class GameManager : MonoBehaviour
         boardRules = new BoardRules(boardDefinition);
         stateMachine = new GameStateMachine(allPieces, boardView, boardRules);
 
-        stateMachine.OnDiceRolled += (dice1, dice2) =>
-        {
-            Debug.Log($"Dice rolled: {dice1}, {dice2}");
-            ClearPlayersActionHints();
-            SetCurrentPlayerDiceHint($"{dice1},{dice2}");
-        };
-        stateMachine.OnTurnChanged += player =>
-        {
-            Debug.Log($"Turn changed to Player {player}");
-            ClearMoveHints();
-        };
-        stateMachine.OnMoveStarted += () =>
-        {
-            Debug.Log($"On Move Started");
-        };
-        stateMachine.OnMoveEnded += () =>
-        {
-            Debug.Log($"On Move Ended");
-        };
-        stateMachine.OnAvailableMovesUpdated += () =>
-        {
-            ClearMoveHints();
-            UpdateMoveHints();
-        };
-        stateMachine.OnGamePhaseChanged += (phase) =>
-        {
-            if (phase == GamePhase.WaitingForRoll)
-            {
-                ClearPlayersActionHints();
-                ClearMoveHints();
-                SetPlayerActionHint(stateMachine.currentPlayerIndex, "Roll");
-            }
-            if (phase == GamePhase.WaitingForMove)
-            {
-                ClearOtherPlayersDiceHints();
-                SetPlayerActionHint(stateMachine.currentPlayerIndex, "Move");
-            }
-        };
-        stateMachine.OnMovePieceToStart += (piece) =>
-        {
-            ResetPiece(piece);
-        };
-        stateMachine.OnPlayerFinishedTheGame += (player) =>
-        {
-            Debug.Log($"Player {player} has finished the game");  
-            SetPlayerActionHint(player, "Winner!");
-            if (gameOverText != null)
-            {
-                gameOverText.text = $"Player {player}\nhas Won!";
-                gameOverText.enabled = true;
-            }
-        };
-        stateMachine.OnGameOver += () =>
-        {
-            Debug.LogWarning("GAME OVER!");  
-        };
-        stateMachine.OnMoveAnimationRequested += (piece, path, onComplete) =>
-        {
-            Debug.Log($"Animating piece: {piece}");
-            animationManager.PlayMove(piece, path, onComplete);
-        };
+        SubscribeToStateMachineEvents();
 
         ClearOtherPlayersDiceHints();
-        stateMachine.StartGame();
-
-        Debug.Log("StateMachine Initialized " + GetHashCode());
     }
+
+    void Start()
+    {
+        stateMachine.StartGame();
+        Debug.Log("GameManager Initialized " + GetHashCode());
+    }
+
+    private void OnDestroy()
+    {
+        UbsubscribeFromStateMachineEvents();
+    }
+
+    // ---------------------------
+    //  SUBSCRIBE / UNSUBSCRIBE
+    // ---------------------------
+
+    private void SubscribeToStateMachineEvents()
+    {
+        if (stateMachine == null) return;
+
+        stateMachine.OnDiceRolled += HandleDiceRolled;
+        stateMachine.OnTurnChanged += HandleTurnChanged;
+        stateMachine.OnMoveStarted += HandleMoveStarted;
+        stateMachine.OnMoveEnded += HandleMoveEnded;
+        stateMachine.OnAvailableMovesUpdated += HandleAvailableMovesUpdated;
+        stateMachine.OnGamePhaseChanged += HandleGamePhaseChanged;
+        stateMachine.OnMovePieceToStart += HandleMovePieceToStart;
+        stateMachine.OnPlayerFinishedTheGame += HandlePlayerFinished;
+        stateMachine.OnMoveAnimationRequested += HandleMoveAnimationRequested;
+    }
+
+    private void UbsubscribeFromStateMachineEvents()
+    {
+        if (stateMachine == null) return;
+
+        stateMachine.OnDiceRolled -= HandleDiceRolled;
+        stateMachine.OnTurnChanged -= HandleTurnChanged;
+        stateMachine.OnMoveStarted -= HandleMoveStarted;
+        stateMachine.OnMoveEnded -= HandleMoveEnded;
+        stateMachine.OnAvailableMovesUpdated -= HandleAvailableMovesUpdated;
+        stateMachine.OnGamePhaseChanged -= HandleGamePhaseChanged;
+        stateMachine.OnMovePieceToStart -= HandleMovePieceToStart;
+        stateMachine.OnPlayerFinishedTheGame -= HandlePlayerFinished;
+        stateMachine.OnMoveAnimationRequested -= HandleMoveAnimationRequested;
+    }
+
+    // ---------------------------
+    //  EVENT HANDLERS
+    // ---------------------------
+
+    private void HandleDiceRolled(int dice1, int dice2)
+    {
+        Debug.Log($"Dice rolled: {dice1}, {dice2}");
+        ClearPlayersActionHints();
+        SetCurrentPlayerDiceHint($"{dice1},{dice2}");
+    }
+
+    private void HandleTurnChanged(int player)
+    {
+        Debug.Log($"Turn changed to Player {player}");
+        ClearMoveHints();
+    }
+
+    private void HandleMoveStarted()
+    {
+        Debug.Log("On Move Started");
+    }
+
+    private void HandleMoveEnded()
+    {
+        Debug.Log("On Move Ended");
+    }
+
+    private void HandleAvailableMovesUpdated()
+    {
+        ClearMoveHints();
+        UpdateMoveHints();
+    }
+
+    private void HandleGamePhaseChanged(GamePhase phase)
+    {
+        if (phase == GamePhase.WaitingForRoll)
+        {
+            ClearPlayersActionHints();
+            ClearMoveHints();
+            SetPlayerActionHint(stateMachine.currentPlayerIndex, "Roll");
+        }
+        else if (phase == GamePhase.WaitingForMove)
+        {
+            ClearOtherPlayersDiceHints();
+            SetPlayerActionHint(stateMachine.currentPlayerIndex, "Move");
+        }
+        else if (phase == GamePhase.GameOver)
+        {
+            Debug.LogWarning("GAME OVER!");
+        }
+    }
+
+    private void HandleMovePieceToStart(Piece piece)
+    {
+        ResetPiece(piece);
+    }
+
+    private void HandlePlayerFinished(int player)
+    {
+        Debug.Log($"Player {player} has finished the game");
+        SetPlayerActionHint(player, "Winner!");
+
+        if (gameOverText != null)
+        {
+            gameOverText.text = $"Player {player}\nhas Won!";
+            gameOverText.enabled = true;
+        }
+    }
+
+    private void HandleMoveAnimationRequested(Piece piece, List<int> path, System.Action onComplete)
+    {
+        Debug.Log($"Animating piece: {piece}");
+        animationManager.PlayMove(piece, path, onComplete);
+    }
+
+    // ---------------------------
+    //  EXISTING HELPERS
+    // ---------------------------
 
     private void ClearPlayersActionHints()
     {
