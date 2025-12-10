@@ -22,7 +22,7 @@ public class Piece : Clickable2D
        gameManager.OnPieceClicked(this);
     }
 
-    public void MoveToTile(int tileIndex, BoardView boardView)
+    public void MoveToTile(int tileIndex)
     {
         currentTileIndex = tileIndex;
     }

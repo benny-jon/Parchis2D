@@ -190,7 +190,7 @@ public class GameStateMachine
     private void FinalizeMoveAfterAnimation(MoveOption moveOption, MoveResult moveResult)
     {
         Debug.Log($"Moving {moveOption.piece} from Tiles {moveOption.piece.currentTileIndex} to {moveOption.targetTileIndex}");
-        moveOption.piece.MoveToTile(moveOption.targetTileIndex, boardView);
+        moveOption.piece.MoveToTile(moveOption.targetTileIndex);
 
         if (moveResult.status == MoveStatus.Capture)
         {

@@ -141,7 +141,6 @@ public class GameManager : MonoBehaviour
 
     private void HandleMovePieceToStart(Piece piece)
     {
-        ResetPiece(piece);
         if (piece.ownerPlayerIndex != stateMachine.currentPlayerIndex)
         {
             // it was a capture
@@ -151,6 +150,13 @@ public class GameManager : MonoBehaviour
         {
             soundManager?.PlayPieceToStart();
         }
+        
+        piece.MoveToTile(-1);
+
+        animationManager.PlayResetPiece(piece, boardView.pieceSpawnPoints[allPieces.FindIndex(p => p == piece)].position, () =>
+        {
+            ResetPiece(piece);
+        });
     }
 
     private void HandlePlayerFinished(int player)
