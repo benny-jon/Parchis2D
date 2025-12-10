@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public BoardDefinition boardDefinition;
     [SerializeField] public BoardView boardView;
     [SerializeField] public AnimationManager animationManager;
+    [SerializeField] public SoundManager soundManager;
 
     public List<Piece> allPieces;
     public TMP_Text[] actionHintPerPlayer;
@@ -85,6 +86,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleDiceRolled(int dice1, int dice2)
     {
+        soundManager?.PlayDiceRoll();
         Debug.Log($"Dice rolled: {dice1}, {dice2}");
         ClearPlayersActionHints();
         SetCurrentPlayerDiceHint($"{dice1},{dice2}");
@@ -101,9 +103,14 @@ public class GameManager : MonoBehaviour
         Debug.Log("On Move Started");
     }
 
-    private void HandleMoveEnded()
+    private void HandleMoveEnded(MoveResult moveResult)
     {
         Debug.Log("On Move Ended");
+        soundManager?.PlayPieceMoveEnd();
+        if (moveResult.status == MoveStatus.ReachedHome)
+        {
+            soundManager?.PlayHome();
+        }
     }
 
     private void HandleAvailableMovesUpdated()
@@ -128,12 +135,22 @@ public class GameManager : MonoBehaviour
         else if (phase == GamePhase.GameOver)
         {
             Debug.LogWarning("GAME OVER!");
+            soundManager?.PlayPlayerWin();
         }
     }
 
     private void HandleMovePieceToStart(Piece piece)
     {
         ResetPiece(piece);
+        if (piece.ownerPlayerIndex != stateMachine.currentPlayerIndex)
+        {
+            // it was a capture
+            soundManager?.PlayCapture();
+        }
+        else
+        {
+            soundManager?.PlayPieceToStart();
+        }
     }
 
     private void HandlePlayerFinished(int player)
@@ -146,6 +163,8 @@ public class GameManager : MonoBehaviour
             gameOverText.text = $"Player {player}\nhas Won!";
             gameOverText.enabled = true;
         }
+
+        soundManager?.PlayPlayerWin();
     }
 
     private void HandleMoveAnimationRequested(Piece piece, List<int> path, System.Action onComplete)
@@ -268,6 +287,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        soundManager?.PlayPieceClicked();
         stateMachine.OnPieceClicked(piece);
     }
 

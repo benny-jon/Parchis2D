@@ -39,7 +39,7 @@ public class GameStateMachine
     public Action<int> OnTurnChanged;
     public Action OnMoveStarted;
     public Action<Piece, List<int>, Action> OnMoveAnimationRequested;
-    public Action OnMoveEnded;
+    public Action<MoveResult> OnMoveEnded;
     public Action<GamePhase> OnGamePhaseChanged;
     public Action<Piece> OnMovePieceToStart;
     public Action<int> OnPlayerFinishedTheGame;
@@ -201,7 +201,7 @@ public class GameStateMachine
 
         boardView.LayoutPieces(pieces);
 
-        OnMoveEnded?.Invoke();
+        OnMoveEnded?.Invoke(moveResult);
 
         HandleEndOfMove(moveOption, moveResult);
     }
