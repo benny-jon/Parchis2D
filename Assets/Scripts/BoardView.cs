@@ -205,5 +205,16 @@ public class BoardView : MonoBehaviour
 
             Gizmos.DrawSphere(p.position, 0.10f);
         }
+
+        Gizmos.color = Color.black;
+
+        Transform anchorPointsParent = transform.GetChild(3);
+        if (anchorPointsParent != null)
+        {
+            for (int i = 0; i < anchorPointsParent.childCount; i++)
+            {
+                Gizmos.DrawSphere(anchorPointsParent.GetChild(i).position, 0.10f);
+            }
+        }
     }
 }

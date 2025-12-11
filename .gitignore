@@ -104,3 +104,5 @@ InitTestScene*.unity*
 !.vscode/settings.json
 
 CodeCoverage/
+parchis2d-mobile_BackUpThisFolder_ButDontShipItWithYourGame/
+ParchisBoardGame2D_BurstDebugInformation_DoNotShip/

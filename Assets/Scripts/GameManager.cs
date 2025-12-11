@@ -10,20 +10,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] public AnimationManager animationManager;
     [SerializeField] public SoundManager soundManager;
 
+    [SerializeField] public ParchisUI parchisUI;
+
     public List<Piece> allPieces;
-    public TMP_Text[] actionHintPerPlayer;
-    public TMP_Text[] diceHintPerPlayer;
-    public TMP_Text gameOverText;
 
     private BoardRules boardRules;
     private GameStateMachine stateMachine;
 
     private void Awake()
     {
-        if (gameOverText != null)
-        {
-            gameOverText.enabled = false;
-        }
         ResetPieces();
         ClearPlayersActionHints();
 
@@ -89,7 +84,7 @@ public class GameManager : MonoBehaviour
         soundManager?.PlayDiceRoll();
         Debug.Log($"Dice rolled: {dice1}, {dice2}");
         ClearPlayersActionHints();
-        SetCurrentPlayerDiceHint($"{dice1},{dice2}");
+        SetCurrentPlayerDiceHint(dice1, dice2);
     }
 
     private void HandleTurnChanged(int player)
@@ -125,12 +120,12 @@ public class GameManager : MonoBehaviour
         {
             ClearPlayersActionHints();
             ClearMoveHints();
-            SetPlayerActionHint(stateMachine.currentPlayerIndex, "Roll");
+            SetPlayerActionHint(stateMachine.currentPlayerIndex, phase);
         }
         else if (phase == GamePhase.WaitingForMove)
         {
             ClearOtherPlayersDiceHints();
-            SetPlayerActionHint(stateMachine.currentPlayerIndex, "Move");
+            SetPlayerActionHint(stateMachine.currentPlayerIndex, phase);
         }
         else if (phase == GamePhase.GameOver)
         {
@@ -162,12 +157,11 @@ public class GameManager : MonoBehaviour
     private void HandlePlayerFinished(int player)
     {
         Debug.Log($"Player {player} has finished the game");
-        SetPlayerActionHint(player, "Winner!");
+        //SetPlayerActionHint(player, "Winner!");
 
-        if (gameOverText != null)
+        if (parchisUI != null)
         {
-            gameOverText.text = $"Player {player}\nhas Won!";
-            gameOverText.enabled = true;
+            parchisUI.ShowGameOver(player);
         }
 
         soundManager?.PlayPlayerWin();
@@ -185,50 +179,33 @@ public class GameManager : MonoBehaviour
 
     private void ClearPlayersActionHints()
     {
-        if (actionHintPerPlayer != null)
+        if (parchisUI != null)
         {
-            for (int i = 0; i < actionHintPerPlayer.Length; i++)
-            {
-                actionHintPerPlayer[i].text = "";
-            }
+            parchisUI.ClearTurnHints();
         }
     }
 
     private void ClearOtherPlayersDiceHints()
     {
-        if (diceHintPerPlayer != null)
+        if (parchisUI != null)
         {
-            for (int i = 0; i < diceHintPerPlayer.Length; i++)
-            {
-                if (i != stateMachine.currentPlayerIndex)
-                {
-                    diceHintPerPlayer[i].text = "";
-                }
-            }
+            parchisUI.ClearOtherPlayersDice(stateMachine.currentPlayerIndex);
         }
     }
 
-    private void SetPlayerActionHint(int player, String hintMessage)
+    private void SetPlayerActionHint(int player, GamePhase phase)
     {
-        if (actionHintPerPlayer != null && actionHintPerPlayer.Length >= player + 1)
+        if (parchisUI != null)
         {
-            actionHintPerPlayer[player].text = hintMessage;
-        }
-        else
-        {
-            Debug.LogError("Forgot to assigned values to the actionHintPerPlayer list");
+            parchisUI.ShowTurnHintForPlayer(player, phase);
         }
     }
 
-    private void SetCurrentPlayerDiceHint(String hintMessage)
+    private void SetCurrentPlayerDiceHint(int dice1, int dice2)
     {
-        if (diceHintPerPlayer != null && diceHintPerPlayer.Length >= stateMachine.currentPlayerIndex + 1)
+        if (parchisUI != null)
         {
-            diceHintPerPlayer[stateMachine.currentPlayerIndex].text = hintMessage;
-        }
-        else
-        {
-            Debug.LogError("Forgot to assigned values to the diceHintPerPlayer list");
+            parchisUI.ShowDiceForPlayer(stateMachine.currentPlayerIndex, dice1, dice2);
         }
     }
 
