@@ -44,6 +44,14 @@ public class GameStateMachine
 
     public IReadOnlyDictionary<Piece, List<MoveOption>> CurrentLegalMoves => currentLegalMoves;
 
+    #region Option Selection Variables
+    public Action<int, Piece, IReadOnlyList<MoveOption>> OnMoveOptionSelectionRequest;
+    private int optionRequestIdCounter = 0;
+    private int activeOptionRequestId = -1;
+    private Piece activeOptionPiece = null;
+    private List<MoveOption> activeOptions = null;
+    #endregion
+
     public GameStateMachine(List<Piece> pieces, BoardView boardView, BoardRules boardRules)
     {
         this.pieces = pieces;
@@ -128,6 +136,7 @@ public class GameStateMachine
 
     public void OnPieceClicked(Piece piece)
     {
+        CancelAnyMoveOptionRequestIfNeeded();
         if (gamePhase != GamePhase.WaitingForMove)
         {
             Debug.Log("We are not waiting for move yet!");
@@ -145,23 +154,50 @@ public class GameStateMachine
             return;
         }
 
-        MoveOption chosenOption = ChooseMoveOption(options);
+        if (options.Count > 1)
+        {
+            SendMoveOptionSelectionRequest(piece, options);
+        }
+        else
+        {
+            MoveOption onlyOption = options[0];
+            MoveResult moveResult = boardRules.TryResolveMove(piece, onlyOption.steps, pieces);
+            ExecuteResolvedMove(onlyOption, moveResult);
+        }
+    }
+
+    private void SendMoveOptionSelectionRequest(Piece piece, List<MoveOption> options)
+    {
+        activeOptionRequestId = ++optionRequestIdCounter;
+        activeOptionPiece = piece;
+        activeOptions = options;
+
+        OnMoveOptionSelectionRequest?.Invoke(activeOptionRequestId, piece, options);
+    }
+
+    public void OnMoveOptionSelected(int requestId, Piece piece, int moveOptionIndex)
+    {
+        if (requestId != activeOptionRequestId) return;
+        if (activeOptions == null) return;
+        if (moveOptionIndex < 0 || moveOptionIndex >= activeOptions.Count) return;
+
+        gamePhase = GamePhase.WaitingForMove;
+
+        MoveOption chosenOption = activeOptions[moveOptionIndex];
+
+        activeOptionRequestId = -1;
+        activeOptionPiece = null;
+        activeOptions = null;
 
         MoveResult moveResult = boardRules.TryResolveMove(piece, chosenOption.steps, pieces);
         ExecuteResolvedMove(chosenOption, moveResult);
     }
 
-    public MoveOption ChooseMoveOption(List<MoveOption> options)
+    private void CancelAnyMoveOptionRequestIfNeeded()
     {
-        if (options.Count == 1)
-        {
-            return options[0];
-        }
-        else
-        {
-            // TODO show options to the user so they can tap on one.
-            return options.First();
-        }
+        activeOptionRequestId = -1;
+        activeOptionPiece = null;
+        activeOptions = null;
     }
 
     private void ExecuteResolvedMove(MoveOption moveOption, MoveResult moveResult)

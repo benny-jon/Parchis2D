@@ -38,6 +38,10 @@ public class GameStateMachineTests
         {
             onComplete?.Invoke();
         };
+        stateMachine.OnMoveOptionSelectionRequest += (id, piece, options) =>
+        {
+            stateMachine.OnMoveOptionSelected(id, piece, 0);
+        };
     }
 
     [Test]

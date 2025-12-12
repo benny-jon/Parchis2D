@@ -17,7 +17,7 @@ public class Piece : Clickable2D
 
     public override void OnClickUp()
     {
-       gameManager.OnPieceClicked(this);
+       gameManager.OnPieceClicked(this, transform);
     }
 
     public void MoveToTile(int tileIndex)

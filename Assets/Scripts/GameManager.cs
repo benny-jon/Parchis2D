@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -11,11 +12,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] public SoundManager soundManager;
 
     [SerializeField] public ParchisUI parchisUI;
+    [SerializeField] public MovePopupUI movePopupUI;
 
     public List<Piece> allPieces;
 
     private BoardRules boardRules;
     private GameStateMachine stateMachine;
+
+    #region Option Selection Variables
+    private int currenOptionRequestId;
+    private Piece activePiece;
+    private Transform activePieceTransform;
+    #endregion
 
     private void Awake()
     {
@@ -58,6 +66,7 @@ public class GameManager : MonoBehaviour
         stateMachine.OnMovePieceToStart += HandleMovePieceToStart;
         stateMachine.OnPlayerFinishedTheGame += HandlePlayerFinished;
         stateMachine.OnMoveAnimationRequested += HandleMoveAnimationRequested;
+        stateMachine.OnMoveOptionSelectionRequest += HandleSelectMoveOptionRequest;
     }
 
     private void UbsubscribeFromStateMachineEvents()
@@ -73,6 +82,7 @@ public class GameManager : MonoBehaviour
         stateMachine.OnMovePieceToStart -= HandleMovePieceToStart;
         stateMachine.OnPlayerFinishedTheGame -= HandlePlayerFinished;
         stateMachine.OnMoveAnimationRequested -= HandleMoveAnimationRequested;
+        stateMachine.OnMoveOptionSelectionRequest -= HandleSelectMoveOptionRequest;
     }
 
     // ---------------------------
@@ -173,6 +183,17 @@ public class GameManager : MonoBehaviour
         animationManager.PlayMove(piece, path, onComplete);
     }
 
+    public void HandleSelectMoveOptionRequest(int requestId, Piece piece, IReadOnlyList<MoveOption> options)
+    {
+        currenOptionRequestId = requestId;
+
+        movePopupUI?.Show(activePieceTransform, options.ToArray(), onPickIndex: (optionIndex) =>
+        {
+            Debug.Log($"Calling OnMoveOptionSelected for {optionIndex}");
+            stateMachine.OnMoveOptionSelected(currenOptionRequestId, activePiece, optionIndex);
+        });
+    }
+
     // ---------------------------
     //  EXISTING HELPERS
     // ---------------------------
@@ -262,13 +283,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void OnPieceClicked(Piece piece)
+    public void OnPieceClicked(Piece piece, Transform pieceTransform)
     {
         if (stateMachine == null)
         {
             Debug.LogError("StateMachine is NULL " + GetHashCode());
             return;
         }
+
+        activePiece = piece;
+        activePieceTransform = pieceTransform;
 
         soundManager?.PlayPieceClicked();
         stateMachine.OnPieceClicked(piece);
