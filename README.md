@@ -13,31 +13,53 @@ Below is a high-level explanation of each class and how they interact.
 ## Class Summaries
 
 ### BoardDefinition
-Stores the logical definition of every tile on the board (type, owner, index).
+Defines board layout constants (track length, home rows) and provides helper methods to get each player’s start, home-entry and home tiles.
 
 ### BoardTile
-Represents a single tile’s metadata such as its index, type, and owning player.
+A simple data class representing a tile’s index, type (normal, safe, start etc.) and the player who owns it.
 
 ### BoardView
-Provides the world-space positions of tiles and draws gizmos for visual debugging in the Scene view.
+Handles world positions for tiles and spawn points, draws colored gizmos for tile types in the scene, and auto-assigns positions from the editor.
 
 ### Clickable2D
-Base class for any in-scene object that can be clicked using the global Input System raycasts.
+Abstract `MonoBehaviour` that can be clicked; subclasses override `OnClickDown`/`OnClickUp` to react to input.
 
 ### InputController
-Handles mouse/touch input using the new Input System and dispatches click events to Clickable2D objects.
+Uses Unity’s Input System to detect mouse/touch input, raycast into the scene and dispatch click events to `Clickable2D` objects.
 
 ### Piece
-Represents a player’s pawn and moves visually on the board when commanded by the game rules.
+Represents a player's pawn, tracks its owner and current tile, provides methods to move or reset, and displays move hints.
 
 ### DiceButton
-A Clickable2D object that triggers a dice roll through the GameManager.
+A button derived from `Clickable2D` that triggers a dice roll via the `GameManager`.
 
 ### BoardRules
-Contains all logic for computing valid movement paths across the board, including base, loops, and home rows.
+Encapsulates Parchís game logic by determining valid moves, safe tiles, blockades, captures, progress scores and movement paths.
 
 ### GameStateMachine
-Controls turn order, game phases, dice interactions, and move resolution for the entire game flow.
+Manages game phases, dice rolls, bonus moves, move resolution, repeated turns on doubles, and transitions between players.
 
 ### GameManager
-Central glue layer connecting input, rules, state machine, board view, and assets in the Unity scene.
+Unity `MonoBehaviour` that wires together board rules, the state machine, input, UI, animations and sound, resets pieces, and updates player HUDs.
+
+### MoveOption
+Represents a candidate move including the piece, target tile, step count, dice usage and bonus index, used for selecting moves.
+
+### MoveResult
+Indicates the outcome of a move (invalid, normal, capture, blocked by blockade or reach home) and includes the resulting tile or captured piece.
+
+### AnimationManager
+Performs coroutines that animate pieces resetting to their base or moving along a path and calls callbacks when finished.
+
+### SoundManager
+Stores audio clips and plays sounds for dice rolls, clicks, moves ending, captures, returning to start, reaching home, winning and UI clicks.
+
+### ParchisUI
+Manages the orientation-specific UI roots, shows dice values and move/roll hints per player, clears hints, updates orientation and displays game-over text.
+
+### GamePhase (enum)
+Defines the state machine’s phases: waiting to roll, waiting to move, animating a move or game over.
+
+### ArrayUtils
+Provides a utility to convert integer arrays to formatted strings for debugging purposes.
+
