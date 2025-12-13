@@ -401,7 +401,9 @@ public class GameStateMachine
             }
         }
 
-        if (lastDice1Roll == lastDice2Roll)
+        EnforceMustStartPieceIfAvailable();
+
+        if (lastDice1Roll == lastDice2Roll && !dice1Used && !dice2Used)
         {
             EnforceBreakOwnBlockadeRule();
         }
@@ -417,6 +419,18 @@ public class GameStateMachine
         OnAvailableMovesUpdated?.Invoke();
 
         return totalMoves;
+    }
+
+    private void EnforceMustStartPieceIfAvailable()
+    {
+        bool anyStartMoves = currentLegalMoves.Values.Any(list => list.Any(m => m.targetTileIndex == boardRules.GetStartTile(m.piece.ownerPlayerIndex)));
+
+        if (!anyStartMoves) return;
+
+        Debug.Log("Start moves found. Keeping 1");
+        var pieceAndMoves = currentLegalMoves.First(pair => pair.Value.Any(m => m.targetTileIndex == boardRules.GetStartTile(m.piece.ownerPlayerIndex)));
+        currentLegalMoves.Clear();
+        currentLegalMoves.Add(pieceAndMoves.Key, new List<MoveOption>(){ pieceAndMoves.Value.First() }); // only keep 1 start move to auto-execute it.
     }
 
     private void EnforceBreakOwnBlockadeRule()

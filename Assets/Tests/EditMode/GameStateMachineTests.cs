@@ -53,10 +53,6 @@ public class GameStateMachineTests
 
         var basePiece = pieces[0];
 
-        Assert.AreEqual(GamePhase.WaitingForMove, stateMachine.gamePhase);
-
-        stateMachine.OnPieceClicked(basePiece);
-
         Assert.AreEqual(boardDefinition.GetStartTilesIndex()[0], basePiece.currentTileIndex);
     }
 
@@ -78,9 +74,7 @@ public class GameStateMachineTests
         Assert.AreEqual(1, stateMachine.currentPlayerIndex);
         stateMachine.RollDiceWithValues(3, 5);
 
-        Assert.AreEqual(GamePhase.WaitingForMove, stateMachine.gamePhase);
         var basePiece = pieces[1];
-        stateMachine.OnPieceClicked(basePiece);
         Assert.AreEqual(boardDefinition.GetStartTilesIndex()[1], basePiece.currentTileIndex);
     }
 
@@ -101,7 +95,7 @@ public class GameStateMachineTests
         stateMachine.OnPieceClicked(trackPiece);
         Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
 
-        stateMachine.RollDiceWithValues(2, 3);
+        stateMachine.RollDiceWithValues(2, 4);
 
         Assert.AreNotEqual(-1, trackPiece.currentTileIndex);
         Assert.AreEqual(0, stateMachine.currentPlayerIndex);
@@ -293,6 +287,30 @@ public class GameStateMachineTests
     }
 
     [Test]
+    public void Blockade_MustNotBeBroken_WhenRollingDoublesThatAutoStartPiece()
+    {
+        pieces.Clear();
+        var pieceInBlockadeA = CreateTestPiece(0, boardRules.GetStartTile(0));
+        var pieceInBlockadeB = CreateTestPiece(0, -1);
+        var freePiece = CreateTestPiece(0, 6);
+        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece });
+
+        stateMachine.StartGame();
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+
+        // simulates only piece left auto-starts, and every other piece 
+        // should have 1 move available since 1 dice roll was used
+        stateMachine.RollDiceWithValues(5, 5);
+
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForMove, stateMachine.gamePhase);
+        Assert.AreEqual(1, stateMachine.CurrentLegalMoves[freePiece].Count);
+        Assert.AreEqual(1, stateMachine.CurrentLegalMoves[pieceInBlockadeA].Count);
+        Assert.AreEqual(1, stateMachine.CurrentLegalMoves[pieceInBlockadeB].Count);
+    }
+
+    [Test]
     public void Blockade_NonNeedToBeBroken_WhenNotRollingDoubles()
     {
         pieces.Clear();
@@ -406,6 +424,88 @@ public class GameStateMachineTests
         Assert.AreEqual(GamePhase.GameOver, stateMachine.gamePhase);
     }
 
+    [Test]
+    public void Verify_ForceStart_WhenRollingFive()
+    {
+        int player = pieces[0].ownerPlayerIndex;
+        int playerStartTile = boardRules.GetStartTile(player);
+
+        stateMachine.StartGame();
+        Assert.AreEqual(-1, pieces[0].currentTileIndex);
+        Assert.AreNotEqual(playerStartTile, pieces[0].currentTileIndex);
+        Assert.AreNotEqual(-1, pieces[1].currentTileIndex);
+        Assert.AreEqual(pieces[0].ownerPlayerIndex, pieces[1].ownerPlayerIndex); // same player
+
+        stateMachine.RollDiceWithValues(2, 3);
+
+        Assert.AreEqual(playerStartTile, pieces[0].currentTileIndex);
+    }
+
+    [Test]
+    public void Verify_ForceStart_WhenRollingDoubleFive()
+    {
+        int player = pieces[0].ownerPlayerIndex;
+        int playerStartTile = boardRules.GetStartTile(player);
+
+        stateMachine.StartGame();
+        Assert.AreEqual(-1, pieces[0].currentTileIndex);
+        Assert.AreNotEqual(playerStartTile, pieces[0].currentTileIndex);
+        Assert.AreNotEqual(-1, pieces[1].currentTileIndex);
+        Assert.AreEqual(pieces[0].ownerPlayerIndex, pieces[1].ownerPlayerIndex); // same player
+
+        stateMachine.RollDiceWithValues(5, 5);
+
+        Assert.AreEqual(playerStartTile, pieces[0].currentTileIndex);
+    }
+
+    [Test]
+    public void Verify_ForceStart_AfterBreakingBlockade_IfThereIsAnAvailableFive()
+    {
+        int player = 0;
+        int playerStartTile = boardRules.GetStartTile(player);
+        pieces.Clear();
+        var pieceToStart = CreateTestPiece(0, -1);
+        var pieceOnGame1 = CreateTestPiece(0, playerStartTile);
+        var pieceOnGame2 = CreateTestPiece(0, playerStartTile);
+        pieces.AddRange(new List<Piece> { pieceToStart, pieceOnGame1, pieceOnGame2 });
+
+        stateMachine.StartGame();
+        stateMachine.RollDiceWithValues(2, 5);
+
+        Assert.AreNotEqual(playerStartTile, pieces[0].currentTileIndex); // cannot auto-start yet
+
+        //override behavior
+        stateMachine.OnMoveOptionSelectionRequest = (id, piece, options) =>
+        {
+            stateMachine.OnMoveOptionSelected(id, piece, 0);
+        };
+        stateMachine.OnPieceClicked(pieceOnGame1);
+
+        Assert.AreEqual(playerStartTile, pieces[0].currentTileIndex);
+    }
+
+    [Test]
+    public void Verify_ForceDoubleStart_WhenRollingDoubleFive()
+    {
+        int player = 0;
+        int playerStartTile = boardRules.GetStartTile(player);
+        pieces.Clear();
+        var pieceToPlay = CreateTestPiece(0, -1);
+        var pieceToPlay2 = CreateTestPiece(0, -1);
+        var pieceOnGame = CreateTestPiece(0, 10);
+        pieces.AddRange(new List<Piece> { pieceToPlay, pieceToPlay2, pieceOnGame });
+
+        stateMachine.StartGame();
+        Assert.AreEqual(-1, pieces[0].currentTileIndex);
+        Assert.AreEqual(-1, pieces[1].currentTileIndex);
+        Assert.AreNotEqual(-1, pieces[2].currentTileIndex);
+
+        stateMachine.RollDiceWithValues(5, 5);
+
+        Assert.AreEqual(playerStartTile, pieces[0].currentTileIndex);
+        Assert.AreEqual(playerStartTile, pieces[1].currentTileIndex);
+    }
+
     private BoardView CreateTestBoardView(int tileCount)
     {
         var go = new GameObject("BoardView");
@@ -428,7 +528,7 @@ public class GameStateMachineTests
 
     private Piece CreateTestPiece(int owner, int tileIndex)
     {
-        var go = new GameObject($"Piece_P{owner}_T{tileIndex}");
+        var go = new GameObject($"Piece_P{owner}_T{tileIndex}: {Time.captureDeltaTime}");
         var piece = go.AddComponent<Piece>();
         piece.ownerPlayerIndex = owner;
         piece.currentTileIndex = tileIndex;
