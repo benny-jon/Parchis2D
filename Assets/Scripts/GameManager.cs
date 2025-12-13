@@ -294,8 +294,10 @@ public class GameManager : MonoBehaviour
         activePiece = piece;
         activePieceTransform = pieceTransform;
 
-        soundManager?.PlayPieceClicked();
-        stateMachine.OnPieceClicked(piece);
+        if (stateMachine.OnPieceClicked(piece))
+        {
+            soundManager?.PlayPieceClicked();
+        }
     }
 
     public void OnDiceRollButton()

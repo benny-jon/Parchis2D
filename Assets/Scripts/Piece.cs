@@ -15,6 +15,8 @@ public class Piece : Clickable2D
     [Header("UI")]
     public TMP_Text moveHintLabel;
 
+    public double lastTimeItMoved { get; private set;}
+
     public override void OnClickUp()
     {
        gameManager.OnPieceClicked(this, transform);
@@ -23,12 +25,14 @@ public class Piece : Clickable2D
     public void MoveToTile(int tileIndex)
     {
         currentTileIndex = tileIndex;
+        lastTimeItMoved = Time.timeSinceLevelLoadAsDouble;
     }
 
     public void MoveToStart(Vector3 spawnPosition)
     {
         currentTileIndex = -1;
         transform.position = spawnPosition;
+        lastTimeItMoved = Time.timeSinceLevelLoadAsDouble;
     }
 
     public void SetMoveHints(List<MoveOption> moveOptions)

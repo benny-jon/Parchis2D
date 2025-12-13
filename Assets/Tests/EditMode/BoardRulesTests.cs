@@ -317,24 +317,27 @@ public class BoardRulesTests
     }
 
     [Test]
-    public void Piece_CannotLandOnStartTile_WithTwoDifferentEnemiesThere()
+    public void Piece_CanLandOnStartTile_WithTwoDifferentEnemiesThereAndCaptureLastInArrive()
     {
         var playerStartTile = boardDefinition.GetStartTilesIndex()[2];
         Assert.AreEqual(TileType.Start, boardDefinition.tiles[playerStartTile].type);
         Assert.True(rules.IsTileSafe(playerStartTile));
     
-        var enemyPiece = CreateTestPiece(0, playerStartTile);
-        var enemyPieceB = CreateTestPiece(3, playerStartTile);
+        var enemyPiece = CreateTestPiece(0, playerStartTile - 2);
+        enemyPiece.MoveToTile(playerStartTile); // lands first
+        var enemyPieceB = CreateTestPiece(3, playerStartTile - 1);
+        enemyPieceB.MoveToTile(playerStartTile); // lands second
         var mainPiece = CreateTestPiece(2, -1);
 
         var result = rules.TryResolveMove(mainPiece, 5, new List<Piece> { enemyPiece, enemyPieceB, mainPiece });
 
-        Assert.AreEqual(MoveStatus.Invalid, result.status);
-        Assert.AreEqual(-1, result.targetTileIndex);
+        Assert.AreEqual(MoveStatus.Capture, result.status);
+        Assert.AreEqual(playerStartTile, result.targetTileIndex);
+        Assert.AreEqual(enemyPieceB, result.capturedPiece); // capturing the last one to arrive
     }
 
     [Test]
-    public void Piece_CanStartAnd_CaptureEnemy_OnStartTile()
+    public void Piece_CanStartAnd_ShareTileWithEnemy()
     {
         var playerOneStartTile = boardDefinition.GetStartTilesIndex()[1];
         Assert.AreEqual(TileType.Start, boardDefinition.tiles[playerOneStartTile].type);
@@ -344,7 +347,7 @@ public class BoardRulesTests
 
         var result = rules.TryResolveMove(mainPiece, 5, new List<Piece> { enemyPiece, mainPiece });
 
-        Assert.AreEqual(MoveStatus.Capture, result.status);
+        Assert.AreEqual(MoveStatus.Normal, result.status);
         Assert.AreEqual(playerOneStartTile, result.targetTileIndex);
     }
 

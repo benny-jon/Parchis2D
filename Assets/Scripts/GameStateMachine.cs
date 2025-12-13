@@ -134,24 +134,25 @@ public class GameStateMachine
         Debug.Log($"Player {currentPlayerIndex}, pick a Piece with available moves!");
     }
 
-    public void OnPieceClicked(Piece piece)
+    /// <returns>If its valid to click on that Piece</returns>
+    public bool OnPieceClicked(Piece piece)
     {
         CancelAnyMoveOptionRequestIfNeeded();
         if (gamePhase != GamePhase.WaitingForMove)
         {
             Debug.Log("We are not waiting for move yet!");
-            return;
+            return false;
         }
         if (piece.ownerPlayerIndex != currentPlayerIndex)
         {
             Debug.Log($"That's not your piece: {piece}");
-            return;
+            return false;
         }
 
         if (!currentLegalMoves.TryGetValue(piece, out var options) || options.Count == 0)
         {
             Debug.Log($"{piece} has NO legal moves.");
-            return;
+            return false;
         }
 
         if (options.Count > 1)
@@ -164,6 +165,7 @@ public class GameStateMachine
             MoveResult moveResult = boardRules.TryResolveMove(piece, onlyOption.steps, pieces);
             ExecuteResolvedMove(onlyOption, moveResult);
         }
+        return true;
     }
 
     private void SendMoveOptionSelectionRequest(Piece piece, List<MoveOption> options)

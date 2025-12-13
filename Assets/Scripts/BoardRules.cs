@@ -39,6 +39,11 @@ public class BoardRules
         return type == TileType.Safe || type == TileType.HomeEntry || type == TileType.Start;
     }
 
+    public bool IsPlayerStartTile(int tileIndex, int player)
+    {
+        return boardDefinition.tiles[tileIndex].type == TileType.Start && boardDefinition.tiles[tileIndex].ownerPlayerIndex == player;
+    }
+
     public MoveResult TryResolveMove(Piece piece, int steps, List<Piece> allPieces)
     {
         int targetIndex = -1;
@@ -64,25 +69,33 @@ public class BoardRules
         // Check for Safe tiles
         if (IsTileSafe(targetIndex))
         {
-            var enemyPiece = allPieces.Find(p => p.currentTileIndex == targetIndex && p.ownerPlayerIndex != piece.ownerPlayerIndex);
             var piecesCount = allPieces.Where(p => p.currentTileIndex == targetIndex).Count();
+
+            if (IsPlayerStartTile(targetIndex, piece.ownerPlayerIndex))
+            {
+                var enemyPieces = allPieces.Where(p => p.currentTileIndex == targetIndex && p.ownerPlayerIndex != piece.ownerPlayerIndex).ToArray();
+                if (enemyPieces.Length > 0)
+                {
+                    if (targetIndex == startTilebyPlayer[piece.ownerPlayerIndex])
+                    {
+                        Debug.Log($"Kicking enemy piece(s) from Start tile ({targetIndex}): {piece}");
+                        if (enemyPieces.Length == 1 && piecesCount == 2)
+                        {
+                            return new MoveResult(MoveStatus.Capture, targetIndex, enemyPieces[0]); // kick out enemy piece from my Start tile.
+                        }
+                        else if (enemyPieces.Length == 2) // at this point these are enemies from different players, otherwise it would have been a blockade
+                        {
+                            // capture the last one to arrive to the Start
+                            Piece lastPieceToLand = enemyPieces[0].lastTimeItMoved > enemyPieces[1].lastTimeItMoved ? enemyPieces[0] : enemyPieces[1];
+                            return new MoveResult(MoveStatus.Capture, targetIndex, lastPieceToLand);
+                        }
+                    }
+                }
+            }
 
             if (piecesCount >= 2)
             {
                 return MoveResult.InvalidMove(); // Dont allow more than 2 piece stacking
-            }
-
-            if (enemyPiece != null)
-            {
-                if (targetIndex == startTilebyPlayer[piece.ownerPlayerIndex])
-                {
-                    Debug.Log($"Kicking enemy piece from Start tile ({targetIndex}): {piece}");
-                    return new MoveResult(MoveStatus.Capture, targetIndex, enemyPiece); // kick out enemy piece from my Start tile.
-                }
-
-                //Debug.Log($"Enemy piece already in Safe tile {targetIndex}");
-                // Update: allow sharing Safe tiles
-                //return MoveResult.InvalidMove(); // Cannot land on Safe tile that has an enemy piece on it.
             }
 
             return new MoveResult(MoveStatus.Normal, targetIndex);
