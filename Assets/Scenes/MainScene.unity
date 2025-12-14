@@ -10335,6 +10335,7 @@ MonoBehaviour:
   - {fileID: 1849189173}
   - {fileID: 62256353}
   boardDefinition: {fileID: 11400000, guid: 888552e238ef54efa9af347baacd8354, type: 2}
+  spacingBetweenPieces: 0.225
 --- !u!1 &2069561304
 GameObject:
   m_ObjectHideFlags: 0
