@@ -180,6 +180,7 @@ public class GameManager : MonoBehaviour
     private void HandleMoveAnimationRequested(Piece piece, List<int> path, System.Action onComplete)
     {
         Debug.Log($"Animating piece: {piece}");
+        ClearOthersMoveHints(piece);
         animationManager.PlayMove(piece, path, onComplete);
     }
 
@@ -190,6 +191,7 @@ public class GameManager : MonoBehaviour
         movePopupUI?.Show(activePieceTransform, options.ToArray(), onPickIndex: (optionIndex) =>
         {
             Debug.Log($"Calling OnMoveOptionSelected for {optionIndex}");
+            activePiece.SetMoveHints(new List<MoveOption>() { options[optionIndex] });
             stateMachine.OnMoveOptionSelected(currenOptionRequestId, activePiece, optionIndex);
         });
     }
@@ -255,6 +257,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void ClearOthersMoveHints(Piece activePiece)
+    {
+        foreach (Piece piece in allPieces)
+        {
+            if (piece != null && piece != activePiece) piece.ClearMoveHints();
+        }
+    }
+
     void ResetPieces()
     {
         if (allPieces.Count != boardView.pieceSpawnPoints.Length)
@@ -309,5 +319,10 @@ public class GameManager : MonoBehaviour
         }
 
         stateMachine.RollDice();
+    }
+
+    public GamePhase CurrentGamePhase()
+    {
+        return stateMachine != null ? stateMachine.gamePhase : GamePhase.GameOver;
     }
 }

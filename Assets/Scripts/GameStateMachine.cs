@@ -216,6 +216,7 @@ public class GameStateMachine
 
         List<int> path = boardRules.GetPathIndices(moveOption.piece, moveOption.steps);
 
+        gamePhase = GamePhase.AnimatingMove;
         OnMoveAnimationRequested?.Invoke(
             moveOption.piece,
             path,

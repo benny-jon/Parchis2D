@@ -18,6 +18,13 @@ public class Piece : Clickable2D
 
     public double lastTimeItMoved { get; private set;}
 
+    private void Update() {
+        if (gameManager != null && moveHintLabel != null)
+        {
+            ringAnimation.SetActive(moveHintLabel.text != string.Empty && gameManager.CurrentGamePhase() == GamePhase.WaitingForMove);
+        }
+    }
+
     public override void OnClickUp()
     {
        gameManager.OnPieceClicked(this, transform);

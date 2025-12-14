@@ -14,6 +14,7 @@ public class AnimationManager : MonoBehaviour
 
     private IEnumerator AnimatePieceResetCoroutine(Piece piece, Vector3 spawnPoint, System.Action onComplete)
     {
+        piece.transform.localScale += new Vector3(0.1f, 0.1f, 0.1f);
         Vector3 startPos = piece.transform.position;
         Vector3 endPos = spawnPoint;
 
@@ -25,6 +26,7 @@ public class AnimationManager : MonoBehaviour
             piece.transform.position = Vector3.Lerp(startPos, endPos, Mathf.Clamp01(t));
             yield return null;
         }
+        piece.transform.localScale -= new Vector3(0.1f, 0.1f, 0.1f);
     }
 
     public void PlayMove(Piece piece, List<int> pathIndices, System.Action onComplete)
@@ -34,6 +36,7 @@ public class AnimationManager : MonoBehaviour
 
     private IEnumerator AnimatePieceMoveCoroutine(Piece piece, List<int> pathIndices, System.Action onComplete)
     {
+        HighlightPiece(piece);
         Vector3 startPos = piece.transform.position;
 
         foreach (var tileIndex in pathIndices)
@@ -51,7 +54,20 @@ public class AnimationManager : MonoBehaviour
 
             startPos = endPos;
         }
+        UnhighlightPiece(piece);
 
         onComplete?.Invoke();
+    }
+
+    private void HighlightPiece(Piece piece)
+    {
+        piece.transform.localScale += new Vector3(0.1f, 0.1f, 0.1f);
+        piece.GetComponent<SpriteRenderer>().sortingOrder += 5;
+    }
+
+    private void UnhighlightPiece(Piece piece)
+    {
+        piece.transform.localScale -= new Vector3(0.1f, 0.1f, 0.1f);
+        piece.GetComponent<SpriteRenderer>().sortingOrder -= 5;
     }
 }
