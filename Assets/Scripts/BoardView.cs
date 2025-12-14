@@ -9,6 +9,8 @@ public class BoardView : MonoBehaviour
     public Transform[] pieceSpawnPoints;
     public BoardDefinition boardDefinition;
 
+    [SerializeField] public float spacingBetweenPieces = 0.225f;
+
     public Vector3 GetTilePosition(int tileIndex)
     {
         if (tileIndex < 0 || tileIndex >= tilePoints.Length)
@@ -45,7 +47,7 @@ public class BoardView : MonoBehaviour
 
     private Vector3 GetOffsetForGroup(int count, int index, bool isVerticalTile)
     {
-        float s = 0.2f; // spacing
+        float s = spacingBetweenPieces; // spacing
 
         switch (count)
         {

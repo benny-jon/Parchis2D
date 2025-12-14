@@ -14,6 +14,7 @@ public class Piece : Clickable2D
 
     [Header("UI")]
     public TMP_Text moveHintLabel;
+    public GameObject ringAnimation;
 
     public double lastTimeItMoved { get; private set;}
 
@@ -50,6 +51,7 @@ public class Piece : Clickable2D
         if (moveHintLabel != null)
         {
             moveHintLabel.text = string.Join(",", possibleSteps);
+            ringAnimation?.SetActive(true);
         }
         else
         {
@@ -62,6 +64,7 @@ public class Piece : Clickable2D
         if (moveHintLabel != null)
         {
             moveHintLabel.text = string.Empty;
+            ringAnimation?.SetActive(false);
         } 
         else
         {
