@@ -19,7 +19,7 @@ public class ParchisUI : MonoBehaviour
     private void Awake() {
         if (gameOverText != null)
         {
-            gameOverText.enabled = false;
+            gameOverText.gameObject.SetActive(false);
         }
     }
 
@@ -96,8 +96,9 @@ public class ParchisUI : MonoBehaviour
     {
         if (gameOverText != null)
         {
+            Debug.Log($"Player {playerWinner}\nhas Won!");
             gameOverText.text = $"Player {playerWinner}\nhas Won!";
-            gameOverText.enabled = true;
+            gameOverText.gameObject.SetActive(true);
         }
     }
 

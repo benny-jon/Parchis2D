@@ -137,7 +137,6 @@ public class GameStateMachine
     /// <returns>If its valid to click on that Piece</returns>
     public bool OnPieceClicked(Piece piece)
     {
-        CancelAnyMoveOptionRequestIfNeeded();
         if (gamePhase != GamePhase.WaitingForMove)
         {
             Debug.Log("We are not waiting for move yet!");
@@ -148,6 +147,7 @@ public class GameStateMachine
             Debug.Log($"That's not your piece: {piece}");
             return false;
         }
+        CancelAnyMoveOptionRequestIfNeeded();
 
         if (!currentLegalMoves.TryGetValue(piece, out var options) || options.Count == 0)
         {

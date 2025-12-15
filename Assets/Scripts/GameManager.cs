@@ -169,8 +169,12 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Player {player} has finished the game");
         //SetPlayerActionHint(player, "Winner!");
 
+        ClearMoveHints();
+        ClearOtherPlayersDiceHints();
+
         if (parchisUI != null)
         {
+            Debug.Log("Show Game Over message");
             parchisUI.ShowGameOver(player);
         }
 

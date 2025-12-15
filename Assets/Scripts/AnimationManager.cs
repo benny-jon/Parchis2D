@@ -7,7 +7,8 @@ public class AnimationManager : MonoBehaviour
     [SerializeField] private BoardView boardView;
     [SerializeField] private float stepDuration = 0.15f;
 
-    private int temporarySortingOrder;
+    private int temporarySpriteSortingOrder;
+    private int temporaryTextSortingOrder;
 
     public void PlayResetPiece(Piece piece, Vector3 spawnPoint, System.Action onComplete)
     {
@@ -68,8 +69,14 @@ public class AnimationManager : MonoBehaviour
         var pieceImage = piece.transform.GetChild(2);    
         var pieceSprite = pieceImage.GetComponent<SpriteRenderer>();    
         pieceSprite.sortingLayerID = SortingLayer.NameToID("Animating");
-        temporarySortingOrder = pieceSprite.sortingOrder;
+        temporarySpriteSortingOrder = pieceSprite.sortingOrder;
         pieceSprite.sortingOrder = 1000;
+
+        var pieceText = piece.transform.GetChild(0);
+        var textRenderer = pieceText.GetComponent<MeshRenderer>();
+        textRenderer.sortingLayerID = SortingLayer.NameToID("Animating");
+        temporaryTextSortingOrder = textRenderer.sortingOrder;
+        textRenderer.sortingOrder = 1100;
     }
 
     private void UnhighlightPiece(Piece piece)
@@ -79,6 +86,11 @@ public class AnimationManager : MonoBehaviour
         var pieceImage = piece.transform.GetChild(2);        
         var pieceSprite = pieceImage.GetComponent<SpriteRenderer>();  
         pieceSprite.sortingLayerID = SortingLayer.NameToID("Default");
-        pieceSprite.sortingOrder = temporarySortingOrder;
+        pieceSprite.sortingOrder = temporarySpriteSortingOrder;
+
+        var pieceText = piece.transform.GetChild(0);
+        var textRenderer = pieceText.GetComponent<MeshRenderer>();
+        textRenderer.sortingLayerID = SortingLayer.NameToID("UI");
+        textRenderer.sortingOrder = temporaryTextSortingOrder;
     }
 }

@@ -41,6 +41,7 @@ public class BoardView : MonoBehaviour
                 Piece piece = groupList[i];
                 Vector3 offset = GetOffsetForGroup(count, i, IsTileVertical(tileIndex));
                 piece.transform.position = basePos + offset;
+                SetPieceSortingOrderByPos(piece);
             }
         }
     }
@@ -99,6 +100,29 @@ public class BoardView : MonoBehaviour
         || (tileIndex >= 42 && tileIndex <= 58)
         || (tileIndex >= HomeRowStart_Player1 && tileIndex <= HomeRowStart_Player1 + HomRowsCount)
         || (tileIndex >= HomeRowStart_Player3 && tileIndex <= HomeRowStart_Player3 + HomRowsCount);
+    }
+
+    private void SetPieceSortingOrderByPos(Piece piece)
+    {
+        var pieceImage = piece.transform.GetChild(2);    
+        var pieceSprite = pieceImage.GetComponent<SpriteRenderer>();    
+        var newOrder = MapYToSorting(piece.transform.position.y);
+        pieceSprite.sortingOrder = newOrder;
+
+        var pieceText = piece.transform.GetChild(0);
+        var textRenderer = pieceText.GetComponent<MeshRenderer>();
+        textRenderer.sortingOrder = newOrder + 10;
+    }
+
+    private int MapYToSorting(float y)
+    {
+        const float minY = -3.9f;
+        const float maxY = 5.2f;
+        const float minOut = 100f;
+        const float maxOut = 200f;
+
+        float t = Mathf.InverseLerp(maxY, minY, y);
+        return Mathf.RoundToInt(Mathf.Lerp(minOut, maxOut, t));
     }
 
     [ContextMenu("Auto Assign Tiles From Childre")]
