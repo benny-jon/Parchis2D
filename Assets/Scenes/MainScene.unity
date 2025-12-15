@@ -672,6 +672,7 @@ MonoBehaviour:
     landscapeDiceText: {fileID: 2101550261}
     landscapeTurnHint: {fileID: 2080321830}
   gameOverText: {fileID: 767830395}
+  winCelebration: {fileID: 1867755443}
 --- !u!114 &209510790
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9047,6 +9048,52 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 4e57fb753af744530840440253b9fbdd, type: 3}
+--- !u!1 &1867755442
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1867755444}
+  - component: {fileID: 1867755443}
+  m_Layer: 0
+  m_Name: FXManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1867755443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1867755442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43457aece3e8147ae9aec2c3a6b0e057, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Scripts::WinCelebration
+  confettiPrefab: {fileID: 7351729318270846102, guid: 40e79e4039c4d4cb29d171c220abc667, type: 3}
+  sortingOrder: 3000
+--- !u!4 &1867755444
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1867755442}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.7192, y: -0.20923, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1882910114
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10917,6 +10964,7 @@ SceneRoots:
   - {fileID: 2066784743}
   - {fileID: 6336190654349970620}
   - {fileID: 945880647}
+  - {fileID: 1867755444}
   - {fileID: 1829899787}
   - {fileID: 483442566}
   - {fileID: 499500996}

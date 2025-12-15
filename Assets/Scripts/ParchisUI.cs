@@ -13,6 +13,7 @@ public class ParchisUI : MonoBehaviour
 
     [Header("End Game")]
     [SerializeField] public TMP_Text gameOverText;
+    [SerializeField] private WinCelebration winCelebration;
 
     private bool wasLastPortrait;
 
@@ -99,6 +100,10 @@ public class ParchisUI : MonoBehaviour
             Debug.Log($"Player {playerWinner}\nhas Won!");
             gameOverText.text = $"Player {playerWinner}\nhas Won!";
             gameOverText.gameObject.SetActive(true);
+        }
+        if (winCelebration != null)
+        {
+            winCelebration.Play(gameOverText.transform.position);
         }
     }
 
