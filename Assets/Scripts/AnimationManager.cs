@@ -7,6 +7,8 @@ public class AnimationManager : MonoBehaviour
     [SerializeField] private BoardView boardView;
     [SerializeField] private float stepDuration = 0.15f;
 
+    private int temporarySortingOrder;
+
     public void PlayResetPiece(Piece piece, Vector3 spawnPoint, System.Action onComplete)
     {
         StartCoroutine(AnimatePieceResetCoroutine(piece, spawnPoint, onComplete));
@@ -62,12 +64,21 @@ public class AnimationManager : MonoBehaviour
     private void HighlightPiece(Piece piece)
     {
         piece.transform.localScale += new Vector3(0.1f, 0.1f, 0.1f);
-        piece.GetComponent<SpriteRenderer>().sortingOrder += 5;
+
+        var pieceImage = piece.transform.GetChild(2);    
+        var pieceSprite = pieceImage.GetComponent<SpriteRenderer>();    
+        pieceSprite.sortingLayerID = SortingLayer.NameToID("Animating");
+        temporarySortingOrder = pieceSprite.sortingOrder;
+        pieceSprite.sortingOrder = 1000;
     }
 
     private void UnhighlightPiece(Piece piece)
     {
         piece.transform.localScale -= new Vector3(0.1f, 0.1f, 0.1f);
-        piece.GetComponent<SpriteRenderer>().sortingOrder -= 5;
+
+        var pieceImage = piece.transform.GetChild(2);        
+        var pieceSprite = pieceImage.GetComponent<SpriteRenderer>();  
+        pieceSprite.sortingLayerID = SortingLayer.NameToID("Default");
+        pieceSprite.sortingOrder = temporarySortingOrder;
     }
 }
