@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2a3f10f7a601146728cf786f754de55a
+guid: 80fa112dd7f9c48c9a9e72d2e5d74528
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7605783150596359821
-    second: ring_target_0
+      213: 7475000137421813405
+    second: piece_green2_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -72,9 +72,9 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 512
     resizeAlgorithm: 0
-    textureFormat: -1
+    textureFormat: 4
     textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ring_target_0
+      name: piece_green2_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 286
-        height: 286
+        x: 75
+        y: 81
+        width: 442
+        height: 519
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d8682f17a7b2d8960800000000000000
-      internalID: 7605783150596359821
+      spriteID: d96f50f45098cb760800000000000000
+      internalID: 7475000137421813405
       vertices: []
       indices: 
       edges: []
@@ -164,7 +164,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ring_target_0: 7605783150596359821
+      piece_green2_0: 7475000137421813405
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
