@@ -115,6 +115,12 @@ public class GameManager : MonoBehaviour
         if (moveResult.status == MoveStatus.ReachedHome)
         {
             soundManager?.PlayHome();
+            parchisUI.ShowNotification("10 bonus moves when a piece reaches Home");
+        }
+        if (moveResult.status == MoveStatus.Capture)
+        {
+            soundManager?.PlayCapture();
+            parchisUI.ShowNotification("20 bonus moves for capturing a piece");
         }
     }
 
@@ -146,14 +152,10 @@ public class GameManager : MonoBehaviour
 
     private void HandleMovePieceToStart(Piece piece)
     {
-        if (piece.ownerPlayerIndex != stateMachine.currentPlayerIndex)
-        {
-            // it was a capture
-            soundManager?.PlayCapture();
-        }
-        else
+        if (piece.ownerPlayerIndex == stateMachine.currentPlayerIndex)
         {
             soundManager?.PlayPieceToStart();
+            parchisUI.ShowNotification("Penalty for rolling 3 consecutives doubles");
         }
         
         piece.MoveToTile(-1);

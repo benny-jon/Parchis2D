@@ -104,6 +104,8 @@ public class BoardView : MonoBehaviour
 
     private void SetPieceSortingOrderByPos(Piece piece)
     {
+        if (piece.transform.childCount < 3) return;
+
         var pieceImage = piece.transform.GetChild(2);    
         var pieceSprite = pieceImage.GetComponent<SpriteRenderer>();    
         var newOrder = MapYToSorting(piece.transform.position.y);

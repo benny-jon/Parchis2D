@@ -11,6 +11,9 @@ public class ParchisUI : MonoBehaviour
     [Header("Per Player HUDs")]
     [SerializeField] private PlayerHud[] playerHuds;
 
+    [Header("Notifications")]
+    [SerializeField] private TimedMessageUI eventNotification;
+
     [Header("End Game")]
     [SerializeField] public TMP_Text gameOverText;
     [SerializeField] private WinCelebration winCelebration;
@@ -95,6 +98,11 @@ public class ParchisUI : MonoBehaviour
 
     public void ShowGameOver(int playerWinner)
     {
+        if (eventNotification != null)
+        {
+            eventNotification.Hide();
+            
+        }
         if (gameOverText != null)
         {
             Debug.Log($"Player {playerWinner}\nhas Won!");
@@ -104,6 +112,15 @@ public class ParchisUI : MonoBehaviour
         if (winCelebration != null)
         {
             winCelebration.Play(gameOverText.transform.position);
+        }
+    }
+
+    public void ShowNotification(String message)
+    {
+        if (eventNotification != null)
+        {
+            eventNotification.Show(message, 2);
+            
         }
     }
 
