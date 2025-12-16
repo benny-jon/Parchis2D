@@ -18,6 +18,6 @@ public class WinCelebration : MonoBehaviour
 
         confetti.Play();
 
-        Destroy(confetti.gameObject, confetti.main.duration + confetti.main.startLifetime.constantMax + 0.5f);
+        Destroy(confetti.gameObject, confetti.main.duration + confetti.main.startLifetime.constantMax + 1f);
     }
 }

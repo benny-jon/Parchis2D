@@ -9077,7 +9077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43457aece3e8147ae9aec2c3a6b0e057, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Scripts::WinCelebration
-  confettiPrefab: {fileID: 7351729318270846102, guid: 40e79e4039c4d4cb29d171c220abc667, type: 3}
+  confettiPrefab: {fileID: 8355067595168592189, guid: 41a3c6264d453401c8248eb10b6bb62d, type: 3}
   sortingOrder: 3000
 --- !u!4 &1867755444
 Transform:
