@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ParchisUI : MonoBehaviour
 {
@@ -11,6 +12,11 @@ public class ParchisUI : MonoBehaviour
     [Header("Per Player HUDs")]
     [SerializeField] private PlayerHud[] playerHuds;
 
+    [Header("Medals Sprite")]
+    [SerializeField] private Sprite gold;
+    [SerializeField] private Sprite silver;
+    [SerializeField] private Sprite bronze;
+
     [Header("Notifications")]
     [SerializeField] private TimedMessageUI eventNotification;
 
@@ -20,18 +26,21 @@ public class ParchisUI : MonoBehaviour
 
     private bool wasLastPortrait;
 
-    private void Awake() {
+    private void Awake()
+    {
         if (gameOverText != null)
         {
             gameOverText.gameObject.SetActive(false);
         }
     }
 
-    private void Start() {
+    private void Start()
+    {
         ApplyOrientation();
     }
 
-    private void Update() {
+    private void Update()
+    {
         bool isPortrait = Screen.height > Screen.width;
         if (isPortrait != wasLastPortrait)
         {
@@ -101,7 +110,7 @@ public class ParchisUI : MonoBehaviour
         if (eventNotification != null)
         {
             eventNotification.Hide();
-            
+
         }
         if (gameOverText != null)
         {
@@ -120,7 +129,35 @@ public class ParchisUI : MonoBehaviour
         if (eventNotification != null)
         {
             eventNotification.Show(message, 2);
-            
+
+        }
+    }
+
+    public void ShowMedal(int player, Medal medal)
+    {
+        if (playerHuds == null || player < 0 || player >= playerHuds.Length) return;
+
+        var hud = playerHuds[player];
+        if (hud.portraitMedal != null)
+        {
+            hud.portraitMedal.sprite = GetMedalSprite(medal);
+            hud.portraitMedal.gameObject.SetActive(wasLastPortrait);
+        }
+        if (hud.landscapeMedal != null)
+        {
+            hud.landscapeMedal.sprite = GetMedalSprite(medal);
+            hud.landscapeMedal.gameObject.SetActive(!wasLastPortrait);
+        }
+    }
+
+    private Sprite GetMedalSprite(Medal medal)
+    {
+        switch (medal)
+        {
+            case Medal.Gold: return gold;
+            case Medal.Silver: return silver;
+            case Medal.Bronze: return bronze;
+            default: return null;
         }
     }
 
@@ -130,9 +167,11 @@ public class ParchisUI : MonoBehaviour
         [Header("Portrait")]
         public TextMeshProUGUI portraitDiceText;
         public TextMeshProUGUI portraitTurnHint;
+        public Image portraitMedal;
 
         [Header("Landscape")]
         public TextMeshProUGUI landscapeDiceText;
         public TextMeshProUGUI landscapeTurnHint;
+        public Image landscapeMedal;
     }
 }

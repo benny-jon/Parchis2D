@@ -147,6 +147,12 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogWarning("GAME OVER!");
             soundManager?.PlayPlayerWin();
+
+            if (parchisUI != null)
+            {
+                Debug.Log("Show Game Over message");
+                parchisUI.ShowGameOver(stateMachine.playersFinishRanking[0]);
+            }
         }
     }
 
@@ -157,7 +163,7 @@ public class GameManager : MonoBehaviour
             soundManager?.PlayPieceToStart();
             parchisUI.ShowNotification("Penalty for rolling 3 consecutives doubles");
         }
-        
+
         piece.MoveToTile(-1);
 
         animationManager.PlayResetPiece(piece, boardView.pieceSpawnPoints[allPieces.FindIndex(p => p == piece)].position, () =>
@@ -166,7 +172,7 @@ public class GameManager : MonoBehaviour
         });
     }
 
-    private void HandlePlayerFinished(int player)
+    private void HandlePlayerFinished(int player, Medal medal)
     {
         Debug.Log($"Player {player} has finished the game");
         //SetPlayerActionHint(player, "Winner!");
@@ -176,8 +182,7 @@ public class GameManager : MonoBehaviour
 
         if (parchisUI != null)
         {
-            Debug.Log("Show Game Over message");
-            parchisUI.ShowGameOver(player);
+            parchisUI.ShowMedal(player, medal);
         }
 
         soundManager?.PlayPlayerWin();

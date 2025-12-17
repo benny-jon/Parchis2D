@@ -60,6 +60,42 @@ public class BoardRulesTests
     }
 
     [Test]
+    public void SafeTilesCount()
+    {
+        int count = 0;
+
+        for (int tileIndex = 0; tileIndex < BoardDefinition.TOTAL_TILES; tileIndex++)
+        {
+            if (rules.IsTileSafe(tileIndex))
+            {
+                count++;
+            }
+        }
+
+        Assert.AreEqual(12, count);
+    }
+
+    [Test]
+    public void AllSafeTiles()
+    {
+        Assert.True(rules.IsTileSafe(4));
+        Assert.True(rules.IsTileSafe(11));
+        Assert.True(rules.IsTileSafe(16));
+
+        Assert.True(rules.IsTileSafe(21));
+        Assert.True(rules.IsTileSafe(28));
+        Assert.True(rules.IsTileSafe(33));
+
+        Assert.True(rules.IsTileSafe(38));
+        Assert.True(rules.IsTileSafe(45));
+        Assert.True(rules.IsTileSafe(50));
+
+        Assert.True(rules.IsTileSafe(55));
+        Assert.True(rules.IsTileSafe(62));
+        Assert.True(rules.IsTileSafe(67));
+    }
+
+    [Test]
     public void FirstPlayerPiece_ShouldEntryHomeRows()
     {
         for (int steps = 1; steps <= 10; steps++)

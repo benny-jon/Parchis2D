@@ -40,7 +40,9 @@ public class GameStateMachine
     public Action<MoveResult> OnMoveEnded;
     public Action<GamePhase> OnGamePhaseChanged;
     public Action<Piece> OnMovePieceToStart;
-    public Action<int> OnPlayerFinishedTheGame;
+    public Action<int, Medal> OnPlayerFinishedTheGame;
+
+    public List<int> playersFinishRanking;
 
     public IReadOnlyDictionary<Piece, List<MoveOption>> CurrentLegalMoves => currentLegalMoves;
 
@@ -57,13 +59,15 @@ public class GameStateMachine
         this.pieces = pieces;
         this.boardRules = boardRules;
         this.boardView = boardView;
+        this.playersFinishRanking = new List<int>();
 
         ResetGame();
     }
 
     public void StartGame()
     {
-        StartTurn();
+        currentPlayerIndex = -1;
+        NextPlayer();
     }
 
     public void EndGame()
@@ -252,9 +256,18 @@ public class GameStateMachine
 
             if (HasCurrentPlayerFinishedTheGame())
             {
-                OnPlayerFinishedTheGame?.Invoke(currentPlayerIndex);
-                //NextPlayer();
-                EndGame();
+                int finishedSpot = playersFinishRanking.Count;
+                OnPlayerFinishedTheGame?.Invoke(currentPlayerIndex, (Medal) finishedSpot);
+                playersFinishRanking.Add(currentPlayerIndex);
+
+                if (finishedSpot >= 2)
+                {
+                    EndGame();
+                }
+                else
+                {
+                    NextPlayer();
+                }
                 return;
             }
         }

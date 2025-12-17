@@ -271,7 +271,8 @@ public class GameStateMachineTests
         var pieceInBlockadeA = CreateTestPiece(0, 25);
         var pieceInBlockadeB = CreateTestPiece(0, 25);
         var freePiece = CreateTestPiece(0, 5);
-        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece });
+        var enemyPiece = CreateTestPiece(1, -1);
+        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece, enemyPiece });
 
         stateMachine.StartGame();
         Assert.AreEqual(0, stateMachine.currentPlayerIndex);
@@ -293,7 +294,8 @@ public class GameStateMachineTests
         var pieceInBlockadeA = CreateTestPiece(0, boardRules.GetStartTile(0));
         var pieceInBlockadeB = CreateTestPiece(0, -1);
         var freePiece = CreateTestPiece(0, 6);
-        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece });
+        var enemyPiece = CreateTestPiece(1, -1);
+        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece, enemyPiece });
 
         stateMachine.StartGame();
         Assert.AreEqual(0, stateMachine.currentPlayerIndex);
@@ -317,7 +319,8 @@ public class GameStateMachineTests
         var pieceInBlockadeA = CreateTestPiece(0, 25);
         var pieceInBlockadeB = CreateTestPiece(0, 25);
         var freePiece = CreateTestPiece(0, 5);
-        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece });
+        var enemyPiece = CreateTestPiece(1, -1);
+        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece, enemyPiece });
 
         stateMachine.StartGame();
         Assert.AreEqual(0, stateMachine.currentPlayerIndex);
@@ -383,7 +386,8 @@ public class GameStateMachineTests
         var pieceInBlockadeA = CreateTestPiece(0, 25);
         var pieceInBlockadeB = CreateTestPiece(0, 25);
         var freePiece = CreateTestPiece(0, 5);
-        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece });
+        var enemyPiece = CreateTestPiece(1, -1);
+        pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece, enemyPiece });
 
         stateMachine.StartGame();
         Assert.AreEqual(0, stateMachine.currentPlayerIndex);
@@ -403,8 +407,29 @@ public class GameStateMachineTests
         Assert.AreEqual(pieceInBlockadeA.currentTileIndex, pieceInBlockadeB.currentTileIndex); // blockade reform 3 steps forward
     }
 
+    // [Test]
+    // public void Verify_GameOver_WhenOnePlayerFinishes()
+    // {
+    //     pieces.Clear();
+    //     var finishingPiece = CreateTestPiece(0, boardRules.GetHomeTile(0) - 3);
+    //     var otherPiece1 = CreateTestPiece(1, -1);
+    //     var otherPiece2 = CreateTestPiece(2, -1);
+    //     var otherPiece3 = CreateTestPiece(3, -1);
+    //     pieces.AddRange(new List<Piece> { finishingPiece, otherPiece1, otherPiece2, otherPiece3 });
+
+    //     stateMachine.StartGame();
+    //     Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+    //     Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+
+    //     // Roll and auto-finish piece
+    //     stateMachine.RollDiceWithValues(1, 2);
+    //     stateMachine.OnPieceClicked(finishingPiece);
+
+    //     Assert.AreEqual(GamePhase.GameOver, stateMachine.gamePhase);
+    // }
+
     [Test]
-    public void Verify_GameOver_WhenOnePlayerFinishes()
+    public void Verify_NotifyGoldMedal_WhenPlayerFinishesFirst()
     {
         pieces.Clear();
         var finishingPiece = CreateTestPiece(0, boardRules.GetHomeTile(0) - 3);
@@ -417,11 +442,68 @@ public class GameStateMachineTests
         Assert.AreEqual(0, stateMachine.currentPlayerIndex);
         Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
 
+        stateMachine.OnPlayerFinishedTheGame = (player, medal) =>
+        {
+            Assert.AreEqual(0, player);
+            Assert.AreEqual(Medal.Gold, medal);
+        };
+
         // Roll and auto-finish piece
         stateMachine.RollDiceWithValues(1, 2);
         stateMachine.OnPieceClicked(finishingPiece);
 
-        Assert.AreEqual(GamePhase.GameOver, stateMachine.gamePhase);
+        Assert.AreEqual(1, stateMachine.playersFinishRanking.Count);
+        Assert.AreEqual(0, stateMachine.playersFinishRanking[0]);
+    }
+
+    [Test]
+    public void Verify_NotifySilverMedal_WhenPlayerFinishesSecond()
+    {
+        pieces.Clear();
+        var finishingPiece = CreateTestPiece(0, boardRules.GetHomeTile(0));
+        var otherPiece1 = CreateTestPiece(1, boardRules.GetHomeTile(1) - 3);
+        var otherPiece2 = CreateTestPiece(2, -1);
+        var otherPiece3 = CreateTestPiece(3, -1);
+        pieces.AddRange(new List<Piece> { finishingPiece, otherPiece1, otherPiece2, otherPiece3 });
+
+        stateMachine.StartGame();
+        Assert.AreEqual(1, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+
+        stateMachine.OnPlayerFinishedTheGame = (player, medal) =>
+        {
+            Assert.AreEqual(1, player);
+            Assert.AreEqual(Medal.Silver, medal);
+        };
+
+        // Roll and auto-finish piece
+        stateMachine.RollDiceWithValues(1, 2);
+        stateMachine.OnPieceClicked(finishingPiece);
+    }
+
+    [Test]
+    public void Verify_NotifyBronzeMedal_WhenPlayerFinishesThird()
+    {
+        pieces.Clear();
+        var finishingPiece = CreateTestPiece(0, boardRules.GetHomeTile(0));
+        var otherPiece1 = CreateTestPiece(1, boardRules.GetHomeTile(1));
+        var otherPiece2 = CreateTestPiece(2, boardRules.GetHomeTile(2) - 3);
+        var otherPiece3 = CreateTestPiece(3, -1);
+        pieces.AddRange(new List<Piece> { finishingPiece, otherPiece1, otherPiece2, otherPiece3 });
+
+        stateMachine.StartGame();
+        Assert.AreEqual(2, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+
+        stateMachine.OnPlayerFinishedTheGame = (player, medal) =>
+        {
+            Assert.AreEqual(2, player);
+            Assert.AreEqual(Medal.Bronze, medal);
+        };
+
+        // Roll and auto-finish piece
+        stateMachine.RollDiceWithValues(1, 2);
+        stateMachine.OnPieceClicked(finishingPiece);
     }
 
     [Test]
