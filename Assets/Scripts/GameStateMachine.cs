@@ -254,7 +254,7 @@ public class GameStateMachine
             Debug.Log($"{moveOption.piece} reached Home!");
             bonusStepsToMove.Add(BonusForReachingHome);
 
-            if (HasCurrentPlayerFinishedTheGame())
+            if (!CurrentPlayerHasAvailablePieces())
             {
                 int finishedSpot = playersFinishRanking.Count;
                 OnPlayerFinishedTheGame?.Invoke(currentPlayerIndex, (Medal) finishedSpot);
@@ -488,9 +488,9 @@ public class GameStateMachine
         }
     }
 
-    private bool HasCurrentPlayerFinishedTheGame()
+    private bool CurrentPlayerHasAvailablePieces()
     {
-        return pieces.Find(p => p.ownerPlayerIndex == currentPlayerIndex && boardRules.GetHomeTile(currentPlayerIndex) != p.currentTileIndex) == null;
+        return pieces.Find(p => p.ownerPlayerIndex == currentPlayerIndex && boardRules.GetHomeTile(currentPlayerIndex) != p.currentTileIndex) != null;
     }
 
     private bool ThereIsOnlyOnePlayerLeft()
@@ -513,7 +513,7 @@ public class GameStateMachine
             return;
         }
 
-        if (HasCurrentPlayerFinishedTheGame())
+        if (!CurrentPlayerHasAvailablePieces())
         {
             // Skip already finished Player
             NextPlayer();

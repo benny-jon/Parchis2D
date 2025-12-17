@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using System.Linq;
 
-[CreateAssetMenu(fileName = "BoardDefinition", menuName = "Parchisi/BoardDefinition", order = 0)]
+[CreateAssetMenu(fileName = "BoardDefinition", menuName = "Parchis/BoardDefinition", order = 0)]
 public class BoardDefinition : ScriptableObject {
 
     public static readonly int MAIN_TRACK_COUNT = 68;

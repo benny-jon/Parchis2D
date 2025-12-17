@@ -14,7 +14,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] public ParchisUI parchisUI;
     [SerializeField] public MovePopupUI movePopupUI;
 
-    public List<Piece> allPieces;
+    [SerializeField] public List<Piece> allPieces;
+
+    [SerializeField] public GameSettings gameSettings;
 
     private BoardRules boardRules;
     private GameStateMachine stateMachine;
@@ -31,11 +33,47 @@ public class GameManager : MonoBehaviour
         ClearPlayersActionHints();
 
         boardRules = new BoardRules(boardDefinition);
-        stateMachine = new GameStateMachine(allPieces, boardView, boardRules);
+        
+        List<Piece> activePieces = GetActivePlayersPieces();
+        allPieces.ForEach(p => p.gameObject.SetActive(activePieces.Contains(p))); // disable innactive pieces
+        stateMachine = new GameStateMachine(activePieces, boardView, boardRules);
 
         SubscribeToStateMachineEvents();
 
         ClearOtherPlayersDiceHints();
+    }
+
+    private List<Piece> GetActivePlayersPieces()
+    {
+        if (gameSettings == null)
+        {
+            // default to all 4 players
+            return allPieces;
+        }
+
+        if (gameSettings.playerCount == 2)
+        {
+            return GetPiecesForPlayers(new int[] {0, 2});
+        }
+        if (gameSettings.playerCount == 3)
+        {
+            return GetPiecesForPlayers(new int[] {0, 1, 2});
+        }
+
+        return allPieces;
+    }
+
+    private List<Piece> GetPiecesForPlayers(int[] players)
+    {
+        List<Piece> result = new List<Piece>();
+        for (int i = 0; i < allPieces.Count; i++)
+        {
+            if (players.Contains(allPieces[i].ownerPlayerIndex))
+            {
+                result.Add(allPieces[i]);
+            }
+        }
+        return result;
     }
 
     void Start()

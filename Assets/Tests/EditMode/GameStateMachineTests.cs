@@ -588,6 +588,27 @@ public class GameStateMachineTests
         Assert.AreEqual(playerStartTile, pieces[1].currentTileIndex);
     }
 
+    [Test]
+    public void Test_GameWithTwoPlayers()
+    {
+        pieces.Clear();
+        var playerA_piece1 = CreateTestPiece(0, -1);
+        var playerA_piece2 = CreateTestPiece(0, -1);
+        var playerC_piece1 = CreateTestPiece(2, -1);
+        var playerC_piece2 = CreateTestPiece(2, -1);
+        pieces.AddRange(new List<Piece> { playerA_piece1, playerA_piece2, playerC_piece1, playerC_piece2 });
+
+        stateMachine.StartGame();
+        
+        Assert.AreEqual(0, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+
+        stateMachine.RollDiceWithValues(1, 2);
+
+        Assert.AreEqual(2, stateMachine.currentPlayerIndex);
+        Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
+    }
+
     private BoardView CreateTestBoardView(int tileCount)
     {
         var go = new GameObject("BoardView");
