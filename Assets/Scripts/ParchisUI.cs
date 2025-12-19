@@ -128,7 +128,7 @@ public class ParchisUI : MonoBehaviour
     {
         if (eventNotification != null)
         {
-            eventNotification.Show(message, 2);
+            eventNotification.Show(message, 3);
 
         }
     }

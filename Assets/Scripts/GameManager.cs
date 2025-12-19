@@ -27,13 +27,16 @@ public class GameManager : MonoBehaviour
     private Transform activePieceTransform;
     #endregion
 
+    private int pendingBonusToAnnounce = 0;
+    private int pendingBonusPlayer = -1;
+
     private void Awake()
     {
         ResetPieces();
         ClearPlayersActionHints();
 
         boardRules = new BoardRules(boardDefinition);
-        
+
         List<Piece> activePieces = GetActivePlayersPieces();
         allPieces.ForEach(p => p.gameObject.SetActive(activePieces.Contains(p))); // disable innactive pieces
         stateMachine = new GameStateMachine(activePieces, boardView, boardRules);
@@ -53,11 +56,11 @@ public class GameManager : MonoBehaviour
 
         if (gameSettings.playerCount == 2)
         {
-            return GetPiecesForPlayers(new int[] {0, 2});
+            return GetPiecesForPlayers(new int[] { 0, 2 });
         }
         if (gameSettings.playerCount == 3)
         {
-            return GetPiecesForPlayers(new int[] {0, 1, 2});
+            return GetPiecesForPlayers(new int[] { 0, 1, 2 });
         }
 
         return allPieces;
@@ -153,19 +156,74 @@ public class GameManager : MonoBehaviour
         if (moveResult.status == MoveStatus.ReachedHome)
         {
             soundManager?.PlayHome();
-            parchisUI.ShowNotification("10 bonus moves when a piece reaches Home");
+            pendingBonusToAnnounce = GameStateMachine.BonusForReachingHome;
+            pendingBonusPlayer = stateMachine.currentPlayerIndex;
         }
         if (moveResult.status == MoveStatus.Capture)
         {
             soundManager?.PlayCapture();
-            parchisUI.ShowNotification("20 bonus moves for capturing a piece");
+            pendingBonusToAnnounce = GameStateMachine.BonusForCapture;
+            pendingBonusPlayer = stateMachine.currentPlayerIndex;
         }
     }
 
-    private void HandleAvailableMovesUpdated()
+    private void HandleAvailableMovesUpdated(int movesCount)
     {
+        AnnounceBonusMessageIfAvailable();
         ClearMoveHints();
         UpdateMoveHints();
+    }
+
+    private void AnnounceBonusMessageIfAvailable()
+    {
+        if (pendingBonusToAnnounce > 0 && pendingBonusPlayer == stateMachine.currentPlayerIndex)
+        {
+            if (stateMachine.HasCurrentLegalBonusMove())
+            {
+                var message = GetBonusMessage(pendingBonusToAnnounce);
+                if (message != null)
+                {
+                    parchisUI?.ShowNotification(message);
+                }
+            }
+            else
+            {
+                // lost the bonus for not having available legal moves
+                var message = GetBonusLostMessage(pendingBonusToAnnounce);
+                if (message != null)
+                {
+                    parchisUI?.ShowNotification(message);
+                }
+            }
+        }
+        pendingBonusToAnnounce = 0;
+        pendingBonusPlayer = -1;
+    }
+
+    private string GetBonusMessage(int bonusSteps)
+    {
+        if (bonusSteps == GameStateMachine.BonusForCapture)
+        {
+            return $"{GameStateMachine.BonusForCapture} bonus moves for capturing a piece";
+        }
+        if (bonusSteps == GameStateMachine.BonusForReachingHome)
+        {
+            return $"{GameStateMachine.BonusForReachingHome} bonus moves when a piece reaches Home";
+        }
+        return null;
+    }
+
+    private string GetBonusLostMessage(int bonusSteps)
+    {
+        if (bonusSteps == GameStateMachine.BonusForCapture)
+        {
+            return $"Sorry, cannot use the {GameStateMachine.BonusForCapture} bonus moves for capturing a piece :(";
+        }
+        if (bonusSteps == GameStateMachine.BonusForReachingHome)
+        {
+            return $"Nice!, but cannot use the {GameStateMachine.BonusForReachingHome} bonus moves now";
+        }
+        return null;
     }
 
     private void HandleGamePhaseChanged(GamePhase phase)

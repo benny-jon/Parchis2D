@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class GameStateMachine
 {
-    private const int BonusForCapture = 20;
-    private const int BonusForReachingHome = 10;
+    public const int BonusForCapture = 20;
+    public const int BonusForReachingHome = 10;
 
     private GamePhase _phase;
     public GamePhase gamePhase
@@ -33,7 +33,7 @@ public class GameStateMachine
     private readonly BoardView boardView;
 
     public Action<int, int> OnDiceRolled;
-    public Action OnAvailableMovesUpdated;
+    public Action<int> OnAvailableMovesUpdated;
     public Action<int> OnTurnChanged;
     public Action OnMoveStarted;
     public Action<Piece, List<int>, Action> OnMoveAnimationRequested;
@@ -197,6 +197,18 @@ public class GameStateMachine
 
         MoveResult moveResult = boardRules.TryResolveMove(piece, chosenOption.steps, pieces);
         ExecuteResolvedMove(chosenOption, moveResult);
+    }
+
+    public bool HasCurrentLegalBonusMove()
+    {
+        foreach (var piece in CurrentLegalMoves.Keys)
+        {
+            if (CurrentLegalMoves[piece].Find(m => m.bonusIndex >=0) != null)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void CancelAnyMoveOptionRequestIfNeeded()
@@ -430,7 +442,7 @@ public class GameStateMachine
             }
         }
 
-        OnAvailableMovesUpdated?.Invoke();
+        OnAvailableMovesUpdated?.Invoke(totalMoves);
 
         return totalMoves;
     }
