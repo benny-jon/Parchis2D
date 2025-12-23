@@ -9,7 +9,7 @@ public class BoardView : MonoBehaviour
     public Transform[] pieceSpawnPoints;
     public BoardDefinition boardDefinition;
 
-    [SerializeField] public float spacingBetweenPieces = 0.225f;
+    [SerializeField] public float spacingBetweenPieces = 0.235f;
 
     public Vector3 GetTilePosition(int tileIndex)
     {

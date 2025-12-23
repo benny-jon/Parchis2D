@@ -141,12 +141,12 @@ public class ParchisUI : MonoBehaviour
         if (hud.portraitMedal != null)
         {
             hud.portraitMedal.sprite = GetMedalSprite(medal);
-            hud.portraitMedal.gameObject.SetActive(wasLastPortrait);
+            hud.portraitMedal.gameObject.SetActive(true);
         }
         if (hud.landscapeMedal != null)
         {
             hud.landscapeMedal.sprite = GetMedalSprite(medal);
-            hud.landscapeMedal.gameObject.SetActive(!wasLastPortrait);
+            hud.landscapeMedal.gameObject.SetActive(true);
         }
     }
 
