@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour
         stateMachine = new GameStateMachine(activePieces, boardView, boardRules);
 
         SubscribeToStateMachineEvents();
+        SubscribeToParchisUiEvents();
 
         ClearOtherPlayersDiceHints();
     }
@@ -87,7 +88,8 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        UbsubscribeFromStateMachineEvents();
+        UnsubscribeFromStateMachineEvents();
+        UnsubscribeFromParchisUiEvents();
     }
 
     // ---------------------------
@@ -110,7 +112,7 @@ public class GameManager : MonoBehaviour
         stateMachine.OnMoveOptionSelectionRequest += HandleSelectMoveOptionRequest;
     }
 
-    private void UbsubscribeFromStateMachineEvents()
+    private void UnsubscribeFromStateMachineEvents()
     {
         if (stateMachine == null) return;
 
@@ -126,9 +128,36 @@ public class GameManager : MonoBehaviour
         stateMachine.OnMoveOptionSelectionRequest -= HandleSelectMoveOptionRequest;
     }
 
+    private void SubscribeToParchisUiEvents()
+    {
+        Debug.Log("Game Manager, SubscribeToParchisUiEvents");
+        parchisUI.OnPlayerDiceClicked += OnUiDicePanelClicked;
+    }
+
+    private void UnsubscribeFromParchisUiEvents()
+    {
+        parchisUI.OnPlayerDiceClicked -= OnUiDicePanelClicked;
+    }
+
     // ---------------------------
     //  EVENT HANDLERS
     // ---------------------------
+
+    private void OnUiDicePanelClicked(int player)
+    {
+        Debug.Log($"GameManager: OnUiDicePanelClicked {player}");
+        if (stateMachine == null)
+        {
+            Debug.LogError("StateMachine is NULL");
+            return;
+        }
+        if (player != stateMachine.currentPlayerIndex)
+        {
+            return;
+        }
+
+        stateMachine.RollDice();
+    }
 
     private void HandleDiceRolled(int dice1, int dice2)
     {
@@ -415,17 +444,6 @@ public class GameManager : MonoBehaviour
         {
             soundManager?.PlayPieceClicked();
         }
-    }
-
-    public void OnDiceRollButton()
-    {
-        if (stateMachine == null)
-        {
-            Debug.LogError("StateMachine is NULL");
-            return;
-        }
-
-        stateMachine.RollDice();
     }
 
     public GamePhase CurrentGamePhase()

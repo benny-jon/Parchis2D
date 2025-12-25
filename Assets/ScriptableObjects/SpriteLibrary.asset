@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 361eb9ed508574167898ab23e93616a1, type: 3}
+  m_Name: SpriteLibrary
+  m_EditorClassIdentifier: Scripts::SpriteLibrary
+  diceFaces:
+  - {fileID: -1162029201790036853, guid: a83f84bae926749618a0cf9386a09b39, type: 3}
+  - {fileID: -8679895730479474053, guid: 74e6d355aa62447d0aa7473429f9ca90, type: 3}
+  - {fileID: -7078145573161273673, guid: 3093e658c7f1e4653a11f0d8f4f38ad2, type: 3}
+  - {fileID: 4211914617808972773, guid: 60fedb456614f460da5e94e14c955402, type: 3}
+  - {fileID: -5567505861628926109, guid: 91b85f4c86b654fa8949cdc4d03b4297, type: 3}
+  - {fileID: 3585615014435213555, guid: 98cbf1058b95f44c89c6332ad379a724, type: 3}

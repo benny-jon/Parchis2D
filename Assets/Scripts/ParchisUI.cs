@@ -24,6 +24,8 @@ public class ParchisUI : MonoBehaviour
     [SerializeField] public TMP_Text gameOverText;
     [SerializeField] private WinCelebration winCelebration;
 
+    public Action<int> OnPlayerDiceClicked;
+
     private bool wasLastPortrait;
 
     private void Awake()
@@ -32,6 +34,7 @@ public class ParchisUI : MonoBehaviour
         {
             gameOverText.gameObject.SetActive(false);
         }
+        SubscribeToPlayersDicePanelClicks();
     }
 
     private void Start()
@@ -64,8 +67,8 @@ public class ParchisUI : MonoBehaviour
         String roll = $"{d1},{d2}";
         var hud = playerHuds[playerIndex];
 
-        if (hud.landscapeDiceText != null) hud.landscapeDiceText.text = roll;
-        if (hud.portraitDiceText != null) hud.portraitDiceText.text = roll;
+        hud.landscapeDicePanel?.SetDice(d1, d2);
+        hud.portraitDicePanel?.SetDice(d1, d2);
     }
 
     public void ClearOtherPlayersDice(int currentPlayerIndex)
@@ -74,11 +77,15 @@ public class ParchisUI : MonoBehaviour
 
         for (int i = 0; i < playerHuds.Length; i++)
         {
-            if (i == currentPlayerIndex) continue;
-
             var hud = playerHuds[i];
-            if (hud.landscapeDiceText != null) hud.landscapeDiceText.text = "";
-            if (hud.portraitDiceText != null) hud.portraitDiceText.text = "";
+            hud.landscapeDicePanel?.SetDim(i != currentPlayerIndex);
+            hud.portraitDicePanel?.SetDim(i != currentPlayerIndex);
+
+            if (i != currentPlayerIndex)
+            {
+                hud.landscapeDicePanel?.SetTimeToRoll(false);
+                hud.portraitDicePanel?.SetTimeToRoll(false);
+            }
         }
     }
 
@@ -89,8 +96,10 @@ public class ParchisUI : MonoBehaviour
         String hint = gamePhase == GamePhase.WaitingForRoll ? "Roll" : gamePhase == GamePhase.WaitingForMove ? "Move" : "";
 
         var hud = playerHuds[playerIndex];
-        if (hud.landscapeTurnHint != null) hud.landscapeTurnHint.text = hint;
-        if (hud.portraitTurnHint != null) hud.portraitTurnHint.text = hint;
+        hud.landscapeDicePanel?.SetDim(false);
+        hud.portraitDicePanel?.SetDim(false);
+        hud.landscapeDicePanel?.SetTimeToRoll(gamePhase == GamePhase.WaitingForRoll);
+        hud.portraitDicePanel?.SetTimeToRoll(gamePhase == GamePhase.WaitingForRoll);
     }
 
     public void ClearTurnHints()
@@ -100,8 +109,8 @@ public class ParchisUI : MonoBehaviour
         for (int i = 0; i < playerHuds.Length; i++)
         {
             var hud = playerHuds[i];
-            if (hud.landscapeTurnHint != null) hud.landscapeTurnHint.text = "";
-            if (hud.portraitTurnHint != null) hud.portraitTurnHint.text = "";
+            hud.landscapeDicePanel?.SetDim(true);
+            hud.portraitDicePanel?.SetDim(true);
         }
     }
 
@@ -161,17 +170,41 @@ public class ParchisUI : MonoBehaviour
         }
     }
 
+    private void SubscribeToPlayersDicePanelClicks()
+    {
+        Debug.Log("Parchis UI, SubscribeToPlayersDicePanelClicks");
+        for (int i = 0; i < playerHuds.Length; i++)
+        {
+            Debug.Log("Subscribing for player " + i);
+            int player = i;
+            if (playerHuds[player].portraitDicePanel != null)
+            {
+                playerHuds[player].portraitDicePanel.OnDiceClicked += () =>
+                {
+                    Debug.Log($"OnDice clicked for player {player}");
+                    OnPlayerDiceClicked?.Invoke(player);
+                };
+            }
+            if (playerHuds[player].landscapeDicePanel != null)
+            {
+                playerHuds[player].landscapeDicePanel.OnDiceClicked += () =>
+                {
+                    Debug.Log($"OnDice clicked for player {player}");
+                    OnPlayerDiceClicked?.Invoke(player);
+                };
+            }
+        }
+    }
+
     [System.Serializable]
     public class PlayerHud
     {
         [Header("Portrait")]
-        public TextMeshProUGUI portraitDiceText;
-        public TextMeshProUGUI portraitTurnHint;
+        public PlayerDicePanel portraitDicePanel;
         public Image portraitMedal;
 
         [Header("Landscape")]
-        public TextMeshProUGUI landscapeDiceText;
-        public TextMeshProUGUI landscapeTurnHint;
+        public PlayerDicePanel landscapeDicePanel;
         public Image landscapeMedal;
     }
 }
