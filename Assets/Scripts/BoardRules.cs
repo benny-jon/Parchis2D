@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 public class BoardRules
 {
+    public static string RULES_TYPE = "Spanish";
+
     private static readonly int INVALID_TARGET = -1;
     private static readonly int START_ROLL_REQUIREMENT = 5;
     private BoardDefinition boardDefinition;
@@ -14,6 +15,11 @@ public class BoardRules
     private int[] homeEntryByPlayer;
     private int[] firstHomeRowByPlayer;
     private int[] homeTileByPlayer;
+
+    private readonly MoveTraceBuffer debugBuffer = new MoveTraceBuffer();
+    private bool isTestingEnvironment;
+
+    private int moveCount = 0;
 
     public BoardRules(BoardDefinition boardDefinition)
     {
@@ -28,6 +34,24 @@ public class BoardRules
         Debug.Log($"Initialized: Home Entry Tiles {ArrayUtils.ToString(homeEntryByPlayer)}");
         Debug.Log($"Initialized: First Home Row Tiles {ArrayUtils.ToString(firstHomeRowByPlayer)}");
     }
+
+    public void SetTestEnvironment()
+    {
+        isTestingEnvironment = true;
+    }
+
+    private void AddTrace(MoveTraceEntry trace)
+    {
+        debugBuffer.Add(trace);
+    }
+
+    private void DumpDebugTraces(string reason)
+    {
+       if (!isTestingEnvironment)
+        {
+             TraceDumpWriter.Dump(debugBuffer.Snapshot(), reason);
+        }
+    }    
 
     public int GetStartTile(int playerIndex) => startTilebyPlayer[playerIndex];
 
@@ -46,10 +70,40 @@ public class BoardRules
 
     public MoveResult TryResolveMove(Piece piece, int steps, List<Piece> allPieces)
     {
+        var result = TryResolveMoveHelper(piece, steps, allPieces);
+
+        //Validate invariants
+        var unSafetilesWithMultiplePieces = allPieces.Where(p => p.currentTileIndex > -1 && !IsTileSafe(p.currentTileIndex)).GroupBy(p => p.currentTileIndex);
+        foreach (var unSafeTile in unSafetilesWithMultiplePieces)
+        {
+            var pieces = unSafeTile.ToList();
+            if (pieces.Count > 1 && pieces[0].ownerPlayerIndex != pieces[1].ownerPlayerIndex)
+            {
+                DumpDebugTraces($"Invariant violation: mixed colors on non-safe tile: Player:{pieces[0].ownerPlayerIndex} and Player:{pieces[1].ownerPlayerIndex} at {pieces[0].currentTileIndex}");
+            }
+        }
+
+        return result;
+    }
+
+    public MoveResult TryResolveMoveHelper(Piece piece, int steps, List<Piece> allPieces)
+    {
+        moveCount++;
         int targetIndex = -1;
 
         // First check pure geometry
         targetIndex = TryGetTargetTileIndex(piece, steps);
+        AddTrace(new MoveTraceEntry
+        {
+            moveId = moveCount,
+            phase = "TryResolveMove-TryGetTargetTileIndex",
+            player = piece.ownerPlayerIndex,
+            stepsToMove = steps,
+            fromTile = piece.currentTileIndex,
+            toTile = targetIndex,
+            tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+            note = "After geometry check"
+        });
         if (targetIndex == -1)
         {
             return MoveResult.InvalidMove();
@@ -63,6 +117,17 @@ public class BoardRules
 
         if (boardDefinition.GetHomeTilesIndex()[piece.ownerPlayerIndex] == targetIndex)
         {
+            AddTrace(new MoveTraceEntry
+            {
+                moveId = moveCount,
+                phase = "TryResolveMove-CheckHomeTile",
+                player = piece.ownerPlayerIndex,
+                stepsToMove = steps,
+                fromTile = piece.currentTileIndex,
+                toTile = targetIndex,
+                tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+                note = $"Tile ReachedHome"
+            });
             return new MoveResult(MoveStatus.ReachedHome, targetIndex);
         }
 
@@ -81,10 +146,32 @@ public class BoardRules
                         Debug.Log($"Kicking enemy piece(s) from Start tile ({targetIndex}): {piece}");
                         if (enemyPieces.Length == 1 && piecesCount == 2)
                         {
+                            AddTrace(new MoveTraceEntry
+                            {
+                                moveId = moveCount,
+                                phase = "TryResolveMove-IsTileSafe-IsPlayerStartTile",
+                                player = piece.ownerPlayerIndex,
+                                stepsToMove = steps,
+                                fromTile = piece.currentTileIndex,
+                                toTile = targetIndex,
+                                tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+                                note = $"Capture enemy piece Player:{enemyPieces[0].ownerPlayerIndex} at startTile"
+                            });
                             return new MoveResult(MoveStatus.Capture, targetIndex, enemyPieces[0]); // kick out enemy piece from my Start tile.
                         }
                         else if (enemyPieces.Length == 2) // at this point these are enemies from different players, otherwise it would have been a blockade
                         {
+                            AddTrace(new MoveTraceEntry
+                            {
+                                moveId = moveCount,
+                                phase = "TryResolveMove-IsTileSafe-IsPlayerStartTile",
+                                player = piece.ownerPlayerIndex,
+                                stepsToMove = steps,
+                                fromTile = piece.currentTileIndex,
+                                toTile = targetIndex,
+                                tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+                                note = $"Capture last enemy piece Player:{enemyPieces[1].currentTileIndex} to arrived at StartTile"
+                            });
                             // capture the last one to arrive to the Start
                             Piece lastPieceToLand = enemyPieces[0].lastTimeItMoved > enemyPieces[1].lastTimeItMoved ? enemyPieces[0] : enemyPieces[1];
                             return new MoveResult(MoveStatus.Capture, targetIndex, lastPieceToLand);
@@ -95,26 +182,99 @@ public class BoardRules
 
             if (piecesCount >= 2)
             {
+                AddTrace(new MoveTraceEntry
+                {
+                    moveId = moveCount,
+                    phase = "TryResolveMove-IsTileSafe",
+                    player = piece.ownerPlayerIndex,
+                    stepsToMove = steps,
+                    fromTile = piece.currentTileIndex,
+                    toTile = targetIndex,
+                    tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+                    note = $"StartTile has already 2 pieces on it"
+                });
                 return MoveResult.InvalidMove(); // Dont allow more than 2 piece stacking
             }
 
+            AddTrace(new MoveTraceEntry
+            {
+                moveId = moveCount,
+                phase = "TryResolveMove-IsTileSafe",
+                player = piece.ownerPlayerIndex,
+                stepsToMove = steps,
+                fromTile = piece.currentTileIndex,
+                toTile = targetIndex,
+                tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+                note = $"Normal Move"
+            });
             return new MoveResult(MoveStatus.Normal, targetIndex);
         }
 
-        // Look for enemies on that tile
+        // Dont allow land on Tile with 2 pieces
+        if (allPieces.Where(p => p.currentTileIndex == targetIndex).ToList().Count >= 2)
+        {
+            AddTrace(new MoveTraceEntry
+            {
+                moveId = moveCount,
+                phase = "TryResolveMove",
+                player = piece.ownerPlayerIndex,
+                stepsToMove = steps,
+                fromTile = piece.currentTileIndex,
+                toTile = targetIndex,
+                tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+                note = $"Tile has already 2 pieces on it"
+            });
+            return MoveResult.InvalidMove();
+        }
+
+        // Look for enemies on target tile
         int currentPlayer = piece.ownerPlayerIndex;
 
         var enemiesOnTile = allPieces.Where(p => p.currentTileIndex == targetIndex && p.ownerPlayerIndex != currentPlayer).ToList();
 
         if (enemiesOnTile.Count == 1)
         {
+            AddTrace(new MoveTraceEntry
+            {
+                moveId = moveCount,
+                phase = "TryResolveMove-LookForEnemies",
+                player = piece.ownerPlayerIndex,
+                stepsToMove = steps,
+                fromTile = piece.currentTileIndex,
+                toTile = targetIndex,
+                tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+                note = $"Capturing enemy tile from Player:{enemiesOnTile[0].ownerPlayerIndex}"
+            });
             return new MoveResult(MoveStatus.Capture, targetIndex, enemiesOnTile[0]);
         }
         else if (enemiesOnTile.Count > 1)
         {
+            AddTrace(new MoveTraceEntry
+            {
+                moveId = moveCount,
+                phase = "TryResolveMove-LookForEnemies",
+                player = piece.ownerPlayerIndex,
+                stepsToMove = steps,
+                fromTile = piece.currentTileIndex,
+                toTile = targetIndex,
+                tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+                note = $"Should not reached this point: Blockade by Pieces Player:{enemiesOnTile[0].ownerPlayerIndex} and Player{enemiesOnTile[1].ownerPlayerIndex}"
+            });
+            // should never reach here, but keeping
             return new MoveResult(MoveStatus.BlockedByBlockade, -1); // Enemy blockade
         }
 
+        AddTrace(new MoveTraceEntry
+        {
+            moveId = moveCount,
+            phase = "TryResolveMove-DefaultReturn",
+            player = piece.ownerPlayerIndex,
+            stepsToMove = steps,
+            fromTile = piece.currentTileIndex,
+            toTile = targetIndex,
+            tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+            note = $"Normal Move"
+        });
         // nothing to capture
         return new MoveResult(MoveStatus.Normal, targetIndex);
     }
@@ -132,8 +292,19 @@ public class BoardRules
         // check blockate on the start tile
         if (currentIndex == -1)
         {
-            if (IsBlockadeAtTile(GetStartTile(piece.ownerPlayerIndex), allPieces, out _))
+            if (IsBlockadeAtTile(GetStartTile(piece.ownerPlayerIndex), allPieces, out int blockerPlayer))
             {
+                AddTrace(new MoveTraceEntry
+                {
+                    moveId = moveCount,
+                    phase = "IsMoveBlockedByBlockade",
+                    player = piece.ownerPlayerIndex,
+                    stepsToMove = steps,
+                    fromTile = piece.currentTileIndex,
+                    toTile = targetIndex,
+                    tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+                    note = $"Blockade at StartTile by {blockerPlayer}"
+                });
                 return true;
             }
 
@@ -147,8 +318,19 @@ public class BoardRules
             int nextIndex = GetNextIndexAlongPath(currentIndex, piece.ownerPlayerIndex);
             currentIndex = nextIndex;
 
-            if (IsBlockadeAtTile(nextIndex, allPieces, out _))
+            if (IsBlockadeAtTile(nextIndex, allPieces, out int blockerPlayer))
             {
+                AddTrace(new MoveTraceEntry
+                {
+                    moveId = moveCount,
+                    phase = "IsMoveBlockedByBlockade",
+                    player = piece.ownerPlayerIndex,
+                    stepsToMove = steps,
+                    fromTile = piece.currentTileIndex,
+                    toTile = targetIndex,
+                    tileType = targetIndex != -1 ? boardDefinition.tiles[targetIndex].type.ToString() : "Invalid",
+                    note = $"Blockade by {blockerPlayer}"
+                });
                 return true;
             }
         }

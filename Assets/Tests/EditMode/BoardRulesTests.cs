@@ -18,6 +18,7 @@ public class BoardRulesTests
         BoardDefinitionGenerator.GenerateFullBoard(boardDefinition);
 
         rules = new BoardRules(boardDefinition);
+        rules.SetTestEnvironment();
     }
 
     [Test]
@@ -401,6 +402,45 @@ public class BoardRulesTests
 
         Assert.AreEqual(MoveStatus.BlockedByBlockade, result.status);
         Assert.AreEqual(-1, result.targetTileIndex);
+    }
+
+    [Test]
+    public void TestBug_WherePieceLandsOnEnemyTileWithoutCapturing_ButShouldCapture()
+    {
+        var pieceA1 = CreateTestPiece(0, 26);
+        var pieceA2 = CreateTestPiece(0, 29);
+        var pieceA3 = CreateTestPiece(0, 33);
+        var pieceA4 = CreateTestPiece(0, -1);
+        var pieceB1 = CreateTestPiece(1, 25);
+        var pieceB2 = CreateTestPiece(1, -1);
+        var pieceB3 = CreateTestPiece(1, -1);
+        var pieceB4 = CreateTestPiece(1, 21);
+        var pieceC1 = CreateTestPiece(2, 58);
+        var pieceC2 = CreateTestPiece(2, 39);
+        var pieceC3 = CreateTestPiece(2, 39);
+        var pieceC4 = CreateTestPiece(2, 38);
+        
+        var allPieces = new List<Piece> { pieceA1, pieceA2, pieceA3, pieceA4, pieceB1, pieceB2, pieceB3, pieceB4, pieceC1, pieceC2, pieceC3, pieceC4 };
+
+        MoveResult moveResult = rules.TryResolveMove(pieceB1, 4, allPieces);
+
+        Assert.AreEqual(29, moveResult.targetTileIndex);
+        Assert.AreEqual(MoveStatus.Capture, moveResult.status);
+        Assert.AreEqual(pieceA2, moveResult.capturedPiece);
+    }
+
+    [Test]
+    public void CannotMove_ToTileWithTwoPieces()
+    {
+        var pieceA1 = CreateTestPiece(0, 26);
+        var pieceA2 = CreateTestPiece(0, 29);
+        var pieceB1 = CreateTestPiece(1, 29);
+
+        var allPieces = new List<Piece> { pieceA1, pieceA2, pieceB1 };
+
+        MoveResult moveResult = rules.TryResolveMove(pieceA1, 3, allPieces);
+
+        Assert.AreEqual(MoveStatus.Invalid, moveResult.status);
     }
 
     // Parametized test arguments

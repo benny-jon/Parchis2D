@@ -9,6 +9,7 @@ public class Piece : Clickable2D
 {
 
     public int ownerPlayerIndex;
+    public int playerPieceIndex; // range from 0 to 3
     public int currentTileIndex = -1; // -1 = in base
     public GameManager gameManager;
 

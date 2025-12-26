@@ -16,12 +16,13 @@ public class BoardDefinition : ScriptableObject {
 
     public int[] GetHomeEntryTilesIndex()
     {
+        
         return new int[] { 67, 16, 33, 50 };
     }
 
     public int[] GetStartTilesIndex()
     {
-        return new int[] { 4, 4 + 17, 4 + 17 * 2, 4 + 17 * 3 };
+        return tiles.FindAll(p => p.type == TileType.Start).Select(p => p.index).ToArray();
     }
 
     public int[] GetHomeTilesIndex()

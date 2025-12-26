@@ -106,3 +106,5 @@ InitTestScene*.unity*
 CodeCoverage/
 *DoNotShip*/
 *DontShip*/
+_Recovery/
+_Recovery.meta

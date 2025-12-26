@@ -486,7 +486,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -97.89526, y: -612.7286}
+  m_AnchoredPosition: {x: -142.53622, y: -681.47217}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &91267374
@@ -1389,9 +1389,13 @@ PrefabInstance:
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 2867187899538064380}
+    - target: {fileID: 4996083922995197359, guid: d0f2c385d275f4419ae2a42e4edb0305, type: 3}
+      propertyPath: playerPieceIndex
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: d0f2c385d275f4419ae2a42e4edb0305, type: 3}
       propertyPath: m_Name
-      value: PieceA (4)
+      value: PieceA (3)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3846,7 +3850,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -802.13806, y: 363.09848}
+  m_AnchoredPosition: {x: -869.69354, y: 403.8354}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &698351804
@@ -3968,7 +3972,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &754180323
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4320,9 +4324,13 @@ PrefabInstance:
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 2867187899538064380}
+    - target: {fileID: 4996083922995197359, guid: 79400cdecbdc04d66a5a577f1082cf63, type: 3}
+      propertyPath: playerPieceIndex
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: 79400cdecbdc04d66a5a577f1082cf63, type: 3}
       propertyPath: m_Name
-      value: PieceB (2)
+      value: PieceB (1)
       objectReference: {fileID: 0}
     - target: {fileID: 7992263984771403816, guid: 79400cdecbdc04d66a5a577f1082cf63, type: 3}
       propertyPath: m_SortingOrder
@@ -4798,7 +4806,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 619.224, y: -612.7286}
+  m_AnchoredPosition: {x: 655.0385, y: -681.47217}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &903730299
@@ -5618,7 +5626,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 619.224, y: 644.4995}
+  m_AnchoredPosition: {x: 655.0385, y: 716.8076}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1028612059
@@ -6519,7 +6527,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -266.3, y: -17.283752}
+  m_AnchoredPosition: {x: -253, y: -17.283752}
   m_SizeDelta: {x: 142.34001, y: 32.5675}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!61 &1176307170
@@ -7011,9 +7019,13 @@ PrefabInstance:
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 2867187899538064380}
+    - target: {fileID: 4996083922995197359, guid: 4e57fb753af744530840440253b9fbdd, type: 3}
+      propertyPath: playerPieceIndex
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: 4e57fb753af744530840440253b9fbdd, type: 3}
       propertyPath: m_Name
-      value: PieceC (2)
+      value: PieceC (1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7798,12 +7810,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2867187899538064380}
     - target: {fileID: 4996083922995197359, guid: 01ff2ee3076be48fcb5d4904bc6adada, type: 3}
+      propertyPath: currentTileIndex
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4996083922995197359, guid: 01ff2ee3076be48fcb5d4904bc6adada, type: 3}
       propertyPath: ownerPlayerIndex
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4996083922995197359, guid: 01ff2ee3076be48fcb5d4904bc6adada, type: 3}
+      propertyPath: playerPieceIndex
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: 01ff2ee3076be48fcb5d4904bc6adada, type: 3}
       propertyPath: m_Name
-      value: PieceD (4)
+      value: PieceD (3)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7899,7 +7919,7 @@ PrefabInstance:
       objectReference: {fileID: 2867187899538064380}
     - target: {fileID: 6130529613671815627, guid: 79400cdecbdc04d66a5a577f1082cf63, type: 3}
       propertyPath: m_Name
-      value: PieceB (1)
+      value: PieceB (0)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7975,7 +7995,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -97.89526, y: 644.4995}
+  m_AnchoredPosition: {x: -142.53622, y: 716.8076}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1408505357
@@ -8221,9 +8241,13 @@ PrefabInstance:
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 2867187899538064380}
+    - target: {fileID: 4996083922995197359, guid: d0f2c385d275f4419ae2a42e4edb0305, type: 3}
+      propertyPath: playerPieceIndex
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: d0f2c385d275f4419ae2a42e4edb0305, type: 3}
       propertyPath: m_Name
-      value: PieceA (3)
+      value: PieceA (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8299,7 +8323,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 905.1639, y: 358.55963}
+  m_AnchoredPosition: {x: 973.0589, y: 398.7872}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1431238555
@@ -8795,7 +8819,7 @@ PrefabInstance:
       objectReference: {fileID: 2501826}
     - target: {fileID: 6130529613671815627, guid: d0f2c385d275f4419ae2a42e4edb0305, type: 3}
       propertyPath: m_Name
-      value: PieceA (1)
+      value: PieceA (0)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8895,7 +8919,7 @@ PrefabInstance:
       objectReference: {fileID: 2867187899538064380}
     - target: {fileID: 6130529613671815627, guid: 4e57fb753af744530840440253b9fbdd, type: 3}
       propertyPath: m_Name
-      value: PieceC (1)
+      value: PieceC (0)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9256,9 +9280,13 @@ PrefabInstance:
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 2867187899538064380}
+    - target: {fileID: 4996083922995197359, guid: d0f2c385d275f4419ae2a42e4edb0305, type: 3}
+      propertyPath: playerPieceIndex
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: d0f2c385d275f4419ae2a42e4edb0305, type: 3}
       propertyPath: m_Name
-      value: PieceA (2)
+      value: PieceA (1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9536,9 +9564,13 @@ PrefabInstance:
       propertyPath: ownerPlayerIndex
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 4996083922995197359, guid: 01ff2ee3076be48fcb5d4904bc6adada, type: 3}
+      propertyPath: playerPieceIndex
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: 01ff2ee3076be48fcb5d4904bc6adada, type: 3}
       propertyPath: m_Name
-      value: PieceD (2)
+      value: PieceD (1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9935,7 +9967,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -802.13806, y: -366.12418}
+  m_AnchoredPosition: {x: -869.69354, y: -407.2006}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1698889057
@@ -10115,9 +10147,13 @@ PrefabInstance:
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 2867187899538064380}
+    - target: {fileID: 4996083922995197359, guid: 79400cdecbdc04d66a5a577f1082cf63, type: 3}
+      propertyPath: playerPieceIndex
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: 79400cdecbdc04d66a5a577f1082cf63, type: 3}
       propertyPath: m_Name
-      value: PieceB (3)
+      value: PieceB (2)
       objectReference: {fileID: 0}
     - target: {fileID: 7992263984771403816, guid: 79400cdecbdc04d66a5a577f1082cf63, type: 3}
       propertyPath: m_SortingOrder
@@ -11329,9 +11365,13 @@ PrefabInstance:
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 2867187899538064380}
+    - target: {fileID: 4996083922995197359, guid: 4e57fb753af744530840440253b9fbdd, type: 3}
+      propertyPath: playerPieceIndex
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: 4e57fb753af744530840440253b9fbdd, type: 3}
       propertyPath: m_Name
-      value: PieceC (3)
+      value: PieceC (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11439,9 +11479,13 @@ PrefabInstance:
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 2867187899538064380}
+    - target: {fileID: 4996083922995197359, guid: 4e57fb753af744530840440253b9fbdd, type: 3}
+      propertyPath: playerPieceIndex
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: 4e57fb753af744530840440253b9fbdd, type: 3}
       propertyPath: m_Name
-      value: PieceC (4)
+      value: PieceC (3)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11900,9 +11944,13 @@ PrefabInstance:
       propertyPath: ownerPlayerIndex
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 4996083922995197359, guid: 01ff2ee3076be48fcb5d4904bc6adada, type: 3}
+      propertyPath: playerPieceIndex
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: 01ff2ee3076be48fcb5d4904bc6adada, type: 3}
       propertyPath: m_Name
-      value: PieceD (3)
+      value: PieceD (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12048,7 +12096,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 855.1639, y: -316.12418}
+  m_AnchoredPosition: {x: 923.0589, y: -357.2006}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1981486045
@@ -12072,6 +12120,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4509533146628920165, guid: 01ff2ee3076be48fcb5d4904bc6adada, type: 3}
   m_PrefabInstance: {fileID: 1939485102}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2010776036
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2010776038}
+  - component: {fileID: 2010776037}
+  m_Layer: 0
+  m_Name: ReplayRunner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2010776037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2010776036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3063189b8590479b94bc4ce0e5504a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Scripts::ReplayRunnerMono
+  replayFilePath: /Users/bennyjon/Library/Application Support/Benny Jon/Parcheese/replays/replay_20251225_202659.json
+  gameManager: {fileID: 0}
+--- !u!4 &2010776038
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2010776036}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.34163, y: -0.08163, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2030582630
 GameObject:
   m_ObjectHideFlags: 0
@@ -12233,9 +12327,13 @@ PrefabInstance:
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 2867187899538064380}
+    - target: {fileID: 4996083922995197359, guid: 79400cdecbdc04d66a5a577f1082cf63, type: 3}
+      propertyPath: playerPieceIndex
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6130529613671815627, guid: 79400cdecbdc04d66a5a577f1082cf63, type: 3}
       propertyPath: m_Name
-      value: PieceB (4)
+      value: PieceB (3)
       objectReference: {fileID: 0}
     - target: {fileID: 7992263984771403816, guid: 79400cdecbdc04d66a5a577f1082cf63, type: 3}
       propertyPath: m_SortingOrder
@@ -13060,7 +13158,7 @@ PrefabInstance:
       objectReference: {fileID: 2867187899538064380}
     - target: {fileID: 6130529613671815627, guid: 01ff2ee3076be48fcb5d4904bc6adada, type: 3}
       propertyPath: m_Name
-      value: PieceD (1)
+      value: PieceD (0)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13094,6 +13192,7 @@ SceneRoots:
   - {fileID: 619394802}
   - {fileID: 2066784743}
   - {fileID: 6336190654349970620}
+  - {fileID: 2010776038}
   - {fileID: 945880647}
   - {fileID: 1867755444}
   - {fileID: 1829899787}

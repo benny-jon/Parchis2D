@@ -609,6 +609,43 @@ public class GameStateMachineTests
         Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
     }
 
+    [Test]
+    public void TestBug_WherePieceLandsOnEnemyTileWithoutCapturing_ButShouldCapture()
+    {
+        pieces.Clear();
+        var pieceA1 = CreateTestPiece(0, 26);
+        var pieceA2 = CreateTestPiece(0, 28);
+        var pieceA3 = CreateTestPiece(0, 33);
+        var pieceA4 = CreateTestPiece(0, -1);
+        var pieceB1 = CreateTestPiece(1, 25);
+        var pieceB2 = CreateTestPiece(1, -1);
+        var pieceB3 = CreateTestPiece(1, -1);
+        var pieceB4 = CreateTestPiece(1, 21);
+        var pieceC1 = CreateTestPiece(2, 58);
+        var pieceC2 = CreateTestPiece(2, 39);
+        var pieceC3 = CreateTestPiece(2, 39);
+        var pieceC4 = CreateTestPiece(2, 38);
+        
+        var allPieces = new List<Piece> { pieceA1, pieceA2, pieceA3, pieceA4, pieceB1, pieceB2, pieceB3, pieceB4, pieceC1, pieceC2, pieceC3, pieceC4 };
+        pieces.AddRange(allPieces);
+
+        stateMachine.StartGame();
+        stateMachine.RollDiceWithValues(1, 0);
+        stateMachine.OnPieceClicked(pieceA2);
+        Assert.AreEqual(29, pieceA2.currentTileIndex);
+
+        stateMachine.RollDiceWithValues(4, 3);
+
+        var moveOption = stateMachine.CurrentLegalMoves[pieceB1].Find(m => m.targetTileIndex == 29);
+        Assert.NotNull(moveOption);
+        Assert.AreEqual(29, moveOption.targetTileIndex);
+        Assert.AreEqual(pieceB1, moveOption.piece);
+
+        stateMachine.OnPieceClicked(pieceB1);
+        Assert.AreEqual(29, pieceB1.currentTileIndex);
+        Assert.AreEqual(-1, pieceA2.currentTileIndex); // captured
+    }
+
     private BoardView CreateTestBoardView(int tileCount)
     {
         var go = new GameObject("BoardView");
