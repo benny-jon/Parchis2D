@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     private int pendingBonusToAnnounce = 0;
     private int pendingBonusPlayer = -1;
 
+    private bool pendingShowForceStartTooltip = true;
+
     public GameStateMachine GetStateMachine()
     {
         return stateMachine;
@@ -113,6 +115,7 @@ public class GameManager : MonoBehaviour
         stateMachine.OnPlayerFinishedTheGame += HandlePlayerFinished;
         stateMachine.OnMoveAnimationRequested += HandleMoveAnimationRequested;
         stateMachine.OnMoveOptionSelectionRequest += HandleSelectMoveOptionRequest;
+        stateMachine.OnPlayerEnforcedToSpecialCase += HandlePlayerForcedToSpecialCase;
     }
 
     private void UnsubscribeFromStateMachineEvents()
@@ -129,6 +132,7 @@ public class GameManager : MonoBehaviour
         stateMachine.OnPlayerFinishedTheGame -= HandlePlayerFinished;
         stateMachine.OnMoveAnimationRequested -= HandleMoveAnimationRequested;
         stateMachine.OnMoveOptionSelectionRequest -= HandleSelectMoveOptionRequest;
+        stateMachine.OnPlayerEnforcedToSpecialCase -= HandlePlayerForcedToSpecialCase;
     }
 
     private void SubscribeToParchisUiEvents()
@@ -240,7 +244,7 @@ public class GameManager : MonoBehaviour
         }
         if (bonusSteps == GameStateMachine.BonusForReachingHome)
         {
-            return $"{GameStateMachine.BonusForReachingHome} bonus moves when a piece reaches Home";
+            return $"{GameStateMachine.BonusForReachingHome} bonus moves for reaching Home";
         }
         return null;
     }
@@ -273,13 +277,15 @@ public class GameManager : MonoBehaviour
         }
         else if (phase == GamePhase.GameOver)
         {
+            ClearPlayersActionHints();
+            ClearMoveHints();
             Debug.LogWarning("GAME OVER!");
             soundManager?.PlayPlayerWin();
 
             if (parchisUI != null)
             {
                 Debug.Log("Show Game Over message");
-                parchisUI.ShowGameOver(stateMachine.playersFinishRanking[0]);
+                parchisUI.ShowGameOver($"Game Over\n{GetPlayersName(stateMachine.playersFinishRanking[0])}\n Won first Place!");
             }
         }
     }
@@ -289,7 +295,7 @@ public class GameManager : MonoBehaviour
         if (piece.ownerPlayerIndex == stateMachine.currentPlayerIndex)
         {
             soundManager?.PlayPieceToStart();
-            parchisUI.ShowNotification("Penalty for rolling 3 consecutives doubles");
+            parchisUI.ShowNotification($"Penalty {GetPlayersName(piece.ownerPlayerIndex)} for rolling 3 consecutives doubles");
         }
 
         animationManager.PlayResetPiece(piece, boardView.pieceSpawnPoints[allPieces.IndexOf(piece)].position, () =>
@@ -332,6 +338,27 @@ public class GameManager : MonoBehaviour
             currentPiece.SetMoveHints(new List<MoveOption>() { options[optionIndex] });
             stateMachine.OnMoveOptionSelected(currenOptionRequestId, currentPiece, optionIndex);
         });
+    }
+
+    private void HandlePlayerForcedToSpecialCase(int player, MoveSpecialCaseType caseType)
+    {
+        switch (caseType)
+        {
+            case MoveSpecialCaseType.ForceToBreakBlockade:
+                {
+                    parchisUI?.ShowNotification($"{GetPlayersName(player)} rolled double and is forced to break the blockade");
+                    break;
+                }
+            case MoveSpecialCaseType.ForceToStart:
+                {
+                    if (pendingShowForceStartTooltip)
+                    {
+                        parchisUI?.ShowNotification($"Rolling a 5 forces a token to Start");
+                        pendingShowForceStartTooltip = false;
+                    }
+                    break;
+                }
+        }
     }
 
     // ---------------------------
@@ -448,5 +475,18 @@ public class GameManager : MonoBehaviour
     public GamePhase CurrentGamePhase()
     {
         return stateMachine != null ? stateMachine.gamePhase : GamePhase.GameOver;
+    }
+
+    // TODO: move to game settings to let user choose color and position
+    private string GetPlayersName(int player)
+    {
+        switch(player)
+        {
+            case 0: return "Yellow";
+            case 1: return "Blue";
+            case 2: return "Red";
+            case 3: return "Green";
+        }
+        return "Player " + player;
     }
 }

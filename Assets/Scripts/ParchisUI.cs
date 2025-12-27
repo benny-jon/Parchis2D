@@ -114,7 +114,7 @@ public class ParchisUI : MonoBehaviour
         }
     }
 
-    public void ShowGameOver(int playerWinner)
+    public void ShowGameOver(string message)
     {
         if (eventNotification != null)
         {
@@ -123,8 +123,7 @@ public class ParchisUI : MonoBehaviour
         }
         if (gameOverText != null)
         {
-            Debug.Log($"Player {playerWinner}\nhas Won!");
-            gameOverText.text = $"Player {playerWinner}\nhas Won!";
+            gameOverText.text = message;
             gameOverText.gameObject.SetActive(true);
         }
         if (winCelebration != null)

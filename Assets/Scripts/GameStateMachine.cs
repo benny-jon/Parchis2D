@@ -47,6 +47,7 @@ public class GameStateMachine : IReplayGame
     public Action<GamePhase> OnGamePhaseChanged;
     public Action<Piece> OnMovePieceToStart;
     public Action<int, Medal> OnPlayerFinishedTheGame;
+    public Action<int, MoveSpecialCaseType> OnPlayerEnforcedToSpecialCase;
 
     public List<int> playersFinishRanking;
 
@@ -519,6 +520,8 @@ public class GameStateMachine : IReplayGame
         var pieceAndMoves = currentLegalMoves.First(pair => pair.Value.Any(m => m.targetTileIndex == boardRules.GetStartTile(m.piece.ownerPlayerIndex)));
         currentLegalMoves.Clear();
         currentLegalMoves.Add(pieceAndMoves.Key, new List<MoveOption>() { pieceAndMoves.Value.First() }); // only keep 1 start move to auto-execute it.
+
+        OnPlayerEnforcedToSpecialCase?.Invoke(currentPlayerIndex, MoveSpecialCaseType.ForceToStart);
     }
 
     private void EnforceBreakOwnBlockadeRule()
@@ -560,6 +563,8 @@ public class GameStateMachine : IReplayGame
                 currentLegalMoves.Remove(piece);
             }
         }
+
+        OnPlayerEnforcedToSpecialCase?.Invoke(currentPlayerIndex, MoveSpecialCaseType.ForceToBreakBlockade);
     }
 
     private bool CurrentPlayerHasAvailablePieces()
