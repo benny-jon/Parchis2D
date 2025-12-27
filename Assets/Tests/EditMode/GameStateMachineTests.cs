@@ -28,6 +28,7 @@ public class GameStateMachineTests
         };
 
         stateMachine = new GameStateMachine(pieces, boardView, boardRules);
+        stateMachine.SetTestEnvironment();
 
         stateMachine.OnMovePieceToStart += (piece) =>
         {

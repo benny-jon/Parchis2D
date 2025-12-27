@@ -82,6 +82,6 @@ public class Piece : Clickable2D
 
     public override string ToString()
     {
-        return $"Piece from Player {ownerPlayerIndex}, pos = {currentTileIndex}. - " + base.ToString();
+        return $"Piece from Player {ownerPlayerIndex}, index = {playerPieceIndex}, pos = {currentTileIndex}. - " + base.ToString();
     }
 }

@@ -3,10 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class GameStateMachine
+public class GameStateMachine : IReplayGame
 {
     public const int BonusForCapture = 20;
     public const int BonusForReachingHome = 10;
+
+    private ReplayWriter replayWriter;
+    private int turnCount;
+    private bool isTestingEnvironment;
+
+    private System.Random rng;
 
     private GamePhase _phase;
     public GamePhase gamePhase
@@ -64,8 +70,22 @@ public class GameStateMachine
         ResetGame();
     }
 
+    public void SetTestEnvironment()
+    {
+        isTestingEnvironment = true;
+    }
+
     public void StartGame()
     {
+        int seed = Environment.TickCount;
+        rng = new System.Random(seed);
+        if (!isTestingEnvironment)
+        {
+            replayWriter = new ReplayWriter($"replay_{DateTime.Now:yyyyMMdd_HHmmss}.json");
+            replayWriter.WriteHeader(seed, BoardRules.RULES_TYPE);
+        }
+        turnCount = 0;
+
         currentPlayerIndex = -1;
         NextPlayer();
     }
@@ -73,12 +93,19 @@ public class GameStateMachine
     public void EndGame()
     {
         gamePhase = GamePhase.GameOver;
+        DisposeReplayWrite();
+    }
+
+    private void OnDestroy()
+    {
+        DisposeReplayWrite();
     }
 
     private void StartTurn()
     {
         gamePhase = GamePhase.WaitingForRoll;
         OnTurnChanged?.Invoke(currentPlayerIndex);
+        turnCount++;
     }
 
     public void RollDice()
@@ -89,8 +116,8 @@ public class GameStateMachine
             return;
         }
 
-        int d1 = UnityEngine.Random.Range(1, 7);
-        int d2 = UnityEngine.Random.Range(1, 7);
+        int d1 = rng.Next(1, 7);
+        int d2 = rng.Next(1, 7);
 
         RollDiceWithValues(d1, d2);
     }
@@ -103,6 +130,8 @@ public class GameStateMachine
         lastDice1Roll = d1;
         lastDice2Roll = d2;
         OnDiceRolled?.Invoke(lastDice1Roll, lastDice2Roll);
+        replayWriter?.WriteRoll(turnCount, currentPlayerIndex, d1, d2);
+
         if (d1 == d2)
         {
             rolledDoublesInARow++;
@@ -167,6 +196,15 @@ public class GameStateMachine
         {
             MoveOption onlyOption = options[0];
             MoveResult moveResult = boardRules.TryResolveMove(piece, onlyOption.steps, pieces);
+
+            replayWriter?.WriteMove(
+                turnCount,
+                currentPlayerIndex,
+                piece.playerPieceIndex,
+                currentLegalMoves[piece].IndexOf(onlyOption),
+                onlyOption.bonusIndex >= 0 ? onlyOption.steps : 0
+            );
+
             ExecuteResolvedMove(onlyOption, moveResult);
         }
         return true;
@@ -186,16 +224,35 @@ public class GameStateMachine
         if (requestId != activeOptionRequestId) return;
         if (activeOptions == null) return;
         if (moveOptionIndex < 0 || moveOptionIndex >= activeOptions.Count) return;
-
-        gamePhase = GamePhase.WaitingForMove;
+        if (activeOptionPiece != piece)
+        { 
+            Debug.LogError("Wrong piece selected, its not the active piece");
+            return; 
+        }
 
         MoveOption chosenOption = activeOptions[moveOptionIndex];
+        if (piece != chosenOption.piece)
+        {
+            Debug.LogError("Wrong Piece selected, move option doesnt belong to it.");
+            return;
+        }
+
+        gamePhase = GamePhase.WaitingForMove;
 
         activeOptionRequestId = -1;
         activeOptionPiece = null;
         activeOptions = null;
 
         MoveResult moveResult = boardRules.TryResolveMove(piece, chosenOption.steps, pieces);
+
+        replayWriter?.WriteMove(
+            turnCount,
+            currentPlayerIndex,
+            piece.playerPieceIndex,
+            currentLegalMoves[piece].IndexOf(chosenOption),
+            chosenOption.bonusIndex >= 0 ? chosenOption.steps : 0
+        );
+
         ExecuteResolvedMove(chosenOption, moveResult);
     }
 
@@ -203,7 +260,7 @@ public class GameStateMachine
     {
         foreach (var piece in CurrentLegalMoves.Keys)
         {
-            if (CurrentLegalMoves[piece].Find(m => m.bonusIndex >=0) != null)
+            if (CurrentLegalMoves[piece].Find(m => m.bonusIndex >= 0) != null)
             {
                 return true;
             }
@@ -232,6 +289,9 @@ public class GameStateMachine
 
         List<int> path = boardRules.GetPathIndices(moveOption.piece, moveOption.steps);
 
+        Debug.Log($"ExecuteResolvedMove-BeforeAnimation-Moving {moveOption.piece} from Tiles {moveOption.piece.currentTileIndex} to {moveOption.targetTileIndex}");
+        Debug.Log($"ExecuteResolvedMove-BeforeAnimation-Move Result: status={moveResult.status}, targetTile={moveResult.targetTileIndex} captured={moveResult.capturedPiece}");
+
         gamePhase = GamePhase.AnimatingMove;
         OnMoveAnimationRequested?.Invoke(
             moveOption.piece,
@@ -242,13 +302,15 @@ public class GameStateMachine
 
     private void FinalizeMoveAfterAnimation(MoveOption moveOption, MoveResult moveResult)
     {
-        Debug.Log($"Moving {moveOption.piece} from Tiles {moveOption.piece.currentTileIndex} to {moveOption.targetTileIndex}");
+        Debug.Log($"FinalizeMoveAfterAnimation-Moving {moveOption.piece} from Tiles {moveOption.piece.currentTileIndex} to {moveOption.targetTileIndex}");
+        Debug.Log($"FinalizeMoveAfterAnimation-Move Result: status={moveResult.status}, targetTile={moveResult.targetTileIndex} captured={moveResult.capturedPiece}");
         moveOption.piece.MoveToTile(moveOption.targetTileIndex);
 
         if (moveResult.status == MoveStatus.Capture)
         {
             Debug.Log($"Capturing {moveResult.capturedPiece}");
             OnMovePieceToStart?.Invoke(moveResult.capturedPiece);
+            moveResult.capturedPiece.MoveToTile(-1);
             bonusStepsToMove.Add(BonusForCapture);
         }
 
@@ -269,7 +331,7 @@ public class GameStateMachine
             if (!CurrentPlayerHasAvailablePieces())
             {
                 int finishedSpot = playersFinishRanking.Count;
-                OnPlayerFinishedTheGame?.Invoke(currentPlayerIndex, (Medal) finishedSpot);
+                OnPlayerFinishedTheGame?.Invoke(currentPlayerIndex, (Medal)finishedSpot);
                 playersFinishRanking.Add(currentPlayerIndex);
 
                 if (finishedSpot >= 2)
@@ -456,7 +518,7 @@ public class GameStateMachine
         Debug.Log("Start moves found. Keeping 1");
         var pieceAndMoves = currentLegalMoves.First(pair => pair.Value.Any(m => m.targetTileIndex == boardRules.GetStartTile(m.piece.ownerPlayerIndex)));
         currentLegalMoves.Clear();
-        currentLegalMoves.Add(pieceAndMoves.Key, new List<MoveOption>(){ pieceAndMoves.Value.First() }); // only keep 1 start move to auto-execute it.
+        currentLegalMoves.Add(pieceAndMoves.Key, new List<MoveOption>() { pieceAndMoves.Value.First() }); // only keep 1 start move to auto-execute it.
     }
 
     private void EnforceBreakOwnBlockadeRule()
@@ -541,4 +603,42 @@ public class GameStateMachine
         gamePhase = GamePhase.WaitingForRoll;
         currentPlayerIndex = 0;
     }
+
+    private void DisposeReplayWrite()
+    {
+        replayWriter?.Dispose();
+        replayWriter = null;
+    }
+
+    #region REPLAY HELPER METHODS (IReplayGame)
+    public void ApplyRoll(int player, int d1, int d2)
+    {
+        if (player != currentPlayerIndex)
+        {
+            throw new Exception($"Invalid player turn: {player} while current is {currentPlayerIndex}");
+        }
+        RollDiceWithValues(d1, d2);
+    }
+
+    public void ApplyMove(int player, int piece, int moveOption)
+    {
+        if (gamePhase == GamePhase.WaitingForMove)
+        {
+            activeOptionRequestId = -1;
+            activeOptionPiece = null;
+            activeOptions = null;
+
+            Piece pieceToMove = pieces.Find(p => p.ownerPlayerIndex == currentPlayerIndex && p.playerPieceIndex == piece);
+
+            MoveOption chosenOption = CurrentLegalMoves[pieceToMove][moveOption];
+
+            MoveResult moveResult = boardRules.TryResolveMove(pieceToMove, chosenOption.steps, pieces);
+            ExecuteResolvedMove(chosenOption, moveResult);
+        }
+        else
+        {
+            Debug.LogError("Move discarded");
+        }
+    }
+    #endregion
 }

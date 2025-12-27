@@ -23,12 +23,15 @@ public class GameManager : MonoBehaviour
 
     #region Option Selection Variables
     private int currenOptionRequestId;
-    private Piece activePiece;
-    private Transform activePieceTransform;
     #endregion
 
     private int pendingBonusToAnnounce = 0;
     private int pendingBonusPlayer = -1;
+
+    public GameStateMachine GetStateMachine()
+    {
+        return stateMachine;
+    }
 
     private void Awake()
     {
@@ -180,7 +183,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleMoveEnded(MoveResult moveResult)
     {
-        Debug.Log("On Move Ended");
+        Debug.Log("On Move Ended. With status: " + moveResult.status);
         soundManager?.PlayPieceMoveEnd();
         if (moveResult.status == MoveStatus.ReachedHome)
         {
@@ -289,9 +292,7 @@ public class GameManager : MonoBehaviour
             parchisUI.ShowNotification("Penalty for rolling 3 consecutives doubles");
         }
 
-        piece.MoveToTile(-1);
-
-        animationManager.PlayResetPiece(piece, boardView.pieceSpawnPoints[allPieces.FindIndex(p => p == piece)].position, () =>
+        animationManager.PlayResetPiece(piece, boardView.pieceSpawnPoints[allPieces.IndexOf(piece)].position, () =>
         {
             ResetPiece(piece);
         });
@@ -324,11 +325,12 @@ public class GameManager : MonoBehaviour
     {
         currenOptionRequestId = requestId;
 
-        movePopupUI?.Show(activePieceTransform, options.ToArray(), onPickIndex: (optionIndex) =>
+        Piece currentPiece = piece; // to be used from the lambda response
+        movePopupUI?.Show(piece.transform, options.ToArray(), onPickIndex: (optionIndex) =>
         {
             Debug.Log($"Calling OnMoveOptionSelected for {optionIndex}");
-            activePiece.SetMoveHints(new List<MoveOption>() { options[optionIndex] });
-            stateMachine.OnMoveOptionSelected(currenOptionRequestId, activePiece, optionIndex);
+            currentPiece.SetMoveHints(new List<MoveOption>() { options[optionIndex] });
+            stateMachine.OnMoveOptionSelected(currenOptionRequestId, currentPiece, optionIndex);
         });
     }
 
@@ -393,11 +395,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void ClearOthersMoveHints(Piece activePiece)
+    private void ClearOthersMoveHints(Piece pieceOfInterest)
     {
         foreach (Piece piece in allPieces)
         {
-            if (piece != null && piece != activePiece) piece.ClearMoveHints();
+            if (piece != null && piece != pieceOfInterest) piece.ClearMoveHints();
         }
     }
 
@@ -436,9 +438,6 @@ public class GameManager : MonoBehaviour
             Debug.LogError("StateMachine is NULL " + GetHashCode());
             return;
         }
-
-        activePiece = piece;
-        activePieceTransform = pieceTransform;
 
         if (stateMachine.OnPieceClicked(piece))
         {

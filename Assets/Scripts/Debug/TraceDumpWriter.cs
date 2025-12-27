@@ -20,7 +20,7 @@ public static class TraceDumpWriter
             sb.AppendLine("---- TRACE ----");
             foreach (var e in trace)
             {
-                sb.AppendLine($"Move {e.phase} | Player={e.player} | Steps={e.stepsToMove} | {e.fromTile}->{e.toTile} | {e.tileType} | {e.note}");
+                sb.AppendLine($"Move {e.phase} | Player={e.player} | Piece={e.pieceIndex} | Steps={e.stepsToMove} | {e.fromTile}->{e.toTile} | {e.tileType} | {e.note}");
             }
 
             sb.AppendLine();
