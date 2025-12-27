@@ -7,6 +7,7 @@ public class BoardView : MonoBehaviour
 {
     public Transform[] tilePoints;
     public Transform[] pieceSpawnPoints;
+    public Transform[] homeAnchorPoints;
     public BoardDefinition boardDefinition;
 
     [SerializeField] public float spacingBetweenPieces = 0.235f;
@@ -39,8 +40,15 @@ public class BoardView : MonoBehaviour
             for (int i = 0; i < count; i++)
             {
                 Piece piece = groupList[i];
-                Vector3 offset = GetOffsetForGroup(count, i, IsTileVertical(tileIndex));
-                piece.transform.position = basePos + offset;
+                if (piece.currentTileIndex == boardDefinition.GetHomeTilesIndex()[piece.ownerPlayerIndex])
+                {
+                    piece.transform.position = homeAnchorPoints[piece.ownerPlayerIndex * 4 + piece.playerPieceIndex].position;
+                }
+                else
+                {
+                    Vector3 offset = GetOffsetForGroup(count, i, IsTileVertical(tileIndex));
+                    piece.transform.position = basePos + offset;
+                }
                 SetPieceSortingOrderByPos(piece);
             }
         }
@@ -106,8 +114,8 @@ public class BoardView : MonoBehaviour
     {
         if (piece.transform.childCount < 3) return;
 
-        var pieceImage = piece.transform.GetChild(2);    
-        var pieceSprite = pieceImage.GetComponent<SpriteRenderer>();    
+        var pieceImage = piece.transform.GetChild(2);
+        var pieceSprite = pieceImage.GetComponent<SpriteRenderer>();
         var newOrder = MapYToSorting(piece.transform.position.y);
         pieceSprite.sortingOrder = newOrder;
 
@@ -127,19 +135,20 @@ public class BoardView : MonoBehaviour
         return Mathf.RoundToInt(Mathf.Lerp(minOut, maxOut, t));
     }
 
-    [ContextMenu("Auto Assign Tiles From Childre")]
+    [ContextMenu("Auto Assign Tiles From Children")]
     public void AutoAssignTilesContextMenu()
     {
         AutoAssignTilesPoints();
+        AutoAssignHomeAnchorPoints();
         AutoAssignPieceSpawnPoints();
     }
 
     public void AutoAssignTilesPoints()
     {
-        var trackTilesPointsParent = transform.GetChild(0);
+        var trackTilesPointsParent = transform.GetChild(2);
         var trackTilesPointsCount = trackTilesPointsParent.childCount;
 
-        var homeTrackTilesPointsParent = transform.GetChild(1);
+        var homeTrackTilesPointsParent = transform.GetChild(3);
         var homeTrackTilesPointsCount = homeTrackTilesPointsParent.childCount;
 
         tilePoints = new Transform[trackTilesPointsCount + homeTrackTilesPointsCount];
@@ -157,9 +166,24 @@ public class BoardView : MonoBehaviour
         Debug.Log($"BoardView: Auto-assigned {tilePoints.Length} tiles points.");
     }
 
+    public void AutoAssignHomeAnchorPoints()
+    {
+        var homeAnchorPointsParent = transform.GetChild(4);
+        var homeAnchorPointsCount = homeAnchorPointsParent.childCount;
+
+        homeAnchorPoints = new Transform[homeAnchorPointsCount];
+
+        for (int i = 0; i < homeAnchorPointsCount; i++)
+        {
+            homeAnchorPoints[i] = homeAnchorPointsParent.GetChild(i);
+        }
+
+        Debug.Log($"BoardView: Auto-assigned {homeAnchorPoints.Length} home anchor points");
+    }
+
     public void AutoAssignPieceSpawnPoints()
     {
-        var pieceSpawnPointsParent = transform.GetChild(2);
+        var pieceSpawnPointsParent = transform.GetChild(5);
         var pieceSpawnPointsCount = pieceSpawnPointsParent.childCount;
 
         pieceSpawnPoints = new Transform[pieceSpawnPointsCount];
@@ -197,7 +221,7 @@ public class BoardView : MonoBehaviour
                         Gizmos.DrawSphere(t.position, sphereRadius);
                         break;
                     case TileType.Home:
-                        Gizmos.DrawSphere(t.position, sphereRadius);
+                        Gizmos.DrawSphere(t.position, sphereRadius / 2);
                         break;
                     case TileType.Normal:
                     default:
@@ -205,22 +229,9 @@ public class BoardView : MonoBehaviour
                         break;
                 }
             }
-
-            // #if UNITY_EDITOR
-
-            // var style = new GUIStyle();
-            // style.normal.textColor = Color.black;     // <<< CHANGE LABEL COLOR HERE
-            // style.fontSize = 15;
-            // style.fontStyle = FontStyle.Bold;
-
-            // UnityEditor.Handles.Label(
-            //     t.position + Vector3.up * 0.1f,
-            //     i.ToString(),
-            //     style
-            // );
-
-            // #endif
         }
+
+        // Start Box Pieces Anchor Points
 
         if (pieceSpawnPoints == null) return;
 
@@ -234,9 +245,26 @@ public class BoardView : MonoBehaviour
             Gizmos.DrawSphere(p.position, 0.10f);
         }
 
+        // HOME Anchor points
+
+        if (homeAnchorPoints == null) return;
+
+        Gizmos.color = Color.white;
+
+        for (int i = 0; i < homeAnchorPoints.Length; i++)
+        {
+            var p = homeAnchorPoints[i];
+            if (p == null) continue;
+
+            Gizmos.DrawSphere(p.position, 0.10f);
+        }
+
+
+        // Players HUD Anchor points
+
         Gizmos.color = Color.black;
 
-        Transform anchorPointsParent = transform.GetChild(3);
+        Transform anchorPointsParent = transform.GetChild(6);
         if (anchorPointsParent != null)
         {
             for (int i = 0; i < anchorPointsParent.childCount; i++)

@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour
         ClearOtherPlayersDiceHints();
     }
 
-    private List<Piece> GetActivePlayersPieces()
+    public List<Piece> GetActivePlayersPieces()
     {
         if (gameSettings == null)
         {
@@ -489,4 +489,17 @@ public class GameManager : MonoBehaviour
         }
         return "Player " + player;
     }
+
+    #region DEBUG METHODS
+
+    [ContextMenu("Re-Layout Pieces Positions")]
+    private void LayoutPieces() 
+    {
+        if (boardView != null)
+        {
+            boardView.LayoutPieces(GetActivePlayersPieces());
+        }
+    }
+
+    #endregion
 }

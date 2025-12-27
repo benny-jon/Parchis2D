@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 281215b15efcb474ab334c66ebc0d278, type: 3}
+  m_Name: TestScenario_AllPiecesAtHome
+  m_EditorClassIdentifier: Scripts::PieceScenario
+  title: All Pieces at their Home
+  configuration:
+  - player: 0
+    pieceIndex: 0
+    tileIndex: 75
+  - player: 0
+    pieceIndex: 1
+    tileIndex: 75
+  - player: 0
+    pieceIndex: 2
+    tileIndex: 75
+  - player: 0
+    pieceIndex: 3
+    tileIndex: 75
+  - player: 1
+    pieceIndex: 0
+    tileIndex: 83
+  - player: 1
+    pieceIndex: 1
+    tileIndex: 83
+  - player: 1
+    pieceIndex: 2
+    tileIndex: 83
+  - player: 1
+    pieceIndex: 3
+    tileIndex: 83
+  - player: 2
+    pieceIndex: 0
+    tileIndex: 91
+  - player: 2
+    pieceIndex: 1
+    tileIndex: 91
+  - player: 2
+    pieceIndex: 2
+    tileIndex: 91
+  - player: 2
+    pieceIndex: 3
+    tileIndex: 91
+  - player: 3
+    pieceIndex: 0
+    tileIndex: 99
+  - player: 3
+    pieceIndex: 1
+    tileIndex: 99
+  - player: 3
+    pieceIndex: 2
+    tileIndex: 99
+  - player: 3
+    pieceIndex: 3
+    tileIndex: 99
