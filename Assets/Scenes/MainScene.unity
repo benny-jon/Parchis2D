@@ -9599,10 +9599,10 @@ RectTransform:
   - {fileID: 944711308}
   m_Father: {fileID: 1898958664}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -40, y: -130}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 210, y: -80}
+  m_SizeDelta: {x: 380, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1571879059
 MonoBehaviour:
@@ -10052,7 +10052,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Scripts::PieceScenarioLoader
   boardView: {fileID: 2066784745}
   gameManager: {fileID: 2867187899538064380}
-  scenario: {fileID: 11400000, guid: 8c06ea66c7a414a6daef4d501024e2af, type: 2}
+  scenario: {fileID: 11400000, guid: e122e82e2447a4f189974c343a937fe6, type: 2}
 --- !u!1 &1626269762
 GameObject:
   m_ObjectHideFlags: 0
@@ -12238,6 +12238,8 @@ GameObject:
   - component: {fileID: 1898958666}
   - component: {fileID: 1898958665}
   - component: {fileID: 1898958667}
+  - component: {fileID: 1898958669}
+  - component: {fileID: 1898958668}
   m_Layer: 5
   m_Name: MovePopup
   m_TagString: Untagged
@@ -12263,7 +12265,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 420, y: 200}
+  m_SizeDelta: {x: 420, y: 160}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1898958665
 MonoBehaviour:
@@ -12328,8 +12330,48 @@ MonoBehaviour:
   - {fileID: 211108243}
   - {fileID: 932508523}
   - {fileID: 1800769920}
-  screenOffset: {x: 0, y: 160}
+  screenOffset: {x: 0, y: 130}
   overlayButton: {fileID: 1460703550}
+--- !u!114 &1898958668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898958663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_Padding:
+    m_Left: 20
+    m_Right: 20
+    m_Top: 20
+    m_Bottom: 20
+  m_ChildAlignment: 4
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!114 &1898958669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898958663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 2
+  m_VerticalFit: 2
 --- !u!1 &1910354119
 GameObject:
   m_ObjectHideFlags: 0

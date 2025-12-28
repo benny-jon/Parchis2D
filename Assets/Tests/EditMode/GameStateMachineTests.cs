@@ -39,10 +39,6 @@ public class GameStateMachineTests
         {
             onComplete?.Invoke();
         };
-        stateMachine.OnMoveOptionSelectionRequest += (id, piece, options) =>
-        {
-            stateMachine.OnMoveOptionSelected(id, piece, 0);
-        };
     }
 
     [Test]
@@ -82,17 +78,27 @@ public class GameStateMachineTests
     [Test]
     public void TwoConsecutiveDoubles_ShouldBeFine()
     {
+        stateMachine.OnMoveOptionSelectionRequest += (id, piece, options) =>
+        {
+            stateMachine.OnMoveOptionSelected(id, piece, 0);
+        };
+        pieces.Clear();
+        pieces.Add(CreateTestPiece(owner: 0, tileIndex: -1));
+        pieces.Add(CreateTestPiece(0, 10));
+        pieces.Add(CreateTestPiece(0, 11));
+        pieces.Add(CreateTestPiece(1, -1));
+        pieces.Add(CreateTestPiece(1, -1));
         stateMachine.StartGame();
-        Assert.AreEqual(-1, pieces[0].currentTileIndex);
 
         var trackPiece = pieces[1];
-        trackPiece.currentTileIndex = 20;
 
         stateMachine.RollDiceWithValues(4, 4);
+        stateMachine.OnPieceClicked(trackPiece);
         stateMachine.OnPieceClicked(trackPiece);
         Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
 
         stateMachine.RollDiceWithValues(3, 3);
+        stateMachine.OnPieceClicked(trackPiece);
         stateMachine.OnPieceClicked(trackPiece);
         Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
 
@@ -105,6 +111,10 @@ public class GameStateMachineTests
     [Test]
     public void Verify_FirstPlayerPenalty_ForMostAdvancePiece_WhenRollingThreeDoubles()
     {
+        stateMachine.OnMoveOptionSelectionRequest += (id, piece, options) =>
+        {
+            stateMachine.OnMoveOptionSelected(id, piece, 0);
+        };
         stateMachine.StartGame();
         Assert.AreEqual(-1, pieces[0].currentTileIndex);
 
@@ -128,6 +138,10 @@ public class GameStateMachineTests
     [Test]
     public void Verify_NonFirstPlayerPenalty_ForMostAdvancePiece_WhenRollingThreeDoubles()
     {
+        stateMachine.OnMoveOptionSelectionRequest += (id, piece, options) =>
+        {
+            stateMachine.OnMoveOptionSelected(id, piece, 0);
+        };
         stateMachine.StartGame();
         pieces.Clear();
 
@@ -227,6 +241,10 @@ public class GameStateMachineTests
         pieces.Add(finishingPiece);
         pieces.Add(pieceA);
         pieces.Add(pieceB);
+        stateMachine.OnMoveOptionSelectionRequest += (id, piece, options) =>
+        {
+            stateMachine.OnMoveOptionSelected(id, piece, 0);
+        };
 
         stateMachine.StartGame();
 
@@ -250,6 +268,10 @@ public class GameStateMachineTests
         pieces.Add(finishingPiece);
         pieces.Add(pieceA);
         pieces.Add(otherPlayerPiece);
+        stateMachine.OnMoveOptionSelectionRequest += (id, piece, options) =>
+        {
+            stateMachine.OnMoveOptionSelected(id, piece, 0);
+        };
 
         stateMachine.StartGame();
 
@@ -389,7 +411,11 @@ public class GameStateMachineTests
         var freePiece = CreateTestPiece(0, 5);
         var enemyPiece = CreateTestPiece(1, -1);
         pieces.AddRange(new List<Piece> { pieceInBlockadeA, pieceInBlockadeB, freePiece, enemyPiece });
-
+        stateMachine.OnMoveOptionSelectionRequest += (id, piece, options) =>
+        {
+            stateMachine.OnMoveOptionSelected(id, piece, 0);
+        };
+        
         stateMachine.StartGame();
         Assert.AreEqual(0, stateMachine.currentPlayerIndex);
         Assert.AreEqual(GamePhase.WaitingForRoll, stateMachine.gamePhase);
@@ -432,6 +458,10 @@ public class GameStateMachineTests
     [Test]
     public void Verify_NotifyGoldMedal_WhenPlayerFinishesFirst()
     {
+        stateMachine.OnMoveOptionSelectionRequest += (id, piece, options) =>
+        {
+            stateMachine.OnMoveOptionSelected(id, piece, 0);
+        };
         pieces.Clear();
         var finishingPiece = CreateTestPiece(0, boardRules.GetHomeTile(0) - 3);
         var otherPiece1 = CreateTestPiece(1, -1);
@@ -629,6 +659,10 @@ public class GameStateMachineTests
         
         var allPieces = new List<Piece> { pieceA1, pieceA2, pieceA3, pieceA4, pieceB1, pieceB2, pieceB3, pieceB4, pieceC1, pieceC2, pieceC3, pieceC4 };
         pieces.AddRange(allPieces);
+        stateMachine.OnMoveOptionSelectionRequest += (id, piece, options) =>
+        {
+            stateMachine.OnMoveOptionSelected(id, piece, 0);
+        };
 
         stateMachine.StartGame();
         stateMachine.RollDiceWithValues(1, 0);
@@ -662,6 +696,15 @@ public class GameStateMachineTests
             tileGo.transform.parent = go.transform;
             tileGo.transform.position = new Vector3(i, 0f, 0f);
             view.tilePoints[i] = tileGo.transform;
+        }
+
+        view.homeAnchorPoints = new Transform[BoardDefinition.PLAYERS * 4];
+        for (int i = 0; i < view.homeAnchorPoints.Length; i++)
+        {
+            var anchorPoint = new GameObject($"Anchor_{i}");
+            anchorPoint.transform.parent = go.transform;
+            anchorPoint.transform.position = new Vector3(i, 0f, 0f);
+            view.homeAnchorPoints[i] = anchorPoint.transform;
         }
 
         return view;
