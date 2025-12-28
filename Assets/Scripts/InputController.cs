@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class InputController : MonoBehaviour
@@ -36,6 +37,17 @@ public class InputController : MonoBehaviour
         {
             return;
         }
+
+        // --- UI BLOCK: if click is on UI, don't let it hit the board ---
+        if (IsPointerOverUI())
+        {
+            // If we were tracking a press on the board, cancel it so it can't "complete" on release
+            if (value <= 0.5f)
+                pressedObject = null;
+
+            return;
+        }
+
         Vector2 worldPos = cam.ScreenToWorldPoint(screenPos);
 
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
@@ -69,5 +81,20 @@ public class InputController : MonoBehaviour
                 pressedObject = null;
             }
         }
+    }
+
+    private static bool IsPointerOverUI()
+    {
+        if (EventSystem.current == null) return false;
+
+        // Mouse / Pen / general pointer
+        if (Pointer.current != null)
+            return EventSystem.current.IsPointerOverGameObject();
+
+        // Touch: must pass finger id
+        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)
+            return EventSystem.current.IsPointerOverGameObject(Touchscreen.current.primaryTouch.touchId.ReadValue());
+
+        return false;
     }
 }
