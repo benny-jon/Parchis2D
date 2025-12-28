@@ -8,14 +8,15 @@ public class MovePopupUI : MonoBehaviour
     [Header("Wiring")]
     [SerializeField] public Canvas canvas;
     [SerializeField] public Camera worldCamera;
+    [SerializeField] public SpriteLibrary spriteLibrary;
     [SerializeField] private RectTransform popupRect;
     [SerializeField] private RectTransform popupParentRect;
     [SerializeField] private Button[] optionButtons;
     [SerializeField] private TextMeshProUGUI[] optionLabels;
-    [SerializeField] private Vector2 screenOffset = new Vector2(0, 40);
+    [SerializeField] private Vector2 screenOffset = new Vector2(0, 130);
 
     [Header("Overlay")]
-    [SerializeField] private Button overlayButton; 
+    [SerializeField] private Button overlayButton;
 
     private Action<int> _onPickIndex;
 
@@ -45,8 +46,30 @@ public class MovePopupUI : MonoBehaviour
 
         PositionToWorldAnchor(worldAnchor.position);
 
+        SetPlayerColor(options[0].piece.ownerPlayerIndex);
+
         gameObject.SetActive(true);
         if (overlayButton != null) overlayButton.gameObject.SetActive(true);
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>()); // refresh layout
+    }
+
+    private void SetPlayerColor(int playerIndex)
+    {
+       if (spriteLibrary != null)
+        {
+            GetComponent<Image>().color = spriteLibrary.playersColorSecondary[playerIndex];
+            var buttonsContainer = transform.GetChild(0);
+            for (int i = 0; i < buttonsContainer.childCount; i++)
+            {
+                buttonsContainer.GetChild(i).GetComponent<Image>().color = spriteLibrary.playersColorPrimary[playerIndex];
+                buttonsContainer.GetChild(i).GetComponentInChildren<TMP_Text>().color = Color.white;
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"{name} missing SpriteLibrary assignation");
+        }
     }
 
     private void PositionToWorldAnchor(Vector3 worldPos)
@@ -59,6 +82,14 @@ public class MovePopupUI : MonoBehaviour
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(popupParentRect, screenPos, camForUI, out var localPoint))
         {
             popupRect.anchoredPosition = localPoint + screenOffset;
+            float parentHeight = popupParentRect.GetComponent<RectTransform>().rect.height;
+            float topOfScreen = parentHeight / 2; // assuming parent is at 0,0 pos and takes over the whole screen.
+
+            if ((localPoint + screenOffset).y > topOfScreen)
+            {
+                // Lets show the popup bellow the piece
+                popupRect.anchoredPosition = localPoint + screenOffset * new Vector2(0, -1);
+            }
 
             ClampToParent(popupRect, popupParentRect);
         }

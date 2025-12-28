@@ -126,8 +126,9 @@ public class BoardView : MonoBehaviour
 
     private int MapYToSorting(float y)
     {
-        const float minY = -3.9f;
-        const float maxY = 5.2f;
+        var boardImage = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        float minY = -1 * boardImage.bounds.size.y / 2; // bottom of the board since Pos is at 0,0
+        float maxY = boardImage.bounds.size.y / 2; // top of the board since Pos is at 0,0
         const float minOut = 100f;
         const float maxOut = 200f;
 

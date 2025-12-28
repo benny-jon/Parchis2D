@@ -12263,7 +12263,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 420, y: 250}
+  m_SizeDelta: {x: 420, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1898958665
 MonoBehaviour:
@@ -12278,14 +12278,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.078431375, g: 0.09803922, b: 0.078431375, a: 0.92156863}
+  m_Color: {r: 0.078431375, g: 0.09803922, b: 0.078431375, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -12317,6 +12317,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Scripts::MovePopupUI
   canvas: {fileID: 209510792}
   worldCamera: {fileID: 519420031}
+  spriteLibrary: {fileID: 11400000, guid: cd789c70aeecd4b1fbf11daa7887f2ee, type: 2}
   popupRect: {fileID: 1898958664}
   popupParentRect: {fileID: 1460703547}
   optionButtons:
@@ -12327,7 +12328,7 @@ MonoBehaviour:
   - {fileID: 211108243}
   - {fileID: 932508523}
   - {fileID: 1800769920}
-  screenOffset: {x: 0, y: 40}
+  screenOffset: {x: 0, y: 160}
   overlayButton: {fileID: 1460703550}
 --- !u!1 &1910354119
 GameObject:

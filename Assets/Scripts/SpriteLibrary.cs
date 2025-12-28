@@ -4,6 +4,8 @@ using UnityEngine;
 public class SpriteLibrary : ScriptableObject
 {
     [SerializeField] public Sprite[] diceFaces;
+    [SerializeField] public Color[] playersColorPrimary;
+    [SerializeField] public Color[] playersColorSecondary;
 
     public Sprite GetDiceFace(int diceValue)
     {

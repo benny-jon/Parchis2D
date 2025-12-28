@@ -165,7 +165,16 @@ public class GameStateMachine : IReplayGame
         }
 
         gamePhase = GamePhase.WaitingForMove;
-        Debug.Log($"Player {currentPlayerIndex}, pick a Piece with available moves!");
+
+        if (CurrentLegalMoves.Count == 1)
+        {
+            // If only 1 piece with available moves, simulate selection
+            OnPieceClicked(CurrentLegalMoves.Keys.First());
+        }
+        else
+        {
+            Debug.Log($"Player {currentPlayerIndex}, pick a Piece with available moves!");
+        }
     }
 
     /// <returns>If its valid to click on that Piece</returns>
@@ -382,7 +391,16 @@ public class GameStateMachine : IReplayGame
         }
 
         gamePhase = GamePhase.WaitingForMove;
-        Debug.Log($"Player {currentPlayerIndex}, pick a Piece with available moves!");
+
+        if (CurrentLegalMoves.Count == 1)
+        {
+            // If only 1 piece with available moves, simulate selection
+            OnPieceClicked(CurrentLegalMoves.Keys.First());
+        }
+        else
+        {
+            Debug.Log($"Player {currentPlayerIndex}, pick a Piece with available moves!");
+        }
     }
 
     private void AutoRunTheOnlyAvailableMove()
