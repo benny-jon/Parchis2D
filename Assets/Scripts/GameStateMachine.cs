@@ -564,7 +564,10 @@ public class GameStateMachine : IReplayGame
             }
         }
 
-        OnPlayerEnforcedToSpecialCase?.Invoke(currentPlayerIndex, MoveSpecialCaseType.ForceToBreakBlockade);
+        if (currentLegalMoves.Count > 0)
+        {
+            OnPlayerEnforcedToSpecialCase?.Invoke(currentPlayerIndex, MoveSpecialCaseType.ForceToBreakBlockade);
+        }
     }
 
     private bool CurrentPlayerHasAvailablePieces()
