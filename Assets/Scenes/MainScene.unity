@@ -1986,7 +1986,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3063189b8590479b94bc4ce0e5504a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Scripts::ReplayRunnerMono
-  replayFilePath: replays/replay_20251226_220816.json
+  replayFilePath: replays/replay_20251228_113248.json
   gameManager: {fileID: 2867187899538064380}
 --- !u!4 &333233406
 Transform:

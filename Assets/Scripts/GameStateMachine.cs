@@ -571,6 +571,21 @@ public class GameStateMachine : IReplayGame
             return; // no blockade
         }
 
+        // Check if pieces in a Blockade have available Legal Moves
+        bool blockadesAreBreakable = false;
+        foreach (var p in blockadePieces)
+        {
+            if (currentLegalMoves.ContainsKey(p))
+            {
+                blockadesAreBreakable = true;
+                break;
+            }
+        }
+        if (!blockadesAreBreakable)
+        {
+            return; // allow other pieces to move
+        }
+
         playerHadABlockade = true;
 
         foreach (var piece in pieces)
@@ -585,6 +600,12 @@ public class GameStateMachine : IReplayGame
         if (currentLegalMoves.Count > 0)
         {
             OnPlayerEnforcedToSpecialCase?.Invoke(currentPlayerIndex, MoveSpecialCaseType.ForceToBreakBlockade);
+
+            // force a piece to move
+            var pieceToForce = currentLegalMoves.Keys.First();
+            var forcedMove = currentLegalMoves[pieceToForce][0];
+            MoveResult moveResult = boardRules.TryResolveMove(pieceToForce, forcedMove.steps, pieces);
+            ExecuteResolvedMove(forcedMove, moveResult);
         }
     }
 
