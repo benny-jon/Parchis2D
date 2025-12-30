@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class MovePopupUI : MonoBehaviour
 {
+    [SerializeField] private GameSettings gameSettings;
+
     [Header("Wiring")]
     [SerializeField] public Canvas canvas;
     [SerializeField] public Camera worldCamera;
@@ -17,16 +19,14 @@ public class MovePopupUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] optionLabels;
     [SerializeField] private Vector2 screenOffset = new Vector2(0, 130);
 
-    [Header("Overlay")]
-    [SerializeField] private Button overlayButton;
+    private Button overlayButton;
 
     private Action<int> _onPickIndex;
 
-    private void Awake() {
-        HideImmediate();
-
-        if (overlayButton != null)
+    private void SetupOverlayButtonIfNeeded() {
+        if (overlayButton == null)
         {
+            overlayButton = transform.parent.GetComponent<Button>();
             overlayButton.onClick.RemoveAllListeners();
             overlayButton.onClick.AddListener(HideImmediate);
         }
@@ -39,6 +39,7 @@ public class MovePopupUI : MonoBehaviour
     public void Show(Transform worldAnchor, MoveOption[] options, Action<int> onPickIndex)
     {
         if (worldAnchor == null || options == null || options.Length < 1) return;
+        SetupOverlayButtonIfNeeded();
 
         _onPickIndex = onPickIndex;
 
@@ -52,18 +53,29 @@ public class MovePopupUI : MonoBehaviour
 
         PositionToWorldAnchor(worldAnchor.position);
 
-        SetPlayerColor(options[0].piece.ownerPlayerIndex);
+        var playerIndex = options[0].piece.ownerPlayerIndex;
+        SetPlayerColor(playerIndex);
+        SetRotationByPlayer(playerIndex);
 
         gameObject.SetActive(true);
         if (overlayButton != null) overlayButton.gameObject.SetActive(true);
 
         // Set tile highlights
-        if (moveHighlightLayer != null)
+        if (moveHighlightLayer != null && gameSettings.highlightMovesEnabled)
         {
             moveHighlightLayer.ShowHighlights(options);
         }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>()); // refresh layout
+    }
+
+    private void SetRotationByPlayer(int playerIndex)
+    {
+        transform.rotation = new Quaternion(0, 0, 0, 0);
+        if (playerIndex == 1 || playerIndex == 2)
+        {
+            transform.Rotate(0, 0, 180, Space.Self);
+        }
     }
 
     private void SetPlayerColor(int playerIndex)

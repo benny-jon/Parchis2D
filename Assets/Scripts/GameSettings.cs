@@ -7,4 +7,10 @@ public class GameSettings : ScriptableObject
     [Range(2, 4)]
     [SerializeField] 
     public int playerCount = 4;
+
+    [SerializeField]
+    public bool soundEnabled = true;
+
+    [SerializeField]
+    public bool highlightMovesEnabled = false;
 }

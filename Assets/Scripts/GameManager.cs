@@ -219,7 +219,7 @@ public class GameManager : MonoBehaviour
                 var message = GetBonusMessage(pendingBonusToAnnounce);
                 if (message != null)
                 {
-                    parchisUI?.ShowNotification(message);
+                    parchisUI?.ShowNotification(message, stateMachine.currentPlayerIndex);
                 }
             }
             else
@@ -228,7 +228,7 @@ public class GameManager : MonoBehaviour
                 var message = GetBonusLostMessage(pendingBonusToAnnounce);
                 if (message != null)
                 {
-                    parchisUI?.ShowNotification(message);
+                    parchisUI?.ShowNotification(message, stateMachine.currentPlayerIndex);
                 }
             }
         }
@@ -295,7 +295,7 @@ public class GameManager : MonoBehaviour
         if (piece.ownerPlayerIndex == stateMachine.currentPlayerIndex)
         {
             soundManager?.PlayPieceToStart();
-            parchisUI.ShowNotification($"Penalty {GetPlayersName(piece.ownerPlayerIndex)} for rolling 3 consecutives doubles");
+            parchisUI.ShowNotification($"Penalty {GetPlayersName(piece.ownerPlayerIndex)} for rolling 3 consecutives doubles", stateMachine.currentPlayerIndex);
         }
 
         animationManager.PlayResetPiece(piece, boardView.pieceSpawnPoints[allPieces.IndexOf(piece)].position, () =>
@@ -346,14 +346,14 @@ public class GameManager : MonoBehaviour
         {
             case MoveSpecialCaseType.ForceToBreakBlockade:
                 {
-                    parchisUI?.ShowNotification($"{GetPlayersName(player)} rolled double and is forced to break the blockade");
+                    parchisUI?.ShowNotification($"{GetPlayersName(player)} rolled double and is forced to break the blockade", stateMachine.currentPlayerIndex);
                     break;
                 }
             case MoveSpecialCaseType.ForceToStart:
                 {
                     if (pendingShowForceStartTooltip)
                     {
-                        parchisUI?.ShowNotification($"Rolling a 5 forces a token to Start");
+                        parchisUI?.ShowNotification($"Rolling a 5 forces a token to Start", stateMachine.currentPlayerIndex);
                         pendingShowForceStartTooltip = false;
                     }
                     break;

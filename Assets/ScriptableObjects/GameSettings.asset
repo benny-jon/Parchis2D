@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: GameSettings
   m_EditorClassIdentifier: Scripts::GameSettings
   playerCount: 4
+  soundEnabled: 0
+  highlightMovesEnabled: 0

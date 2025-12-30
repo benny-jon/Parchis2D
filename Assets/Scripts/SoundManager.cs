@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
+    [SerializeField] private GameSettings gameSettings;
+
     [Header("Clips")]
     [SerializeField] private AudioClip diceRollClip;
     [SerializeField] private AudioClip pieceClickedClip;
@@ -25,7 +27,7 @@ public class SoundManager : MonoBehaviour
 
     private void PlayClip(AudioClip clip)
     {
-        if (clip == null || sfxSource == null) return;
+        if (!gameSettings.soundEnabled || clip == null || sfxSource == null) return;
         sfxSource.PlayOneShot(clip);
     }
 

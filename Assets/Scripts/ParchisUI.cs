@@ -9,6 +9,9 @@ public class ParchisUI : MonoBehaviour
     [SerializeField] private GameObject portraitRoot;
     [SerializeField] private GameObject landscapeRoot;
 
+    [Header("Settings Menu")]
+    [SerializeField] private GameSettingsMenu gameSettingsMenu;
+
     [Header("Per Player HUDs")]
     [SerializeField] private PlayerHud[] playerHuds;
 
@@ -132,12 +135,16 @@ public class ParchisUI : MonoBehaviour
         }
     }
 
-    public void ShowNotification(String message)
+    public void ShowNotification(String message, int playerIndex)
     {
         if (eventNotification != null)
         {
             eventNotification.Show(message, 3);
-
+            eventNotification.transform.rotation = new Quaternion(0, 0, 0, 0);
+            if (playerIndex == 1 || playerIndex == 2)
+            {
+                eventNotification.transform.Rotate(0, 0, 180, Space.Self);
+            }
         }
     }
 
@@ -155,6 +162,18 @@ public class ParchisUI : MonoBehaviour
         {
             hud.landscapeMedal.sprite = GetMedalSprite(medal);
             hud.landscapeMedal.gameObject.SetActive(true);
+        }
+    }
+
+    public void ShowSettingsMenu()
+    {
+        if (gameSettingsMenu != null)
+        {
+            gameSettingsMenu.Show();
+        }
+        else
+        {
+            Debug.LogWarning("ParchisUI: GameSettingMenu not assigned");
         }
     }
 

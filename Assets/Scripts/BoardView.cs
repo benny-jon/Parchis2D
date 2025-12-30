@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 
 public class BoardView : MonoBehaviour
 {
@@ -252,7 +255,9 @@ public class BoardView : MonoBehaviour
                 }
             }
 
+            #if UNITY_EDITOR
             Handles.Label(t.position, $"{i}", labelStyle);
+            #endif
         }
 
         // Start Box Pieces Anchor Points
