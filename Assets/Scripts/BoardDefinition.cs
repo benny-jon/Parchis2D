@@ -14,10 +14,14 @@ public class BoardDefinition : ScriptableObject {
     
     public List<BoardTile> tiles = new List<BoardTile>();
 
+    private readonly int[] homeEntryTiles = { 67, 16, 33, 50};
+    private readonly int[] leftCornerTileIndexes = { 7, 24, 41, 58};
+    private readonly int[] rightCornerTileIndexes = { 8, 25, 42, 59};
+
     public int[] GetHomeEntryTilesIndex()
     {
-        
-        return new int[] { 67, 16, 33, 50 };
+
+        return homeEntryTiles;
     }
 
     public int[] GetStartTilesIndex()
@@ -28,6 +32,16 @@ public class BoardDefinition : ScriptableObject {
     public int[] GetHomeTilesIndex()
     {
         return tiles.FindAll(p => p.type == TileType.Home).Select(p => p.index).ToArray();
+    }
+
+    public int[] GetLeftCornerTilesIndex()
+    {
+        return leftCornerTileIndexes;
+    }
+
+    public int[] GetRightCornerTilesIndex()
+    {
+        return rightCornerTileIndexes;
     }
 
     /// <summary>

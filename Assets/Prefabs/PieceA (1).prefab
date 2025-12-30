@@ -78,7 +78,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 11
+  m_SortingOrder: 14
   m_Sprite: {fileID: 21300000, guid: 6ec531f25cc8f4b14ac41c7aab5fde47, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -352,7 +352,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 12
+  m_SortingOrder: 14
   m_Sprite: {fileID: 0}
   m_Color: {r: 0.6981132, g: 0.58567196, b: 0.11525452, a: 1}
   m_FlipX: 0
@@ -377,8 +377,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Piece
   ownerPlayerIndex: 0
+  playerPieceIndex: 0
   currentTileIndex: -1
-  gameManager: {fileID: 1367280783265641526, guid: 7b247de0985c547488d7d075bb5798ed, type: 3}
+  gameManager: {fileID: 0}
   moveHintLabel: {fileID: 4313165433589110744}
   ringAnimation: {fileID: 6363732466522150296}
 --- !u!58 &-7780321648109441690
@@ -496,7 +497,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 13
   m_Sprite: {fileID: 2334100839638980508, guid: 04c8f807d7cc94736a7eba00eef3da17, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

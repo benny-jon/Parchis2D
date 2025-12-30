@@ -6,6 +6,11 @@ public class SpriteLibrary : ScriptableObject
     [SerializeField] public Sprite[] diceFaces;
     [SerializeField] public Color[] playersColorPrimary;
     [SerializeField] public Color[] playersColorSecondary;
+    [SerializeField] public Sprite normalHighlightBackground;
+    [SerializeField] public Sprite leftCornerHighlightBackground;
+
+    [SerializeField] public Sprite rightCornerHighlightBackground;
+    [SerializeField] public Sprite homeHighlightBackground;
 
     public Sprite GetDiceFace(int diceValue)
     {

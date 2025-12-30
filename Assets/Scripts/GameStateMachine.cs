@@ -440,6 +440,7 @@ public class GameStateMachine : IReplayGame
             if (mostAdvancePiece != null)
             {
                 Debug.Log($"Sent back home: {mostAdvancePiece}");
+                mostAdvancePiece.MoveToTile(-1);
                 OnMovePieceToStart?.Invoke(mostAdvancePiece);
             }
             return true;

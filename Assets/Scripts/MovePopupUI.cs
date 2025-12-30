@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,7 @@ public class MovePopupUI : MonoBehaviour
     [SerializeField] public SpriteLibrary spriteLibrary;
     [SerializeField] private RectTransform popupRect;
     [SerializeField] private RectTransform popupParentRect;
+    [SerializeField] private MoveHighlightLayer moveHighlightLayer;
     [SerializeField] private Button[] optionButtons;
     [SerializeField] private TextMeshProUGUI[] optionLabels;
     [SerializeField] private Vector2 screenOffset = new Vector2(0, 130);
@@ -28,6 +30,10 @@ public class MovePopupUI : MonoBehaviour
             overlayButton.onClick.RemoveAllListeners();
             overlayButton.onClick.AddListener(HideImmediate);
         }
+    }
+
+    private void Start() {
+        LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>()); // refresh layout
     }
 
     public void Show(Transform worldAnchor, MoveOption[] options, Action<int> onPickIndex)
@@ -50,6 +56,12 @@ public class MovePopupUI : MonoBehaviour
 
         gameObject.SetActive(true);
         if (overlayButton != null) overlayButton.gameObject.SetActive(true);
+
+        // Set tile highlights
+        if (moveHighlightLayer != null)
+        {
+            moveHighlightLayer.ShowHighlights(options);
+        }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>()); // refresh layout
     }
@@ -84,8 +96,9 @@ public class MovePopupUI : MonoBehaviour
             popupRect.anchoredPosition = localPoint + screenOffset;
             float parentHeight = popupParentRect.GetComponent<RectTransform>().rect.height;
             float topOfScreen = parentHeight / 2; // assuming parent is at 0,0 pos and takes over the whole screen.
+            bool rightSideOfTheBoard = popupRect.anchoredPosition.x > 0;
 
-            if ((localPoint + screenOffset).y > topOfScreen)
+            if (popupRect.anchoredPosition.y > topOfScreen || rightSideOfTheBoard)
             {
                 // Lets show the popup bellow the piece
                 popupRect.anchoredPosition = localPoint + screenOffset * new Vector2(0, -1);
@@ -132,5 +145,10 @@ public class MovePopupUI : MonoBehaviour
         }
         gameObject.SetActive(false);
         if (overlayButton != null) overlayButton.gameObject.SetActive(false);
+
+        if (moveHighlightLayer != null)
+        {
+            moveHighlightLayer.Clear();
+        }
     }
 }

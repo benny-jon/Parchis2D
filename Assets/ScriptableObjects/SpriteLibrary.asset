@@ -29,3 +29,7 @@ MonoBehaviour:
   - {r: 0.14509805, g: 0.30588236, b: 0.41960785, a: 1}
   - {r: 0.49411765, g: 0.16078432, b: 0.13333334, a: 1}
   - {r: 0, g: 0.49019608, b: 0.24705882, a: 1}
+  normalHighlightBackground: {fileID: 21300000, guid: 37740fc26d35f4e4596d5bacf489dbd6, type: 3}
+  leftCornerHighlightBackground: {fileID: 21300000, guid: dc1cbfa51ab1848258a875febe3fef96, type: 3}
+  rightCornerHighlightBackground: {fileID: 21300000, guid: d9f390be81fb44ec888c2cec0ca113b3, type: 3}
+  homeHighlightBackground: {fileID: 21300000, guid: 398d4ac874f19420b82a4084025229b7, type: 3}

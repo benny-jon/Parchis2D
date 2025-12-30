@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public class BoardView : MonoBehaviour
@@ -10,7 +11,9 @@ public class BoardView : MonoBehaviour
     public Transform[] homeAnchorPoints;
     public BoardDefinition boardDefinition;
 
-    [SerializeField] public float spacingBetweenPieces = 0.235f;
+    [SerializeField] public float spacingBetweenPieces = 0.2f;
+    [SerializeField] public Vector3 defaultPieceScale;
+    [SerializeField] public Vector3 blockadePieceScale;
 
     public Vector3 GetTilePosition(int tileIndex)
     {
@@ -48,6 +51,7 @@ public class BoardView : MonoBehaviour
                 {
                     Vector3 offset = GetOffsetForGroup(count, i, IsTileVertical(tileIndex));
                     piece.transform.position = basePos + offset;
+                    piece.transform.localScale = (count > 1) ? blockadePieceScale : defaultPieceScale;
                 }
                 SetPieceSortingOrderByPos(piece);
             }
@@ -98,7 +102,7 @@ public class BoardView : MonoBehaviour
         }
     }
 
-    private bool IsTileVertical(int tileIndex)
+    public bool IsTileVertical(int tileIndex)
     {
         int HomeRowStart_Player1 = boardDefinition.GetFirstHomeRowTilesIndex()[1];
         int HomeRowStart_Player3 = boardDefinition.GetFirstHomeRowTilesIndex()[3];
@@ -106,8 +110,23 @@ public class BoardView : MonoBehaviour
 
         return (tileIndex >= 8 && tileIndex <= 24)
         || (tileIndex >= 42 && tileIndex <= 58)
-        || (tileIndex >= HomeRowStart_Player1 && tileIndex <= HomeRowStart_Player1 + HomRowsCount)
-        || (tileIndex >= HomeRowStart_Player3 && tileIndex <= HomeRowStart_Player3 + HomRowsCount);
+        || (tileIndex >= HomeRowStart_Player1 && tileIndex < HomeRowStart_Player1 + HomRowsCount)
+        || (tileIndex >= HomeRowStart_Player3 && tileIndex < HomeRowStart_Player3 + HomRowsCount);
+    }
+
+    public bool isCornerTile(int tileIndex)
+    {
+        return isLeftCornerTile(tileIndex) || isRightCornerTile(tileIndex);
+    }
+
+    public bool isRightCornerTile(int tileIndex)
+    {
+        return boardDefinition.GetRightCornerTilesIndex().Contains(tileIndex);
+    }
+
+    public bool isLeftCornerTile(int tileIndex)
+    {
+        return boardDefinition.GetLeftCornerTilesIndex().Contains(tileIndex);
     }
 
     private void SetPieceSortingOrderByPos(Piece piece)
@@ -126,7 +145,7 @@ public class BoardView : MonoBehaviour
 
     private int MapYToSorting(float y)
     {
-        var boardImage = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        var boardImage = transform.Find("board_colored_v2").GetComponent<SpriteRenderer>();
         float minY = -1 * boardImage.bounds.size.y / 2; // bottom of the board since Pos is at 0,0
         float maxY = boardImage.bounds.size.y / 2; // top of the board since Pos is at 0,0
         const float minOut = 100f;
@@ -146,10 +165,10 @@ public class BoardView : MonoBehaviour
 
     public void AutoAssignTilesPoints()
     {
-        var trackTilesPointsParent = transform.GetChild(2);
+        var trackTilesPointsParent = transform.Find("TrackTiles");
         var trackTilesPointsCount = trackTilesPointsParent.childCount;
 
-        var homeTrackTilesPointsParent = transform.GetChild(3);
+        var homeTrackTilesPointsParent = transform.Find("HomeTrackTiles");
         var homeTrackTilesPointsCount = homeTrackTilesPointsParent.childCount;
 
         tilePoints = new Transform[trackTilesPointsCount + homeTrackTilesPointsCount];
@@ -169,7 +188,7 @@ public class BoardView : MonoBehaviour
 
     public void AutoAssignHomeAnchorPoints()
     {
-        var homeAnchorPointsParent = transform.GetChild(4);
+        var homeAnchorPointsParent = transform.Find("HomeAnchorPoints");
         var homeAnchorPointsCount = homeAnchorPointsParent.childCount;
 
         homeAnchorPoints = new Transform[homeAnchorPointsCount];
@@ -184,7 +203,7 @@ public class BoardView : MonoBehaviour
 
     public void AutoAssignPieceSpawnPoints()
     {
-        var pieceSpawnPointsParent = transform.GetChild(5);
+        var pieceSpawnPointsParent = transform.Find("PieceSpawnPoints");
         var pieceSpawnPointsCount = pieceSpawnPointsParent.childCount;
 
         pieceSpawnPoints = new Transform[pieceSpawnPointsCount];
@@ -203,6 +222,8 @@ public class BoardView : MonoBehaviour
 
         float sphereRadius = 0.15f;
 
+        GUIStyle labelStyle = new GUIStyle();
+        labelStyle.normal.textColor = Color.black;
         Gizmos.color = Color.blueViolet;
 
         for (int i = 0; i < tilePoints.Length; i++)
@@ -230,6 +251,8 @@ public class BoardView : MonoBehaviour
                         break;
                 }
             }
+
+            Handles.Label(t.position, $"{i}", labelStyle);
         }
 
         // Start Box Pieces Anchor Points
@@ -265,7 +288,7 @@ public class BoardView : MonoBehaviour
 
         Gizmos.color = Color.black;
 
-        Transform anchorPointsParent = transform.GetChild(6);
+        Transform anchorPointsParent = transform.Find("PlayersHudAnchors");
         if (anchorPointsParent != null)
         {
             for (int i = 0; i < anchorPointsParent.childCount; i++)
