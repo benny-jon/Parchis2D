@@ -7,6 +7,7 @@ public class GameSettingsMenu : MonoBehaviour
     [SerializeField] private GameSettings gameSettings;
     [SerializeField] private Toggle soundToggle;
     [SerializeField] private Toggle highlightMovesToggle;
+    [SerializeField] private Toggle flipBlueAndRedUiToggle;
     [SerializeField] private string mainMenuScene = "MainMenu";
 
     private Button overlayButton;
@@ -24,6 +25,7 @@ public class GameSettingsMenu : MonoBehaviour
         {
             soundToggle.isOn = gameSettings.soundEnabled;
             highlightMovesToggle.isOn = gameSettings.highlightMovesEnabled;
+            flipBlueAndRedUiToggle.isOn = gameSettings.flipRedBlueUI;
         }
 
         gameObject.SetActive(true);
@@ -48,6 +50,11 @@ public class GameSettingsMenu : MonoBehaviour
     public void OnHighlightMovesToggled(bool enabled)
     {
         gameSettings.highlightMovesEnabled = enabled;
+    }
+
+    public void OnFlipBlueAndRedUiToggled(bool enabled)
+    {
+        gameSettings.flipRedBlueUI = enabled;
     }
 
     public void ExitGame()

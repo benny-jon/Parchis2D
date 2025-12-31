@@ -18,6 +18,8 @@ public class Piece : Clickable2D
     public TMP_Text moveHintLabel;
     public GameObject ringAnimation;
 
+    [SerializeField] private GameSettings gameSettings;
+
     public double lastTimeItMoved { get; private set;}
 
     private void Update() {
@@ -65,6 +67,15 @@ public class Piece : Clickable2D
         else
         {
             Debug.LogError($"Hint Label Text is NULL for {ToString()}");
+        }
+
+        if (gameSettings != null && (ownerPlayerIndex == 1 || ownerPlayerIndex == 2))
+        {
+            moveHintLabel.transform.rotation = new Quaternion(0, 0, 0, 0);
+            if (gameSettings.flipRedBlueUI)
+            {
+                moveHintLabel.transform.Rotate(0, 0, 180, Space.Self);
+            }
         }
     }
 

@@ -72,7 +72,7 @@ public class MovePopupUI : MonoBehaviour
     private void SetRotationByPlayer(int playerIndex)
     {
         transform.rotation = new Quaternion(0, 0, 0, 0);
-        if (playerIndex == 1 || playerIndex == 2)
+        if (gameSettings.flipRedBlueUI && (playerIndex == 1 || playerIndex == 2))
         {
             transform.Rotate(0, 0, 180, Space.Self);
         }

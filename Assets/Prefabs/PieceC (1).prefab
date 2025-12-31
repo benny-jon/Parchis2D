@@ -203,6 +203,7 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   moveHintLabel: {fileID: 1903087049364837277}
   ringAnimation: {fileID: 8150156213985063450}
+  gameSettings: {fileID: 11400000, guid: d341c1c32fa6847ceacf3da30b71c862, type: 2}
 --- !u!58 &700684036331437192
 CircleCollider2D:
   m_ObjectHideFlags: 0

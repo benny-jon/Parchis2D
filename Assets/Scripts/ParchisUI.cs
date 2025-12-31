@@ -9,7 +9,8 @@ public class ParchisUI : MonoBehaviour
     [SerializeField] private GameObject portraitRoot;
     [SerializeField] private GameObject landscapeRoot;
 
-    [Header("Settings Menu")]
+    [Header("Settings")]
+    [SerializeField] private GameSettings gameSettings;
     [SerializeField] private GameSettingsMenu gameSettingsMenu;
 
     [Header("Per Player HUDs")]
@@ -141,7 +142,7 @@ public class ParchisUI : MonoBehaviour
         {
             eventNotification.Show(message, 3);
             eventNotification.transform.rotation = new Quaternion(0, 0, 0, 0);
-            if (playerIndex == 1 || playerIndex == 2)
+            if (gameSettings.flipRedBlueUI && (playerIndex == 1 || playerIndex == 2))
             {
                 eventNotification.transform.Rotate(0, 0, 180, Space.Self);
             }
