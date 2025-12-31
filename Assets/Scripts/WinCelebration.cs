@@ -20,4 +20,10 @@ public class WinCelebration : MonoBehaviour
 
         Destroy(confetti.gameObject, confetti.main.duration + confetti.main.startLifetime.constantMax + 1f);
     }
+
+    [ContextMenu("Show Confetti")]
+    public void ShowConfetti()
+    {
+        Play(new Vector3(0, 0, 1));
+    }
 }

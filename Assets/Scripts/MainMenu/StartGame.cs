@@ -7,6 +7,7 @@ public class StartGame : MonoBehaviour
 {
     [SerializeField] private string gameSceneName = "MainScene";
     [SerializeField] private GameSettings gameSettings;
+    [SerializeField] private SoundManager soundManager;
     [SerializeField] private Toggle twoPlayersToggle;
     [SerializeField] private Toggle threePlayersToggle;
     [SerializeField] private Toggle fourPlayersToggle;
@@ -19,6 +20,7 @@ public class StartGame : MonoBehaviour
 
     public void OnStartGame()
     {
+        soundManager?.PlayUIClick();
         SceneManager.LoadScene(gameSceneName);
     }
 
@@ -28,6 +30,7 @@ public class StartGame : MonoBehaviour
         {
             gameSettings.playerCount = 2;
         }
+        soundManager?.PlayUIClick();
     }
 
     public void OnThreePlayersSelected(bool selected)
@@ -36,6 +39,7 @@ public class StartGame : MonoBehaviour
         {
             gameSettings.playerCount = 3;
         }
+        soundManager?.PlayUIClick();
     }
 
     public void OnFourPlayersSelected(bool selected)
@@ -44,5 +48,6 @@ public class StartGame : MonoBehaviour
         {
             gameSettings.playerCount = 4;
         }
+        soundManager?.PlayUIClick();
     }
 }

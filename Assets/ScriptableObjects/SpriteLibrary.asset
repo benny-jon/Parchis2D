@@ -29,6 +29,9 @@ MonoBehaviour:
   - {r: 0.14509805, g: 0.30588236, b: 0.41960785, a: 1}
   - {r: 0.49411765, g: 0.16078432, b: 0.13333334, a: 1}
   - {r: 0, g: 0.49019608, b: 0.24705882, a: 1}
+  gold: {fileID: 21300000, guid: 4be4495c991bac24496c00b0678cf0f4, type: 3}
+  silver: {fileID: 21300000, guid: 00ca63ef3d10f99439b186fdfef1faf5, type: 3}
+  bronze: {fileID: 21300000, guid: d9182d7766fa11640beb4adcc97dcc3c, type: 3}
   normalHighlightBackground: {fileID: 21300000, guid: 37740fc26d35f4e4596d5bacf489dbd6, type: 3}
   leftCornerHighlightBackground: {fileID: 21300000, guid: dc1cbfa51ab1848258a875febe3fef96, type: 3}
   rightCornerHighlightBackground: {fileID: 21300000, guid: d9f390be81fb44ec888c2cec0ca113b3, type: 3}

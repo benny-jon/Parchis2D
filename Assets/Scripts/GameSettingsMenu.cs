@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class GameSettingsMenu : MonoBehaviour
 {
     [SerializeField] private GameSettings gameSettings;
+    [SerializeField] private SoundManager soundManager;
     [SerializeField] private Toggle soundToggle;
     [SerializeField] private Toggle highlightMovesToggle;
     [SerializeField] private Toggle flipBlueAndRedUiToggle;
@@ -45,20 +46,24 @@ public class GameSettingsMenu : MonoBehaviour
     public void OnSoundToggled(bool enabled)
     {
         gameSettings.soundEnabled = enabled;
+        soundManager?.PlayUIClick();
     }
 
     public void OnHighlightMovesToggled(bool enabled)
     {
         gameSettings.highlightMovesEnabled = enabled;
+        soundManager?.PlayUIClick();
     }
 
     public void OnFlipBlueAndRedUiToggled(bool enabled)
     {
         gameSettings.flipRedBlueUI = enabled;
+        soundManager?.PlayUIClick();
     }
 
     public void ExitGame()
     {
+        soundManager?.PlayUIClick();
         SceneManager.LoadScene(mainMenuScene);
     }
 }

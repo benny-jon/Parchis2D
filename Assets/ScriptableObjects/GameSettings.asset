@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: GameSettings
   m_EditorClassIdentifier: Scripts::GameSettings
   playerCount: 4
-  soundEnabled: 0
+  soundEnabled: 1
   highlightMovesEnabled: 0
+  flipRedBlueUI: 0

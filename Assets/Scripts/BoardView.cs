@@ -49,6 +49,7 @@ public class BoardView : MonoBehaviour
                 if (piece.currentTileIndex == boardDefinition.GetHomeTilesIndex()[piece.ownerPlayerIndex])
                 {
                     piece.transform.position = homeAnchorPoints[piece.ownerPlayerIndex * 4 + piece.playerPieceIndex].position;
+                    piece.transform.localScale = blockadePieceScale;
                 }
                 else
                 {

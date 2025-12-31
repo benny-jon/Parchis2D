@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class ParchisUI : MonoBehaviour
 {
+    [SerializeField] private SpriteLibrary spriteLibrary;
+    [SerializeField] private SoundManager soundManager;
+
     [Header("Orientation Roots")]
     [SerializeField] private GameObject portraitRoot;
     [SerializeField] private GameObject landscapeRoot;
@@ -15,11 +18,6 @@ public class ParchisUI : MonoBehaviour
 
     [Header("Per Player HUDs")]
     [SerializeField] private PlayerHud[] playerHuds;
-
-    [Header("Medals Sprite")]
-    [SerializeField] private Sprite gold;
-    [SerializeField] private Sprite silver;
-    [SerializeField] private Sprite bronze;
 
     [Header("Notifications")]
     [SerializeField] private TimedMessageUI eventNotification;
@@ -38,12 +36,29 @@ public class ParchisUI : MonoBehaviour
         {
             gameOverText.gameObject.SetActive(false);
         }
+        CheckPlayersPlaying();
         SubscribeToPlayersDicePanelClicks();
     }
 
     private void Start()
     {
         ApplyOrientation();
+    }
+
+    private void CheckPlayersPlaying()
+    {
+        if (gameSettings.playerCount == 2)
+        {
+            playerHuds[1].portraitDicePanel.gameObject.SetActive(false);
+            playerHuds[1].landscapeDicePanel.gameObject.SetActive(false);
+            playerHuds[3].portraitDicePanel.gameObject.SetActive(false);
+            playerHuds[3].landscapeDicePanel.gameObject.SetActive(false);
+        }
+        else if (gameSettings.playerCount == 3)
+        {
+            playerHuds[3].portraitDicePanel.gameObject.SetActive(false);
+            playerHuds[3].landscapeDicePanel.gameObject.SetActive(false);
+        }
     }
 
     private void Update()
@@ -97,8 +112,6 @@ public class ParchisUI : MonoBehaviour
     {
         if (playerHuds == null || playerIndex < 0 || playerIndex >= playerHuds.Length) return;
 
-        String hint = gamePhase == GamePhase.WaitingForRoll ? "Roll" : gamePhase == GamePhase.WaitingForMove ? "Move" : "";
-
         var hud = playerHuds[playerIndex];
         hud.landscapeDicePanel?.SetDim(false);
         hud.portraitDicePanel?.SetDim(false);
@@ -118,7 +131,7 @@ public class ParchisUI : MonoBehaviour
         }
     }
 
-    public void ShowGameOver(string message)
+    public void ShowGameOver(string message, int firstPlacePlayerIndex)
     {
         if (eventNotification != null)
         {
@@ -129,10 +142,16 @@ public class ParchisUI : MonoBehaviour
         {
             gameOverText.text = message;
             gameOverText.gameObject.SetActive(true);
+
+            gameOverText.transform.rotation = new Quaternion(0, 0, 0, 0);
+            if (gameSettings.flipRedBlueUI && (firstPlacePlayerIndex == 1 || firstPlacePlayerIndex == 2))
+            {
+                gameOverText.transform.Rotate(0, 0, 180, Space.Self);
+            }
         }
         if (winCelebration != null)
         {
-            winCelebration.Play(gameOverText.transform.position);
+            winCelebration.Play(new Vector3(0, 0, 1));
         }
     }
 
@@ -156,12 +175,12 @@ public class ParchisUI : MonoBehaviour
         var hud = playerHuds[player];
         if (hud.portraitMedal != null)
         {
-            hud.portraitMedal.sprite = GetMedalSprite(medal);
+            hud.portraitMedal.sprite = spriteLibrary.GetMedalSprite(medal);
             hud.portraitMedal.gameObject.SetActive(true);
         }
         if (hud.landscapeMedal != null)
         {
-            hud.landscapeMedal.sprite = GetMedalSprite(medal);
+            hud.landscapeMedal.sprite = spriteLibrary.GetMedalSprite(medal);
             hud.landscapeMedal.gameObject.SetActive(true);
         }
     }
@@ -171,21 +190,11 @@ public class ParchisUI : MonoBehaviour
         if (gameSettingsMenu != null)
         {
             gameSettingsMenu.Show();
+            soundManager?.PlayUIClick();
         }
         else
         {
             Debug.LogWarning("ParchisUI: GameSettingMenu not assigned");
-        }
-    }
-
-    private Sprite GetMedalSprite(Medal medal)
-    {
-        switch (medal)
-        {
-            case Medal.Gold: return gold;
-            case Medal.Silver: return silver;
-            case Medal.Bronze: return bronze;
-            default: return null;
         }
     }
 

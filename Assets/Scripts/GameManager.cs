@@ -285,7 +285,7 @@ public class GameManager : MonoBehaviour
             if (parchisUI != null)
             {
                 Debug.Log("Show Game Over message");
-                parchisUI.ShowGameOver($"Game Over\n{GetPlayersName(stateMachine.playersFinishRanking[0])}\n Won first Place!");
+                parchisUI.ShowGameOver($"Good Game\n{GetPlayersName(stateMachine.playersFinishRanking[0])}\n Won first Place!", stateMachine.playersFinishRanking[0]);
             }
         }
     }

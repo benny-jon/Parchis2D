@@ -51,9 +51,8 @@ public class MovePopupUI : MonoBehaviour
             optionLabels[i].text = options[i].steps.ToString();
         }
 
-        PositionToWorldAnchor(worldAnchor.position);
-
         var playerIndex = options[0].piece.ownerPlayerIndex;
+        PositionToWorldAnchor(worldAnchor.position, playerIndex);
         SetPlayerColor(playerIndex);
         SetRotationByPlayer(playerIndex);
 
@@ -96,7 +95,7 @@ public class MovePopupUI : MonoBehaviour
         }
     }
 
-    private void PositionToWorldAnchor(Vector3 worldPos)
+    private void PositionToWorldAnchor(Vector3 worldPos, int playerIndex)
     {
         if (canvas == null || worldCamera == null || popupRect == null || popupParentRect == null) return;
 
@@ -109,8 +108,11 @@ public class MovePopupUI : MonoBehaviour
             float parentHeight = popupParentRect.GetComponent<RectTransform>().rect.height;
             float topOfScreen = parentHeight / 2; // assuming parent is at 0,0 pos and takes over the whole screen.
             bool rightSideOfTheBoard = popupRect.anchoredPosition.x > 0;
+            bool leftSideOfTheBoard = popupRect.anchoredPosition.x < 0;
 
-            if (popupRect.anchoredPosition.y > topOfScreen || rightSideOfTheBoard)
+            if (popupRect.anchoredPosition.y > topOfScreen || 
+                (rightSideOfTheBoard && gameSettings.highlightMovesEnabled) ||
+                (gameSettings.flipRedBlueUI && (playerIndex == 1 || playerIndex == 2) && !(gameSettings.highlightMovesEnabled && leftSideOfTheBoard)))
             {
                 // Lets show the popup bellow the piece
                 popupRect.anchoredPosition = localPoint + screenOffset * new Vector2(0, -1);
