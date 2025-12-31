@@ -13,4 +13,7 @@ public class GameSettings : ScriptableObject
 
     [SerializeField]
     public bool highlightMovesEnabled = false;
+
+    [SerializeField]
+    public bool flipRedBlueUI = false;
 }
