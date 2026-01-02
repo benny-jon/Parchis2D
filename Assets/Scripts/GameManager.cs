@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] public GameSettings gameSettings;
 
+    private readonly LocalizationHelper localizationHelper = new LocalizationHelper();
+
     private BoardRules boardRules;
     private GameStateMachine stateMachine;
 
@@ -219,7 +221,7 @@ public class GameManager : MonoBehaviour
                 var message = GetBonusMessage(pendingBonusToAnnounce);
                 if (message != null)
                 {
-                    parchisUI?.ShowNotification(message, stateMachine.currentPlayerIndex);
+                    parchisUI?.ShowNotification(message, stateMachine.currentPlayerIndex, 5);
                 }
             }
             else
@@ -240,11 +242,11 @@ public class GameManager : MonoBehaviour
     {
         if (bonusSteps == GameStateMachine.BonusForCapture)
         {
-            return $"{GameStateMachine.BonusForCapture} bonus moves for capturing a piece";
+            return localizationHelper.GetCaptureBonusMessage(stateMachine.currentPlayerIndex);
         }
         if (bonusSteps == GameStateMachine.BonusForReachingHome)
         {
-            return $"{GameStateMachine.BonusForReachingHome} bonus moves for reaching Home";
+            return localizationHelper.GetReachingHomeBonusMessage(stateMachine.currentPlayerIndex);
         }
         return null;
     }
@@ -253,11 +255,11 @@ public class GameManager : MonoBehaviour
     {
         if (bonusSteps == GameStateMachine.BonusForCapture)
         {
-            return $"Sorry, cannot use the {GameStateMachine.BonusForCapture} bonus moves for capturing a piece :(";
+            return localizationHelper.GetCapturingBonusLostMessage(stateMachine.currentPlayerIndex);
         }
         if (bonusSteps == GameStateMachine.BonusForReachingHome)
         {
-            return $"Nice!, but cannot use the {GameStateMachine.BonusForReachingHome} bonus moves now";
+            return localizationHelper.GetReachingHomeBonusLostMessage();
         }
         return null;
     }
@@ -285,7 +287,7 @@ public class GameManager : MonoBehaviour
             if (parchisUI != null)
             {
                 Debug.Log("Show Game Over message");
-                parchisUI.ShowGameOver($"Good Game\n{GetPlayersName(stateMachine.playersFinishRanking[0])}\n Won first Place!", stateMachine.playersFinishRanking[0]);
+                parchisUI.ShowGameOver(localizationHelper.GetGameOverMessage(stateMachine.playersFinishRanking[0]), stateMachine.playersFinishRanking[0]);
             }
         }
     }
@@ -295,7 +297,7 @@ public class GameManager : MonoBehaviour
         if (piece.ownerPlayerIndex == stateMachine.currentPlayerIndex)
         {
             soundManager?.PlayPieceToStart();
-            parchisUI.ShowNotification($"Penalty {GetPlayersName(piece.ownerPlayerIndex)} for rolling 3 consecutives doubles", stateMachine.currentPlayerIndex);
+            parchisUI.ShowNotification(localizationHelper.GetPenaltyMessage(stateMachine.currentPlayerIndex), stateMachine.currentPlayerIndex);
         }
 
         animationManager.PlayResetPiece(piece, boardView.pieceSpawnPoints[allPieces.IndexOf(piece)].position, () =>
@@ -346,14 +348,14 @@ public class GameManager : MonoBehaviour
         {
             case MoveSpecialCaseType.ForceToBreakBlockade:
                 {
-                    parchisUI?.ShowNotification($"{GetPlayersName(player)} rolled double and is forced to break the blockade", stateMachine.currentPlayerIndex);
+                    parchisUI?.ShowNotification(localizationHelper.GetForceBreakBlockadeMessage(player), stateMachine.currentPlayerIndex, 5);
                     break;
                 }
             case MoveSpecialCaseType.ForceToStart:
                 {
                     if (pendingShowForceStartTooltip)
                     {
-                        parchisUI?.ShowNotification($"Rolling a 5 forces a token to Start", stateMachine.currentPlayerIndex);
+                        parchisUI?.ShowNotification(localizationHelper.getForceStartMessage(), stateMachine.currentPlayerIndex);
                         pendingShowForceStartTooltip = false;
                     }
                     break;
@@ -478,17 +480,6 @@ public class GameManager : MonoBehaviour
     }
 
     // TODO: move to game settings to let user choose color and position
-    private string GetPlayersName(int player)
-    {
-        switch(player)
-        {
-            case 0: return "Yellow";
-            case 1: return "Blue";
-            case 2: return "Red";
-            case 3: return "Green";
-        }
-        return "Player " + player;
-    }
 
     #region DEBUG METHODS
 

@@ -155,11 +155,11 @@ public class ParchisUI : MonoBehaviour
         }
     }
 
-    public void ShowNotification(String message, int playerIndex)
+    public void ShowNotification(String message, int playerIndex, int duration = 3)
     {
         if (eventNotification != null)
         {
-            eventNotification.Show(message, 3);
+            eventNotification.Show(message, duration);
             eventNotification.transform.rotation = new Quaternion(0, 0, 0, 0);
             if (gameSettings.flipRedBlueUI && (playerIndex == 1 || playerIndex == 2))
             {

@@ -1,0 +1,141 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: UIText_es
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: es
+  m_SharedData: {fileID: 11400000, guid: d9564c9da2a17425c837b1c54b5660a3, type: 2}
+  m_Metadata:
+    m_Items:
+    - rid: 2760236003273736479
+  m_TableData:
+  - m_Id: 382959869952
+    m_Localized: Jugar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 512018604032
+    m_Localized: Reiniciar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1960294998016
+    m_Localized: "Reglas Espa\xF1olas *"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2174611349504
+    m_Localized: 2 Jugadores
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2540547596288
+    m_Localized: 3 Jugadores
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2593098031104
+    m_Localized: 4 Jugadores
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2646713819136
+    m_Localized: "\xBFC\xF3mo Jugar?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3158909640704
+    m_Localized: Sonido
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3194615750656
+    m_Localized: "Pol\xEDtica de Privacidad"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5495803863040
+    m_Localized: Ajustes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7351963738112
+    m_Localized: Mostrar Pasos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7455613378560
+    m_Localized: Rotar Texto del Azul y Rojo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8225951834112
+    m_Localized: Es obligado salir cuando se saca 5 con los dados.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 50641731837952
+    m_Localized: "{0} sac\xF3 un double y tiene que romper la pared"
+    m_Metadata:
+      m_Items:
+      - rid: 2760236003273736479
+  - m_Id: 51088077086720
+    m_Localized: Penalidad para el {0} por sacar 3 dobles seguidos
+    m_Metadata:
+      m_Items:
+      - rid: 2760236003273736479
+  - m_Id: 51234475073536
+    m_Localized: "Buen Juego\\n{0} gan\xF3 el primer lugar."
+    m_Metadata:
+      m_Items:
+      - rid: 2760236003273736479
+  - m_Id: 51519939403776
+    m_Localized: "{0} gan\xF3 20 pasos extras por capturar una pieza."
+    m_Metadata:
+      m_Items:
+      - rid: 2760236003273736479
+  - m_Id: 51701120753664
+    m_Localized: Lo siento {0}, no puede usar los 20 pasos extras por capturar.
+    m_Metadata:
+      m_Items:
+      - rid: 2760236003273736479
+  - m_Id: 51984089473024
+    m_Localized: "{0} gan\xF3 10 pasos extras por llegar a la casa."
+    m_Metadata:
+      m_Items:
+      - rid: 2760236003273736479
+  - m_Id: 55151845957632
+    m_Localized: Muy bien! Pero no puede usar los 10 pasos extras.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 63310564155392
+    m_Localized: Amarillo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 63345678868480
+    m_Localized: Azul
+    m_Metadata:
+      m_Items: []
+  - m_Id: 63375177408512
+    m_Localized: Rojo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 63401815433216
+    m_Localized: Verde
+    m_Metadata:
+      m_Items: []
+  - m_Id: 63432853282816
+    m_Localized: "An\xF3nimo"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 2760236003273736479
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 
+        m_SharedEntries:
+        - id: 50641731837952
+        - id: 51234475073536
+        - id: 51088077086720
+        - id: 51519939403776
+        - id: 51701120753664
+        - id: 51984089473024
