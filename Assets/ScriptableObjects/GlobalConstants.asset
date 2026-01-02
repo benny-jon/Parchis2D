@@ -16,3 +16,6 @@ MonoBehaviour:
   - locale: en
     privacyPolicyUrl: https://benny-jon.github.io/Parchis2D/privacy/
     spanishGameRulesUrl: https://benny-jon.github.io/Parchis2D/rules/
+  - locale: es
+    privacyPolicyUrl: https://benny-jon.github.io/Parchis2D/privacy-es/
+    spanishGameRulesUrl: https://benny-jon.github.io/Parchis2D/rules-es/

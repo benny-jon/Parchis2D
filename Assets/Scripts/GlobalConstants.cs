@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
 
 [CreateAssetMenu(fileName = "GlobalConstants", menuName = "Parchis/GlobalConstants")]
 public class GlobalConstants : ScriptableObject
@@ -8,14 +9,27 @@ public class GlobalConstants : ScriptableObject
     
     public string GetPrivacyPolicyURL()
     {
-        // only 1 language is available so far
-        return constantsByLocale[0].privacyPolicyUrl;
+        return GetActiveConstants().privacyPolicyUrl;
     }
 
     public string GetGameRulesURL()
     {
-        // only 1 language is available so far
-        return constantsByLocale[0].spanishGameRulesUrl;
+        return GetActiveConstants().spanishGameRulesUrl;
+    }
+
+    private Constant GetActiveConstants()
+    {
+        var localeCode = LocalizationSettings.SelectedLocale.Identifier.Code;
+        Debug.Log($"Current Locale: {localeCode}");
+        foreach (var constants in constantsByLocale)
+        {
+            if (constants.locale == localeCode)
+            {
+                return constants;
+            }
+        }
+
+        return constantsByLocale[0];
     }
 
     [Serializable]
