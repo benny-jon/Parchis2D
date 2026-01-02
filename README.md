@@ -1,5 +1,14 @@
 # Parchis2D in Unity
 
+## 🎮 Play the Game
+
+| WEB | Android | iOS |
+|-|-|-|
+| <a href="https://play.unity.com/en/games/a3ba999e-7d04-4c1a-a5e0-fcd3c612854c/parchis2d-web"><img src="https://img.shields.io/badge/Web-Unity_Play-000000?logo=unity&logoColor=white" width="264" style="filter: invert(0);" /><br/></a> | <strong>COMING SOON!</strong> | <strong>COMING SOON!</strong> |
+
+
+
+
 ## Main Scene View
 
 ![Main Game View](https://github.com/benny-jon/Parchis2D/blob/main/RepoImages/game_main_view.png "Optional title")
