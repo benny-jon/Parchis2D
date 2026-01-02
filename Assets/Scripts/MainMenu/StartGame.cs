@@ -7,6 +7,7 @@ public class StartGame : MonoBehaviour
 {
     [SerializeField] private string gameSceneName = "MainScene";
     [SerializeField] private GameSettings gameSettings;
+    [SerializeField] private GameSettingsMenu gameSettingsMenu;
     [SerializeField] private SoundManager soundManager;
     [SerializeField] private Toggle twoPlayersToggle;
     [SerializeField] private Toggle threePlayersToggle;
@@ -48,6 +49,12 @@ public class StartGame : MonoBehaviour
         {
             gameSettings.playerCount = 4;
         }
+        soundManager?.PlayUIClick();
+    }
+
+    public void OnOpenSettings()
+    {
+        gameSettingsMenu?.Show();
         soundManager?.PlayUIClick();
     }
 }

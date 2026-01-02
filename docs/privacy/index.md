@@ -95,5 +95,5 @@ We will post the updated version in this repository and update the **“Last upd
 ## Contact Us
 For privacy questions or requests, contact:
 
-**Email:** bennyjon13@gmail.com  
+**Email:** benny.opinions@gmail.com  
 **Developer/Publisher:** Benny Jon

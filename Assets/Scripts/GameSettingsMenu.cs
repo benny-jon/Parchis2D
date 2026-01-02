@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class GameSettingsMenu : MonoBehaviour
 {
     [SerializeField] private GameSettings gameSettings;
+    [SerializeField] private GlobalConstants globalConstants;
     [SerializeField] private SoundManager soundManager;
     [SerializeField] private Toggle soundToggle;
     [SerializeField] private Toggle highlightMovesToggle;
@@ -13,7 +14,8 @@ public class GameSettingsMenu : MonoBehaviour
 
     private Button overlayButton;
 
-    private void SetupOverlayButton() {
+    private void SetupOverlayButton()
+    {
         overlayButton = GetComponent<Button>();
         overlayButton.onClick.RemoveAllListeners();
         overlayButton.onClick.AddListener(Hide);
@@ -25,8 +27,14 @@ public class GameSettingsMenu : MonoBehaviour
         if (gameSettings != null)
         {
             soundToggle.isOn = gameSettings.soundEnabled;
-            highlightMovesToggle.isOn = gameSettings.highlightMovesEnabled;
-            flipBlueAndRedUiToggle.isOn = gameSettings.flipRedBlueUI;
+            if (highlightMovesToggle != null)
+            {
+                highlightMovesToggle.isOn = gameSettings.highlightMovesEnabled;
+            }
+            if (flipBlueAndRedUiToggle != null)
+            {
+                flipBlueAndRedUiToggle.isOn = gameSettings.flipRedBlueUI;
+            }
         }
 
         gameObject.SetActive(true);
@@ -61,9 +69,24 @@ public class GameSettingsMenu : MonoBehaviour
         soundManager?.PlayUIClick();
     }
 
-    public void ExitGame()
+    public void ExitGameClicked()
     {
         soundManager?.PlayUIClick();
         SceneManager.LoadScene(mainMenuScene);
+    }
+
+    public void OnOpenPrivacyPolicyClicked()
+    {
+        soundManager?.PlayUIClick();
+        var url = globalConstants.GetPrivacyPolicyURL();
+        Debug.Log($"[OpenURL] Attempting: {url}");
+        Application.OpenURL(url);
+        Debug.Log("[OpenURL] Called Application.OpenURL");
+    }
+
+    public void OnHowToPlayClicked()
+    {
+        soundManager?.PlayUIClick();
+        Application.OpenURL(globalConstants.GetGameRulesURL());
     }
 }
