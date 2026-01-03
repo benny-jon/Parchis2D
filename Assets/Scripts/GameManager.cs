@@ -93,6 +93,11 @@ public class GameManager : MonoBehaviour
         Debug.Log("GameManager Initialized " + GetHashCode());
     }
 
+    void Update()
+    {
+        stateMachine.SetAskForMoveConfirmationEvenWhenOnlyOneAvailable(gameSettings.highlightMovesEnabled);
+    }
+
     private void OnDestroy()
     {
         UnsubscribeFromStateMachineEvents();

@@ -61,6 +61,8 @@ public class GameStateMachine : IReplayGame
     private List<MoveOption> activeOptions = null;
     #endregion
 
+    private bool askForMoveConfirmationEvenWhenOnlyOneAvailable = false;
+
     public GameStateMachine(List<Piece> pieces, BoardView boardView, BoardRules boardRules)
     {
         this.pieces = pieces;
@@ -69,6 +71,11 @@ public class GameStateMachine : IReplayGame
         this.playersFinishRanking = new List<int>();
 
         ResetGame();
+    }
+
+    public void SetAskForMoveConfirmationEvenWhenOnlyOneAvailable(bool ask)
+    {
+        askForMoveConfirmationEvenWhenOnlyOneAvailable = ask;
     }
 
     public void SetTestEnvironment()
@@ -198,7 +205,7 @@ public class GameStateMachine : IReplayGame
             return false;
         }
 
-        if (options.Count > 1)
+        if (options.Count > 1 || askForMoveConfirmationEvenWhenOnlyOneAvailable)
         {
             SendMoveOptionSelectionRequest(piece, options);
         }

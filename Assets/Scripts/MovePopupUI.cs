@@ -33,6 +33,7 @@ public class MovePopupUI : MonoBehaviour
     }
 
     private void Start() {
+        HideImmediate();
         LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>()); // refresh layout
     }
 
