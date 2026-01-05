@@ -170,7 +170,7 @@ PlayerSettings:
   applicationIdentifier:
     Android: com.bennyjon.parchis
     Standalone: com.DefaultCompany.2D-URP
-    iPhone: com.bennyjon.parchis2d
+    iPhone: com.bennyjon.parchis2d.ios
   buildNumber:
     Standalone: 0
     VisionOS: 0
