@@ -4,7 +4,7 @@
 
 | WEB | Android | iOS |
 |-|-|-|
-| <a href="https://play.unity.com/en/games/a3ba999e-7d04-4c1a-a5e0-fcd3c612854c/parchis2d-web"><img src="https://img.shields.io/badge/Web-Unity_Play-000000?logo=unity&logoColor=white" width="264" style="filter: invert(0);" /><br/></a> | <strong>COMING SOON!</strong> | <strong>COMING SOON!</strong> |
+| <a href="https://play.unity.com/en/games/a3ba999e-7d04-4c1a-a5e0-fcd3c612854c/parchis2d-web"><img src="https://img.shields.io/badge/Web-Unity_Play-000000?logo=unity&logoColor=white" width="264" style="filter: invert(0);" /><br/></a> | <a href='https://play.google.com/store/apps/details?id=com.bennyjon.parchis&utm_source=github-repo&pcampaignid=google-badge-2026-05-14-github'><img alt='Get it on Google Play' width=300 src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a> | <strong>COMING SOON!</strong> |
 
 
 
