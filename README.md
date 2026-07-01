@@ -74,4 +74,4 @@ Provides a utility to convert integer arrays to formatted strings for debugging 
 
 ## Pages
 
-[Main Page](benny-jon.github.io/Parchis2D/)
+[Main Page](https://benny-jon.github.io/Parchis2D/)
