@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Parchís — Play with friends & family, offline</title>
+<meta name="description" content="Classic 2D Parchís for iPhone, iPad and Android. Up to 4 players, one device — no Wi-Fi, no sign-ups. Just pass & play." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     Store links live on the <a data-store> tags below.
+     ============================================================ */
+  :root {
+    --marine-1: #1d4f7a;
+    --marine-2: #0e2c46;
+    --marine-3: #081a2b;
+    --orange:   #e8792c;
+    --orange-d: #b95709;
+    --gold:     #ffb04d;
+    --ink:      #ffffff;
+    --muted:    rgba(255,255,255,0.74);
+    --faint:    rgba(255,255,255,0.5);
+    --bar-h: 68px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body {
+    margin: 0;
+    background: var(--marine-3);
+    font-family: 'Manrope', system-ui, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ---------- Sticky install bar (ALWAYS visible) ---------- */
+  .install-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--bar-h);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 clamp(14px, 3vw, 32px);
+    background: rgba(8,26,43,0.82);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .brand-mini {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-weight: 800;
+    font-size: clamp(16px, 2.4vw, 20px);
+    letter-spacing: -0.02em;
+    min-width: 0;
+  }
+  .brand-mark {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    flex: none;
+    display: block;
+    object-fit: cover;
+    box-shadow: 0 3px 10px -3px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.14);
+  }
+  .brand-mini .name-full { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .bar-badges { display: flex; align-items: center; gap: 10px; flex: none; }
+
+  /* ---------- Store badge component (official SVG badges) ---------- */
+  .store-badge {
+    display: inline-flex;
+    align-items: center;
+    transition: transform 140ms ease, filter 140ms ease;
+    will-change: transform;
+    border-radius: 11px;
+  }
+  .store-badge img { height: 56px; width: auto; display: block; }
+  .store-badge:hover { transform: translateY(-2px); filter: brightness(1.08); }
+  .store-badge:active { transform: translateY(0); }
+  .bar-badges .store-badge img { height: 42px; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    min-height: 100svh;
+    padding: calc(var(--bar-h) + 40px) clamp(20px, 5vw, 80px) 56px;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items: center;
+    gap: clamp(24px, 5vw, 72px);
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 22% -10%, var(--marine-1) 0%, var(--marine-2) 52%, var(--marine-3) 100%);
+  }
+
+  /* decorative dice pips */
+  .pips { position: absolute; pointer-events: none; opacity: 0.10; }
+  .pips.a { top: 16%; right: 6%; }
+  .pips.b { bottom: 10%; left: 3%; }
+  .pips .row { display: flex; }
+  .pips .p { width: 22px; height: 22px; border-radius: 50%; background:#fff; margin: 7px; }
+
+  .hero-copy { position: relative; z-index: 2; max-width: 620px; }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 22px;
+  }
+  .eyebrow::before {
+    content: ""; width: 26px; height: 2px; background: var(--gold); border-radius: 2px; opacity: 0.7;
+  }
+  .hero h1 {
+    font-weight: 900;
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    margin: 0 0 22px;
+    text-wrap: balance;
+  }
+  .hero h1 .accent { color: var(--gold); }
+  .hero .lede {
+    font-size: clamp(17px, 2.2vw, 22px);
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--muted);
+    margin: 0 0 30px;
+    max-width: 520px;
+    text-wrap: pretty;
+  }
+
+  .feat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 38px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 15px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    font-weight: 700;
+    font-size: 14px;
+    color: #eef1f5;
+  }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: #2faf66; box-shadow: 0 0 8px rgba(47,175,102,0.7); }
+
+  .hero-badges { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+
+  /* ---------- Device visual ---------- */
+  .hero-visual {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
+  .phone {
+    position: relative;
+    width: min(330px, 74vw);
+    aspect-ratio: 1242 / 2688;
+    background: #15161a;
+    border-radius: 42px;
+    padding: 7px;
+    box-shadow:
+      0 60px 120px -40px rgba(0,0,0,0.7),
+      0 0 0 2px rgba(255,255,255,0.06) inset,
+      0 0 0 1px rgba(0,0,0,0.6);
+  }
+  .phone::before {
+    content: ""; position: absolute; inset: -3px; border-radius: 45px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.20), rgba(255,255,255,0) 32%, rgba(255,255,255,0) 68%, rgba(255,255,255,0.08));
+    pointer-events: none; z-index: -1;
+  }
+  .phone .screen {
+    width: 100%; height: 100%;
+    border-radius: 36px;
+    overflow: hidden;
+    background: #2a2c30;
+  }
+  .phone .screen img { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .phone .notch {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    width: 34%; height: 22px; background: #15161a; border-radius: 0 0 14px 14px; z-index: 3;
+  }
+
+  .board-float {
+    position: absolute;
+    width: 176px;
+    right: -6%;
+    bottom: 4%;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 4px solid var(--orange);
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.7);
+    transform: rotate(4deg);
+    z-index: 3;
+    background: #2a2c30;
+  }
+  .board-float img { width: 100%; display: block; }
+
+  /* ---------- Strip below fold ---------- */
+  .strip {
+    padding: clamp(56px, 9vw, 110px) clamp(20px, 5vw, 80px);
+    background: var(--marine-3);
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .strip-inner { max-width: 1040px; margin: 0 auto; }
+  .strip h2 {
+    font-size: clamp(28px, 4.5vw, 46px);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  .strip h2 .accent { color: var(--gold); }
+  .strip .sub { color: var(--muted); font-size: clamp(16px,2vw,19px); max-width: 620px; margin: 0 0 52px; line-height: 1.5; }
+
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .card {
+    padding: 28px 26px;
+    border-radius: 18px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.055), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.09);
+  }
+  .card .k {
+    width: 44px; height: 44px; border-radius: 12px; margin-bottom: 18px;
+    display: grid; place-items: center; font-weight: 900; font-size: 20px;
+  }
+  .card:nth-child(1) .k { background: rgba(215,58,71,0.16);  color:#ff6b76; }
+  .card:nth-child(2) .k { background: rgba(47,175,102,0.16); color:#4fd68b; }
+  .card:nth-child(3) .k { background: rgba(232,121,44,0.18); color:#ffb04d; }
+  .card h3 { margin: 0 0 8px; font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.55; }
+
+  .final-cta {
+    margin-top: clamp(52px, 8vw, 86px);
+    text-align: center;
+    padding: clamp(40px, 6vw, 60px) 24px;
+    border-radius: 24px;
+    background: radial-gradient(circle at 50% 0%, var(--marine-1) 0%, var(--marine-2) 60%, var(--marine-3) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .final-cta h2 { margin: 0 0 26px; }
+  .final-cta .hero-badges { justify-content: center; }
+
+  footer {
+    padding: 34px clamp(20px,5vw,80px) 40px;
+    color: var(--faint);
+    font-size: 13px;
+    display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    background: var(--marine-3);
+  }
+  footer .links { display: flex; gap: 22px; flex-wrap: wrap; }
+  footer a:hover { color: #fff; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; text-align: center; padding-top: calc(var(--bar-h) + 30px); gap: 40px; }
+    .hero-copy { max-width: 640px; margin: 0 auto; }
+    .eyebrow, .feat-row, .hero-badges { justify-content: center; }
+    .eyebrow::before { display: none; }
+    .hero .lede { margin-left: auto; margin-right: auto; }
+    .board-float { width: 130px; right: 2%; }
+    .cards { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .brand-mini .name-full { display: none; }
+    .bar-badges .store-badge img { height: 36px; }
+    .board-float { display: none; }
+  }
+  @media (max-width: 380px) {
+    .brand-mini { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ ALWAYS-VISIBLE INSTALL BAR ============ -->
+  <div class="install-bar">
+    <a class="brand-mini" href="#top" aria-label="Parchís home">
+      <img class="brand-mark" src="assets/app-icon.png" alt="Parchís app icon" />
+      <span class="name-full">Parchís</span>
+    </a>
+    <div class="bar-badges">
+      <a class="store-badge" href="https://apps.apple.com/us/app/parchis2d/id6757377054" target="_blank" rel="noopener" data-store="apple" aria-label="Download on the App Store">
+        <img src="assets/badge-appstore.svg" alt="Download on the App Store" />
+      </a>
+      <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.bennyjon.parchis" target="_blank" rel="noopener" data-store="google" aria-label="Get it on Google Play">
+        <img src="assets/badge-googleplay.svg" alt="Get it on Google Play" />
+      </a>
+    </div>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero" id="top">
+    <div class="pips a"><div class="row"><span class="p"></span><span class="p"></span><span class="p"></span></div><div class="row"><span class="p"></span><span class="p"></span><span class="p"></span></div></div>
+    <div class="pips b"><div class="row"><span class="p"></span><span class="p"></span></div><div class="row"><span class="p"></span><span class="p"></span></div></div>
+
+    <div class="hero-copy">
+      <div class="eyebrow">2D Classic · Spanish Rules</div>
+      <h1>Play Parchís with <span class="accent">friends &amp; family</span>, offline.</h1>
+      <p class="lede">Up to 4 players, one device — no Wi-Fi, no sign-ups, no waiting. Just pass &amp; play the board game you grew up with.</p>
+
+      <div class="feat-row">
+        <span class="chip"><span class="dot"></span>100% Offline</span>
+        <span class="chip"><span class="dot"></span>2–4 Players</span>
+        <span class="chip"><span class="dot"></span>Free to Play</span>
+      </div>
+
+      <div class="hero-badges">
+        <a class="store-badge" href="https://apps.apple.com/us/app/parchis2d/id6757377054" target="_blank" rel="noopener" data-store="apple" aria-label="Download on the App Store">
+          <img src="assets/badge-appstore.svg" alt="Download on the App Store" />
+        </a>
+        <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.bennyjon.parchis" target="_blank" rel="noopener" data-store="google" aria-label="Get it on Google Play">
+          <img src="assets/badge-googleplay.svg" alt="Get it on Google Play" />
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="phone">
+        <span class="notch"></span>
+        <div class="screen"><img src="assets/iphone-moves.png" alt="Parchís board in play with highlighted moves" /></div>
+      </div>
+      <div class="board-float"><img src="assets/feature-board.png" alt="Parchís game board" /></div>
+    </div>
+  </header>
+
+  <!-- ============ FEATURE STRIP ============ -->
+  <section class="strip">
+    <div class="strip-inner">
+      <h2>The classic board, <span class="accent">reimagined for your iPad&nbsp;/&nbsp;Tablet.</span></h2>
+      <p class="sub">Everything you love about Parchís — the strategy, the captures, the rivalries — on a big, shared screen. Pass the device around the table and play.</p>
+
+      <div class="cards">
+        <div class="card">
+          <div class="k">4</div>
+          <h3>Pass &amp; play, together</h3>
+          <p>Gather up to four players around a single phone or tablet. No accounts, no matchmaking — just hand it over on your turn.</p>
+        </div>
+        <div class="card">
+          <div class="k">✦</div>
+          <h3>Smart move hints</h3>
+          <p>Optional highlights show exactly where each piece can go, and capturing an opponent rockets you forward with a 20-move bonus.</p>
+        </div>
+        <div class="card">
+          <div class="k">⚙</div>
+          <h3>Made your way</h3>
+          <p>Sound, move hints and a flippable layout so the board always faces the right player. Tune every setting to your table.</p>
+        </div>
+      </div>
+
+      <div class="final-cta">
+        <h2>Ready to roll the dice?</h2>
+        <div class="hero-badges">
+          <a class="store-badge" href="https://apps.apple.com/us/app/parchis2d/id6757377054" target="_blank" rel="noopener" data-store="apple" aria-label="Download on the App Store">
+            <img src="assets/badge-appstore.svg" alt="Download on the App Store" />
+          </a>
+          <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.bennyjon.parchis" target="_blank" rel="noopener" data-store="google" aria-label="Get it on Google Play">
+            <img src="assets/badge-googleplay.svg" alt="Get it on Google Play" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 Parchís. Not affiliated with any trademark holder.</span>
+    <span class="links">
+      <a href="https://benny-jon.github.io/Parchis2D/privacy/">Privacy</a>
+      <a href="https://benny-jon.github.io/Parchis2D/#-contact">Support</a>
+      <a href="#top">Back to top</a>
+    </span>
+  </footer>
+
+</body>
+</html>
