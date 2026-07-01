@@ -72,3 +72,6 @@ Defines the state machine’s phases: waiting to roll, waiting to move, animatin
 ### ArrayUtils
 Provides a utility to convert integer arrays to formatted strings for debugging purposes.
 
+## Pages
+
+[Main Page](benny-jon.github.io/Parchis2D/)
